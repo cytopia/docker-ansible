@@ -17,7 +17,7 @@
 > [yamllint](https://github.com/cytopia/docker-yamllint)
 
 
-View **[Dockerfile](https://github.com/cytopia/ansible/blob/master/Dockerfile)** on GitHub.
+View **[Dockerfile](https://github.com/cytopia/docker-ansible/blob/master/Dockerfile)** on GitHub.
 
 [![Docker hub](http://dockeri.co/image/cytopia/ansible)](https://hub.docker.com/r/cytopia/ansible)
 
