@@ -17,8 +17,9 @@
 > [yamllint](https://github.com/cytopia/docker-yamllint)
 
 
-[![Docker hub](http://dockeri.co/image/cytopia/ansible)](https://hub.docker.com/r/cytopia/ansible)
+View **[Dockerfile](https://github.com/cytopia/ansible/blob/master/Dockerfile)** on GitHub.
 
+[![Docker hub](http://dockeri.co/image/cytopia/ansible)](https://hub.docker.com/r/cytopia/ansible)
 
 Tiny Alpine-based multistage-build dockerized version of [Ansible](https://github.com/ansible/ansible)<sup>[1]</sup>.
 The image is built nightly against multiple stable versions and pushed to Dockerhub.
