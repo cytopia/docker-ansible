@@ -1,4 +1,10 @@
-.PHONY: build rebuild test tag pull login push enter
+ifneq (,)
+.error This Makefile requires GNU Make.
+endif
+
+.PHONY: build rebuild test _test_version _test_run tag pull login push enter
+
+CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 DIR = .
 FILE = Dockerfile
@@ -12,6 +18,13 @@ rebuild: pull
 	docker build --no-cache --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
 
 test:
+	@$(MAKE) --no-print-directory _test_version
+	@$(MAKE) --no-print-directory _test_run
+
+_test_version:
+	@echo "------------------------------------------------------------"
+	@echo "- Testing correct version"
+	@echo "------------------------------------------------------------"
 	@if [ "$(TAG)" = "latest" ]; then \
 		echo "Fetching latest version from GitHub"; \
 		LATEST="$$( \
@@ -22,11 +35,28 @@ test:
 				| sed 's/.*v//g' \
 		)"; \
 		echo "Testing for latest: $${LATEST}"; \
-		docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $${LATEST}$$"; \
+		if ! docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $${LATEST}$$"; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
 	else \
 		echo "Testing for tag: $(TAG)"; \
-		docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $(TAG)"; \
-	fi
+		if ! docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $(TAG)"; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
+	fi; \
+	echo "Success"; \
+
+_test_run:
+	@echo "------------------------------------------------------------"
+	@echo "- Testing playbook"
+	@echo "------------------------------------------------------------"
+	@if ! docker run --rm -v $(CURRENT_DIR)/tests:/data $(IMAGE) ansible-playbook -i inventory playbook.yml ; then \
+		echo "Failed"; \
+		exit 1; \
+	fi; \
+	echo "Success";
 
 tag:
 	docker tag $(IMAGE) $(IMAGE):$(TAG)
