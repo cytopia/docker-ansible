@@ -12,6 +12,7 @@
 > [ansible](https://github.com/cytopia/docker-ansible) |
 > [ansible-lint](https://github.com/cytopia/docker-ansible-lint) |
 > [awesome-ci](https://github.com/cytopia/awesome-ci) |
+> [eslint](https://github.com/cytopia/docker-eslint) |
 > [jsonlint](https://github.com/cytopia/docker-jsonlint) |
 > [terraform-docs](https://github.com/cytopia/docker-terraform-docs) |
 > [yamllint](https://github.com/cytopia/docker-yamllint)
