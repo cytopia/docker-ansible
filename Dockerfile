@@ -1,4 +1,4 @@
-FROM alpine:latest as builder
+FROM alpine:3.9 as builder
 
 RUN set -x \
 	&& apk add --no-cache \
@@ -22,7 +22,7 @@ RUN set -x \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
 
-FROM alpine:latest as production
+FROM alpine:3.9 as production
 LABEL \
 	maintainer="cytopia <cytopia@everythingcli.org>" \
 	repo="https://github.com/cytopia/docker-ansible"

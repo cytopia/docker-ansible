@@ -46,6 +46,7 @@ install:
 ### Check generation changes, build and test
 ###
 before_script:
+  - make lint
   - while ! make build TAG=${VERSION}; do sleep 1; done
   - while ! make test TAG=${VERSION}; do sleep 1; done
 
