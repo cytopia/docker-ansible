@@ -17,9 +17,12 @@
 > [eslint](https://github.com/cytopia/docker-eslint) **•**
 > [file-lint](https://github.com/cytopia/docker-file-lint) **•**
 > [gofmt](https://github.com/cytopia/docker-gofmt) **•**
+> [goimports](https://github.com/cytopia/docker-phpcs) **•**
 > [golint](https://github.com/cytopia/docker-golint) **•**
 > [jsonlint](https://github.com/cytopia/docker-jsonlint) **•**
+> [phpcbf](https://github.com/cytopia/docker-phpcbf) **•**
 > [phpcs](https://github.com/cytopia/docker-phpcs) **•**
+> [php-cs-fixer](https://github.com/cytopia/docker-php-cs-fixer) **•**
 > [pycodestyle](https://github.com/cytopia/docker-pycodestyle) **•**
 > [pylint](https://github.com/cytopia/docker-pylint) **•**
 > [terraform-docs](https://github.com/cytopia/docker-terraform-docs) **•**
@@ -77,20 +80,25 @@ linter below for reproducible local or remote CI tests:
 |--------------|------|-------------|
 | [awesome-ci](https://github.com/cytopia/awesome-ci) | Basic | Tools for git, file and static source code analysis |
 | [file-lint](https://github.com/cytopia/docker-file-lint) | Basic | Baisc source code analysis |
-| [jsonlint](https://github.com/cytopia/docker-jsonlint) | Basic | Lint JSON files |
+| [jsonlint](https://github.com/cytopia/docker-jsonlint) | Basic | Lint JSON files **<sup>[1]</sup>** |
 | [yamllint](https://github.com/cytopia/docker-yamllint) | Basic | Lint Yaml files |
 | [ansible](https://github.com/cytopia/docker-ansible) | Ansible | Multiple versoins of Ansible |
 | [ansible-lint](https://github.com/cytopia/docker-ansible-lint) | Ansible | Lint  Ansible |
-| [gofmt](https://github.com/cytopia/docker-gofmt) | Go | Format Go source code |
+| [gofmt](https://github.com/cytopia/docker-gofmt) | Go | Format Go source code **<sup>[1]</sup>** |
+| [goimports](https://github.com/cytopia/docker-phpcs) | Go | Format Go source code **<sup>[1]</sup>** |
 | [golint](https://github.com/cytopia/docker-golint) | Go | Lint Go code |
 | [eslint](https://github.com/cytopia/docker-eslint) | Javascript | Lint Javascript code |
 | [checkmake](https://github.com/cytopia/docker-checkmake) | Make | Lint Makefiles |
-| [phpcs](https://github.com/cytopia/docker-phpcs) | PHP | PHPCodeSniffer and Code Beautifier and Fixer |
+| [phpcbf](https://github.com/cytopia/docker-phpcbf) | PHP | PHP Code Beautifier and Fixer |
+| [phpcs](https://github.com/cytopia/docker-phpcs) | PHP | PHP Code Sniffer |
+| [php-cs-fixer](https://github.com/cytopia/docker-php-cs-fixer) | PHP | PHP Coding Standards Fixer |
 | [black](https://github.com/cytopia/docker-black) | Python | The uncompromising Python code formatter |
 | [pycodestyle](https://github.com/cytopia/docker-pycodestyle) | Python | Python style guide checker |
 | [pylint](https://github.com/cytopia/docker-pylint) | Python | Python source code, bug and quality checker |
-| [terraform-docs](https://github.com/cytopia/docker-terraform-docs) | Terraform | Terraform doc generator (TF 0.12 ready) |
+| [terraform-docs](https://github.com/cytopia/docker-terraform-docs) | Terraform | Terraform doc generator (TF 0.12 ready) **<sup>[1]</sup>** |
 | [terragrunt](https://github.com/cytopia/docker-terragrunt) | Terraform | Terragrunt and Terraform |
+
+> **<sup>[1]</sup>** Uses a shell wrapper to add **enhanced functionality** not available by original project.
 
 
 ### Makefiles
