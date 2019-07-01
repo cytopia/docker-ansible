@@ -24,6 +24,7 @@ services:
 ###
 env:
   matrix:
+    - VERSION=2.3
     - VERSION=2.4
     - VERSION=2.5
     - VERSION=2.6
@@ -46,7 +47,7 @@ install:
 ### Check generation changes, build and test
 ###
 before_script:
-  - make lint
+  - while ! make lint; do sleep 1; done
   - while ! make build TAG=${VERSION}; do sleep 1; done
   - while ! make test TAG=${VERSION}; do sleep 1; done
 
