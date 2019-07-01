@@ -54,6 +54,7 @@ The image is built nightly against multiple stable versions and pushed to Docker
 | `2.6`      | Latest stable Ansible 2.6.x version |
 | `2.5`      | Latest stable Ansible 2.5.x version |
 | `2.4`      | Latest stable Ansible 2.4.x version |
+| `2.3`      | Latest stable Ansible 2.3.x version |
 
 
 ## Docker mounts
