@@ -48,6 +48,8 @@ The image is built nightly against multiple stable versions and pushed to Docker
 ## Available Docker image versions
 
 ### Ansible base
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
 
 The following Ansible Docker images are as small as possible and only contain Ansible itself.
 
@@ -62,6 +64,8 @@ The following Ansible Docker images are as small as possible and only contain An
 | `2.3`      | Latest stable Ansible 2.3.x version |
 
 ### Ansible tools
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 
 The following Ansible Docker images contain everything from `Ansible base` and additionally: `jq`.
 
@@ -76,6 +80,8 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 | `2.3-tools`    | Latest stable Ansible 2.3.x version |
 
 ### Ansible aws
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
 
 The following Ansible Docker images contain everything from `Ansible tools` and additionally: `aws-cli`, `boto`, `boto3` and `botocore`.
 
