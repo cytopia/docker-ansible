@@ -17,7 +17,7 @@
 > [eslint](https://github.com/cytopia/docker-eslint) **•**
 > [file-lint](https://github.com/cytopia/docker-file-lint) **•**
 > [gofmt](https://github.com/cytopia/docker-gofmt) **•**
-> [goimports](https://github.com/cytopia/docker-phpcs) **•**
+> [goimports](https://github.com/cytopia/docker-goimports) **•**
 > [golint](https://github.com/cytopia/docker-golint) **•**
 > [jsonlint](https://github.com/cytopia/docker-jsonlint) **•**
 > [phpcbf](https://github.com/cytopia/docker-phpcbf) **•**
@@ -27,6 +27,7 @@
 > [pylint](https://github.com/cytopia/docker-pylint) **•**
 > [terraform-docs](https://github.com/cytopia/docker-terraform-docs) **•**
 > [terragrunt](https://github.com/cytopia/docker-terragrunt) **•**
+> [terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt) **•**
 > [yamllint](https://github.com/cytopia/docker-yamllint)
 
 
@@ -46,6 +47,12 @@ The image is built nightly against multiple stable versions and pushed to Docker
 
 ## Available Docker image versions
 
+### Ansible base
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
+
+The following Ansible Docker images are as small as possible and only contain Ansible itself.
+
 | Docker tag | Build from |
 |------------|------------|
 | `latest`   | Latest stable Ansible version |
@@ -55,6 +62,38 @@ The image is built nightly against multiple stable versions and pushed to Docker
 | `2.5`      | Latest stable Ansible 2.5.x version |
 | `2.4`      | Latest stable Ansible 2.4.x version |
 | `2.3`      | Latest stable Ansible 2.3.x version |
+
+### Ansible tools
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
+
+The following Ansible Docker images contain everything from `Ansible base` and additionally: `jq`.
+
+| Docker tag     | Build from |
+|----------------|------------|
+| `latest-tools` | Latest stable Ansible version |
+| `2.8-tools`    | Latest stable Ansible 2.8.x version |
+| `2.7-tools`    | Latest stable Ansible 2.7.x version |
+| `2.6-tools`    | Latest stable Ansible 2.6.x version |
+| `2.5-tools`    | Latest stable Ansible 2.5.x version |
+| `2.4-tools`    | Latest stable Ansible 2.4.x version |
+| `2.3-tools`    | Latest stable Ansible 2.3.x version |
+
+### Ansible aws
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
+
+The following Ansible Docker images contain everything from `Ansible tools` and additionally: `aws-cli`, `boto`, `boto3` and `botocore`.
+
+| Docker tag     | Build from |
+|----------------|------------|
+| `latest-aws` | Latest stable Ansible version |
+| `2.8-aws`    | Latest stable Ansible 2.8.x version |
+| `2.7-aws`    | Latest stable Ansible 2.7.x version |
+| `2.6-aws`    | Latest stable Ansible 2.6.x version |
+| `2.5-aws`    | Latest stable Ansible 2.5.x version |
+| `2.4-aws`    | Latest stable Ansible 2.4.x version |
+| `2.3-aws`    | Latest stable Ansible 2.3.x version |
 
 
 ## Docker mounts
@@ -86,7 +125,7 @@ linter below for reproducible local or remote CI tests:
 | [ansible](https://github.com/cytopia/docker-ansible) | Ansible | Multiple versoins of Ansible |
 | [ansible-lint](https://github.com/cytopia/docker-ansible-lint) | Ansible | Lint  Ansible |
 | [gofmt](https://github.com/cytopia/docker-gofmt) | Go | Format Go source code **<sup>[1]</sup>** |
-| [goimports](https://github.com/cytopia/docker-phpcs) | Go | Format Go source code **<sup>[1]</sup>** |
+| [goimports](https://github.com/cytopia/docker-goimports) | Go | Format Go source code **<sup>[1]</sup>** |
 | [golint](https://github.com/cytopia/docker-golint) | Go | Lint Go code |
 | [eslint](https://github.com/cytopia/docker-eslint) | Javascript | Lint Javascript code |
 | [checkmake](https://github.com/cytopia/docker-checkmake) | Make | Lint Makefiles |
@@ -98,6 +137,7 @@ linter below for reproducible local or remote CI tests:
 | [pylint](https://github.com/cytopia/docker-pylint) | Python | Python source code, bug and quality checker |
 | [terraform-docs](https://github.com/cytopia/docker-terraform-docs) | Terraform | Terraform doc generator (TF 0.12 ready) **<sup>[1]</sup>** |
 | [terragrunt](https://github.com/cytopia/docker-terragrunt) | Terraform | Terragrunt and Terraform |
+| [terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt) | Terraform | `terraform fmt` for Terragrunt files **<sup>[1]</sup>** |
 
 > **<sup>[1]</sup>** Uses a shell wrapper to add **enhanced functionality** not available by original project.
 
