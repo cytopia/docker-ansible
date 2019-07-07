@@ -12,10 +12,22 @@ IMAGE = cytopia/ansible
 TAG = latest
 
 build:
-	docker build --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
+	@if echo '$(TAG)' | grep -Eq '(latest|[.0-9]+)\-'; then \
+		VERSION="$$( echo '$(TAG)' | grep -Eo '(latest|[.0-9]+)' )"; \
+		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
+		docker build --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
+	else \
+		docker build --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
+	fi
 
 rebuild: pull
-	docker build --no-cache --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
+	@if echo '$(TAG)' | grep -Eq '(latest|[.0-9]+)\-'; then \
+		VERSION="$$( echo '$(TAG)' | grep -Eo '(latest|[.0-9]+)' )"; \
+		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
+		docker build --no-cache --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
+	else \
+		docker build --no-cache --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
+	fi
 
 lint:
 	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-cr --text --ignore '.git/,.github/,tests/' --path .
@@ -33,7 +45,7 @@ _test_version:
 	@echo "------------------------------------------------------------"
 	@echo "- Testing correct version"
 	@echo "------------------------------------------------------------"
-	@if [ "$(TAG)" = "latest" ]; then \
+	@if echo '$(TAG)' | grep -Eq 'latest\-?'; then \
 		echo "Fetching latest version from GitHub"; \
 		LATEST="$$( \
 			curl -L -sS  https://github.com/ansible/ansible/releases/ \
@@ -48,8 +60,9 @@ _test_version:
 			exit 1; \
 		fi; \
 	else \
-		echo "Testing for tag: $(TAG)"; \
-		if ! docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $(TAG)"; then \
+		VERSION="$$( echo '$(TAG)' | grep -Eo '[.0-9]+' )"; \
+		echo "Testing for tag: $${VERSION}"; \
+		if ! docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $${VERSION}"; then \
 			echo "Failed"; \
 			exit 1; \
 		fi; \

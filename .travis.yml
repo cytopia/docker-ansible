@@ -24,6 +24,20 @@ services:
 ###
 env:
   matrix:
+    - VERSION=2.3-aws
+    - VERSION=2.4-aws
+    - VERSION=2.5-aws
+    - VERSION=2.6-aws
+    - VERSION=2.7-aws
+    - VERSION=2.8-aws
+    - VERSION=latest-aws
+    - VERSION=2.3-tools
+    - VERSION=2.4-tools
+    - VERSION=2.5-tools
+    - VERSION=2.6-tools
+    - VERSION=2.7-tools
+    - VERSION=2.8-tools
+    - VERSION=latest-tools
     - VERSION=2.3
     - VERSION=2.4
     - VERSION=2.5
