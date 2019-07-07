@@ -17,7 +17,7 @@
 > [eslint](https://github.com/cytopia/docker-eslint) **•**
 > [file-lint](https://github.com/cytopia/docker-file-lint) **•**
 > [gofmt](https://github.com/cytopia/docker-gofmt) **•**
-> [goimports](https://github.com/cytopia/docker-phpcs) **•**
+> [goimports](https://github.com/cytopia/docker-goimports) **•**
 > [golint](https://github.com/cytopia/docker-golint) **•**
 > [jsonlint](https://github.com/cytopia/docker-jsonlint) **•**
 > [phpcbf](https://github.com/cytopia/docker-phpcbf) **•**
@@ -27,6 +27,7 @@
 > [pylint](https://github.com/cytopia/docker-pylint) **•**
 > [terraform-docs](https://github.com/cytopia/docker-terraform-docs) **•**
 > [terragrunt](https://github.com/cytopia/docker-terragrunt) **•**
+> [terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt) **•**
 > [yamllint](https://github.com/cytopia/docker-yamllint)
 
 
@@ -86,7 +87,7 @@ linter below for reproducible local or remote CI tests:
 | [ansible](https://github.com/cytopia/docker-ansible) | Ansible | Multiple versoins of Ansible |
 | [ansible-lint](https://github.com/cytopia/docker-ansible-lint) | Ansible | Lint  Ansible |
 | [gofmt](https://github.com/cytopia/docker-gofmt) | Go | Format Go source code **<sup>[1]</sup>** |
-| [goimports](https://github.com/cytopia/docker-phpcs) | Go | Format Go source code **<sup>[1]</sup>** |
+| [goimports](https://github.com/cytopia/docker-goimports) | Go | Format Go source code **<sup>[1]</sup>** |
 | [golint](https://github.com/cytopia/docker-golint) | Go | Lint Go code |
 | [eslint](https://github.com/cytopia/docker-eslint) | Javascript | Lint Javascript code |
 | [checkmake](https://github.com/cytopia/docker-checkmake) | Make | Lint Makefiles |
@@ -98,6 +99,7 @@ linter below for reproducible local or remote CI tests:
 | [pylint](https://github.com/cytopia/docker-pylint) | Python | Python source code, bug and quality checker |
 | [terraform-docs](https://github.com/cytopia/docker-terraform-docs) | Terraform | Terraform doc generator (TF 0.12 ready) **<sup>[1]</sup>** |
 | [terragrunt](https://github.com/cytopia/docker-terragrunt) | Terraform | Terragrunt and Terraform |
+| [terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt) | Terraform | `terraform fmt` for Terragrunt files **<sup>[1]</sup>** |
 
 > **<sup>[1]</sup>** Uses a shell wrapper to add **enhanced functionality** not available by original project.
 
