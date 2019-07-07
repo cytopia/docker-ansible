@@ -9,7 +9,7 @@ sudo: required
 ###
 ### Language
 ###
-language: python
+language: minimal
 
 
 ###
@@ -37,19 +37,24 @@ env:
 ### Install requirements
 ###
 install:
-  # Get newer docker version
-  - while ! sudo apt-get update; do sleep 1; done
-  - while ! sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce; do sleep 1; done
-  - docker version
+  - retry() {
+      for ((n=0; n<10; n++)); do
+        echo "[${n}] ${*}";
+        if eval "${*}"; then
+          return 0;
+        fi;
+      done;
+      return 1;
+    }
 
 
 ###
 ### Check generation changes, build and test
 ###
 before_script:
-  - while ! make lint; do sleep 1; done
-  - while ! make build TAG=${VERSION}; do sleep 1; done
-  - while ! make test TAG=${VERSION}; do sleep 1; done
+  - retry make lint
+  - retry make build TAG=${VERSION}
+  - retry make test  TAG=${VERSION}
 
 
 ###
