@@ -28,6 +28,7 @@ LABEL \
 	repo="https://github.com/cytopia/docker-ansible"
 RUN set -x \
 	&& apk add --no-cache \
+		bash \
 		jq \
 		python3 \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \

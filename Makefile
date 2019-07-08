@@ -12,8 +12,8 @@ IMAGE = cytopia/ansible
 TAG = latest
 
 build:
-	@if echo '$(TAG)' | grep -Eq '(latest|[.0-9]+)\-'; then \
-		VERSION="$$( echo '$(TAG)' | grep -Eo '(latest|[.0-9]+)' )"; \
+	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
+		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
 		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
 		docker build --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
 	else \
@@ -21,8 +21,8 @@ build:
 	fi
 
 rebuild: pull
-	@if echo '$(TAG)' | grep -Eq '(latest|[.0-9]+)\-'; then \
-		VERSION="$$( echo '$(TAG)' | grep -Eo '(latest|[.0-9]+)' )"; \
+	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
+		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
 		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
 		docker build --no-cache --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
 	else \
@@ -60,7 +60,7 @@ _test_version:
 			exit 1; \
 		fi; \
 	else \
-		VERSION="$$( echo '$(TAG)' | grep -Eo '[.0-9]+' )"; \
+		VERSION="$$( echo '$(TAG)' | grep -Eo '^[.0-9]+?' )"; \
 		echo "Testing for tag: $${VERSION}"; \
 		if ! docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $${VERSION}"; then \
 			echo "Failed"; \
