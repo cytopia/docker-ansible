@@ -118,10 +118,29 @@ The working directory inside the Docker container is **`/data/`** and should be 
 the root of your project where your Ansible playbooks are.
 
 
-## Usage
+## Examples
 
+### Run Ansible playbook
 ```bash
 docker run --rm -v $(pwd):/data cytopia/ansible ansible-playbook playbook.yml
+```
+
+### Run Ansible playbook with AWS credentials
+```bash
+# Basic
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-aws ansible-playbook playbook.yml
+
+# With AWS Session Token
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-aws ansible-playbook playbook.yml
 ```
 
 
