@@ -30,7 +30,8 @@ RUN set -x \
 	&& pip3 install --no-cache-dir --no-compile awscli \
 	&& rm -r /usr/lib/python3.6/site-packages/awscli/examples \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
-	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf \
+	&& aws --version 2>&1 | grep -E '^aws-cli/[.0-9]+'
 
 
 FROM alpine:3.9 as production
