@@ -53,9 +53,9 @@ The image is built nightly against multiple stable versions and pushed to Docker
 
 The following Ansible Docker images are as small as possible and only contain Ansible itself.
 
-| Docker tag | Build from |
-|------------|------------|
-| `latest`   | Latest stable Ansible version |
+| Docker tag | Build from                          |
+|------------|-------------------------------------|
+| `latest`   | Latest stable Ansible version       |
 | `2.8`      | Latest stable Ansible 2.8.x version |
 | `2.7`      | Latest stable Ansible 2.7.x version |
 | `2.6`      | Latest stable Ansible 2.6.x version |
@@ -67,11 +67,11 @@ The following Ansible Docker images are as small as possible and only contain An
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 
-The following Ansible Docker images contain everything from `Ansible base` and additionally: `jq`.
+The following Ansible Docker images contain everything from `Ansible base` and additionally: `bash` and `jq`.
 
-| Docker tag     | Build from |
-|----------------|------------|
-| `latest-tools` | Latest stable Ansible version |
+| Docker tag     | Build from                          |
+|----------------|-------------------------------------|
+| `latest-tools` | Latest stable Ansible version       |
 | `2.8-tools`    | Latest stable Ansible 2.8.x version |
 | `2.7-tools`    | Latest stable Ansible 2.7.x version |
 | `2.6-tools`    | Latest stable Ansible 2.6.x version |
@@ -85,15 +85,31 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 
 The following Ansible Docker images contain everything from `Ansible tools` and additionally: `aws-cli`, `boto`, `boto3` and `botocore`.
 
-| Docker tag     | Build from |
-|----------------|------------|
-| `latest-aws` | Latest stable Ansible version |
+| Docker tag   | Build from                          |
+|--------------|-------------------------------------|
+| `latest-aws` | Latest stable Ansible version       |
 | `2.8-aws`    | Latest stable Ansible 2.8.x version |
 | `2.7-aws`    | Latest stable Ansible 2.7.x version |
 | `2.6-aws`    | Latest stable Ansible 2.6.x version |
 | `2.5-aws`    | Latest stable Ansible 2.5.x version |
 | `2.4-aws`    | Latest stable Ansible 2.4.x version |
 | `2.3-aws`    | Latest stable Ansible 2.3.x version |
+
+### Ansible awsk8s
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awsk8s.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awsk8s "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awsk8s.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awsk8s "ansible")
+
+The following Ansible Docker images contain everything from `Ansible aws` and additionally: `openshift` and `kubectl`.
+
+| Docker tag      | Build from                          |
+|-----------------|-------------------------------------|
+| `latest-awsk8s` | Latest stable Ansible version       |
+| `2.8-awsk8s`    | Latest stable Ansible 2.8.x version |
+| `2.7-awsk8s`    | Latest stable Ansible 2.7.x version |
+| `2.6-awsk8s`    | Latest stable Ansible 2.6.x version |
+| `2.5-awsk8s`    | Latest stable Ansible 2.5.x version |
+| `2.4-awsk8s`    | Latest stable Ansible 2.4.x version |
+| `2.3-awsk8s`    | Latest stable Ansible 2.3.x version |
 
 
 ## Docker mounts

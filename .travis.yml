@@ -24,6 +24,13 @@ services:
 ###
 env:
   matrix:
+    - VERSION=2.3-awsk8s
+    - VERSION=2.4-awsk8s
+    - VERSION=2.5-awsk8s
+    - VERSION=2.6-awsk8s
+    - VERSION=2.7-awsk8s
+    - VERSION=2.8-awsk8s
+    - VERSION=latest-awsk8s
     - VERSION=2.3-aws
     - VERSION=2.4-aws
     - VERSION=2.5-aws

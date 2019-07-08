@@ -21,6 +21,27 @@ RUN set -x \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
+RUN set -x \
+	&& pip3 install --no-cache-dir --no-compile botocore boto boto3 \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& pip3 install --no-cache-dir --no-compile awscli \
+	&& rm -r /usr/lib/python3.6/site-packages/awscli/examples \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& pip3 install --no-cache-dir --no-compile openshift \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& apk add --no-cache curl \
+	&& curl -sS -L -o /usr/bin/kubectl \
+		https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+	&& chmod +x /usr/bin/kubectl
 
 FROM alpine:3.9 as production
 LABEL \
@@ -46,5 +67,7 @@ RUN set -x \
 COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
 COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
+COPY --from=builder /usr/bin/aws /usr/bin/aws
+COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
 WORKDIR /data
 CMD ["ansible"]
