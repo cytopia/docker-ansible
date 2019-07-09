@@ -15,9 +15,9 @@ build:
 	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
 		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
 		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
-		docker build --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
+		docker build --build-arg KOPS=$(KOPS) --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
 	else \
-		docker build --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
+		docker build --build-arg KOPS=$(KOPS) --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
 	fi
 
 rebuild: pull

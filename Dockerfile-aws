@@ -41,7 +41,9 @@ LABEL \
 RUN set -x \
 	&& apk add --no-cache \
 		bash \
+		git \
 		jq \
+		openssh-client \
 		python3 \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf ansible /usr/bin/ansible-config \
