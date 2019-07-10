@@ -20,10 +20,8 @@ DEFAULT_GID=1000
 ###
 if ! env | grep -q '^USER='; then
 	exec "${@}"
-	exit $?
 elif [ "${USER}" != "ansible" ]; then
 	exec "${@}"
-	exit $?
 fi
 
 
@@ -55,4 +53,8 @@ if [ "${MY_UID}" != "${DEFAULT_UID}" ] || [ "${MY_GID}" != "${DEFAULT_GID}" ]; t
 	adduser -h /home/ansible -s /bin/bash -G ${MY_GROUP} -D -u ${MY_UID} ${MY_USER}
 fi
 
-exec su -l "${MY_USER}" -c "cd /data; ${*}"
+
+###
+### Execute command as 'ansible' user
+###
+exec su "${MY_USER}" -c "${@}"
