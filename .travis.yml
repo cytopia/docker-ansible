@@ -24,6 +24,41 @@ services:
 ###
 env:
   matrix:
+    - VERSION=2.3-awskops KOPS=1.8
+    - VERSION=2.4-awskops KOPS=1.8
+    - VERSION=2.5-awskops KOPS=1.8
+    - VERSION=2.6-awskops KOPS=1.8
+    - VERSION=2.7-awskops KOPS=1.8
+    - VERSION=2.8-awskops KOPS=1.8
+    - VERSION=latest-awskops KOPS=1.8
+    - VERSION=2.3-awskops KOPS=1.9
+    - VERSION=2.4-awskops KOPS=1.9
+    - VERSION=2.5-awskops KOPS=1.9
+    - VERSION=2.6-awskops KOPS=1.9
+    - VERSION=2.7-awskops KOPS=1.9
+    - VERSION=2.8-awskops KOPS=1.9
+    - VERSION=latest-awskops KOPS=1.9
+    - VERSION=2.3-awskops KOPS=1.10
+    - VERSION=2.4-awskops KOPS=1.10
+    - VERSION=2.5-awskops KOPS=1.10
+    - VERSION=2.6-awskops KOPS=1.10
+    - VERSION=2.7-awskops KOPS=1.10
+    - VERSION=2.8-awskops KOPS=1.10
+    - VERSION=latest-awskops KOPS=1.10
+    - VERSION=2.3-awskops KOPS=1.11
+    - VERSION=2.4-awskops KOPS=1.11
+    - VERSION=2.5-awskops KOPS=1.11
+    - VERSION=2.6-awskops KOPS=1.11
+    - VERSION=2.7-awskops KOPS=1.11
+    - VERSION=2.8-awskops KOPS=1.11
+    - VERSION=latest-awskops KOPS=1.11
+    - VERSION=2.3-awskops KOPS=1.12
+    - VERSION=2.4-awskops KOPS=1.12
+    - VERSION=2.5-awskops KOPS=1.12
+    - VERSION=2.6-awskops KOPS=1.12
+    - VERSION=2.7-awskops KOPS=1.12
+    - VERSION=2.8-awskops KOPS=1.12
+    - VERSION=latest-awskops KOPS=1.12
     - VERSION=2.3-awsk8s
     - VERSION=2.4-awsk8s
     - VERSION=2.5-awsk8s
@@ -74,7 +109,7 @@ install:
 ###
 before_script:
   - retry make lint
-  - retry make build TAG=${VERSION}
+  - retry make build TAG=${VERSION} KOPS=${KOPS=}
   - retry make test  TAG=${VERSION}
 
 
@@ -86,11 +121,11 @@ script:
   - if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
       while ! make login USER="${DOCKER_USERNAME}" PASS="${DOCKER_PASSWORD}"; do sleep 1; done;
       if [ -n "${TRAVIS_TAG}" ]; then
-        while ! make push TAG="${VERSION}-${TRAVIS_TAG}"; do sleep 1; done;
+        while ! make push TAG="${VERSION}${KOPS=}-${TRAVIS_TAG}"; do sleep 1; done;
       elif [ "${TRAVIS_BRANCH}" == "master" ]; then
-        while ! make push TAG=${VERSION}; do sleep 1; done;
+        while ! make push TAG=${VERSION}${KOPS=}; do sleep 1; done;
       elif [[ ${TRAVIS_BRANCH} =~ ^(release-[.0-9]+)$ ]]; then
-        while ! make push TAG="${VERSION}-${TRAVIS_BRANCH}"; do sleep 1; done;
+        while ! make push TAG="${VERSION}${KOPS=}-${TRAVIS_BRANCH}"; do sleep 1; done;
       else
         echo "Skipping branch ${TRAVIS_BRANCH}";
       fi

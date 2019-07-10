@@ -4,6 +4,7 @@ RUN set -x \
 	&& apk add --no-cache \
 		bc \
 		gcc \
+		git \
 		libffi-dev \
 		make \
 		musl-dev \
@@ -45,6 +46,21 @@ RUN set -x \
 	&& chmod +x /usr/bin/kubectl \
 	&& kubectl version --client --short=true 2>&1 | grep -E 'v[.0-9]+'
 
+RUN set -x \
+	&& git clone https://github.com/kubernetes/kops
+
+# Install Kops by major and minor version
+ARG KOPS
+RUN set -eux \
+	&& cd kops \
+	# Sort by unique minor versions (without patch) \
+	&& for version in $(git tag | grep -E "^${KOPS}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1); do \
+		echo "${version}"; \
+		curl -sS -L -o /usr/bin/kops https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-amd64; \
+		chmod +x /usr/bin/kops; \
+		/usr/bin/kops version | grep -E "${KOPS}" | grep -E "^Version\s+${version}"; \
+	done
+
 
 FROM alpine:3.9 as production
 LABEL \
@@ -56,6 +72,7 @@ COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
 COPY --from=builder /usr/bin/aws /usr/bin/aws
 COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
+COPY --from=builder /usr/bin/kops /usr/bin/kops
 
 ENV \
 	MY_USER=ansible \
