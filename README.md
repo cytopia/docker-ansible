@@ -39,7 +39,7 @@ View **[Dockerfile](https://github.com/cytopia/docker-ansible/blob/master/Docker
 
 [![Docker hub](http://dockeri.co/image/cytopia/ansible?&kill_cache=1)](https://hub.docker.com/r/cytopia/ansible)
 
-Tiny Alpine-based multistage-build dockerized version of [Ansible](https://github.com/ansible/ansible)<sup>[1]</sup>.
+Tiny Alpine-based multistage-build dockerized version of [Ansible](https://github.com/ansible/ansible)<sup>[1]</sup> in many different flavours.
 The image is built nightly against multiple stable versions and pushed to Dockerhub.
 
 <sup>[1] Official project: https://github.com/ansible/ansible</sup>
@@ -67,7 +67,7 @@ The following Ansible Docker images are as small as possible and only contain An
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 
-The following Ansible Docker images contain everything from `Ansible base` and additionally: `bash`, `git`, `jq` and `ssh`.
+The following Ansible Docker images contain everything from `Ansible base` and additionally: `bash`, `git`, `gpg`, `jq` and `ssh`.
 
 | Docker tag     | Build from                          |
 |----------------|-------------------------------------|
@@ -185,6 +185,17 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.3-awskops1.8`    | Latest stable Ansible 2.3.x version |
 
 
+## Docker environment variables
+
+Environment variables are available for all flavours except for `Ansible base`.
+
+| Variable | Default | Allowed values | Description |
+|----------|---------|----------------|-------------|
+| `USER`   | ``      | `ansible`      | Set this to `ansible` to have everything run inside the container by the user `ansible` instead of `root` |
+| `UID`    | `1000`  | integer        | If your local uid is not `1000` set it to your uid to syncronize file/dir permissions during mounting |
+| `GID`    | `1000`  | integer        | If your local gid is not `1000` set it to your gid to syncronize file/dir permissions during mounting |
+
+
 ## Docker mounts
 
 The working directory inside the Docker container is **`/data/`** and should be mounted locally to
@@ -196,6 +207,64 @@ the root of your project where your Ansible playbooks are.
 ### Run Ansible playbook
 ```bash
 docker run --rm -v $(pwd):/data cytopia/ansible ansible-playbook playbook.yml
+```
+
+### Run Ansible playbook with non-root user
+```bash
+# Use 'ansible' user
+docker run --rm \
+  -e USER=ansible \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
+### Run Ansible playbook with non-root user and uid/gid
+```bash
+# Use 'ansible' user and set local uid/gid
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
+### Run Ansible playbook with local ssh keys mounted
+```bash
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -v ${HOME}/.ssh/:/home/ansible/.ssh/:ro \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
+### Run Ansible playbook with local gpg keys mounted
+```bash
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -v ${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
+### Run Ansible Galaxy
+```bash
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-galaxy install -r requirements.yml
 ```
 
 ### Run Ansible playbook with AWS credentials
@@ -212,6 +281,18 @@ docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-aws ansible-playbook playbook.yml
+
+# With ~/.aws directory mounted (read/only)
+# If you want to make explicit use of aws profiles, use this variant
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -v ${HOME}/.aws:/home/ansible/.aws:ro \
   -v $(pwd):/data \
   cytopia/ansible:latest-aws ansible-playbook playbook.yml
 ```

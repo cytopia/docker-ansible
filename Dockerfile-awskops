@@ -84,6 +84,14 @@ RUN set -x \
 	&& addgroup -g ${MY_GID} ${MY_GROUP} \
 	&& adduser -h /home/ansible -s /bin/bash -G ${MY_GROUP} -D -u ${MY_UID} ${MY_USER} \
 	\
+	&& mkdir /home/ansible/.gnupg \
+	&& chown ansible:ansible /home/ansible/.gnupg \
+	&& chmod 0700 /home/ansible/.gnupg \
+	\
+	&& mkdir /home/ansible/.ssh \
+	&& chown ansible:ansible /home/ansible/.ssh \
+	&& chmod 0755 /home/ansible/.ssh \
+	\
 	&& mkdir /data \
 	&& chown ansible:ansible /data \
 	&& chmod 0755 /data \
@@ -92,8 +100,8 @@ RUN set -x \
 		bash \
 		git \
 		gnupg \
-		openssh-client \
 		jq \
+		openssh-client \
 		python3 \
 	\
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
