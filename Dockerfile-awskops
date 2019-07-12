@@ -92,6 +92,10 @@ RUN set -x \
 	&& chown ansible:ansible /home/ansible/.ssh \
 	&& chmod 0755 /home/ansible/.ssh \
 	\
+	&& mkdir /home/ansible/.aws \
+	&& chown ansible:ansible /home/ansible/.aws \
+	&& chmod 0700 /home/ansible/.aws \
+	\
 	&& mkdir /data \
 	&& chown ansible:ansible /data \
 	&& chmod 0755 /data \

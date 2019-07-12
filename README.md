@@ -211,16 +211,15 @@ docker run --rm -v $(pwd):/data cytopia/ansible ansible-playbook playbook.yml
 
 ### Run Ansible playbook with non-root user
 ```bash
-# Use 'ansible' user
+# Use 'ansible' user inside Docker container
 docker run --rm \
   -e USER=ansible \
   -v $(pwd):/data \
   cytopia/ansible:latest-tools ansible-playbook playbook.yml
 ```
-
-### Run Ansible playbook with non-root user and uid/gid
 ```bash
-# Use 'ansible' user and set local uid/gid
+# Use 'ansible' user inside Docker container
+# Use custom uid/gid for 'ansible' user inside Docker container
 docker run --rm \
   -e USER=ansible \
   -e MY_UID=1000 \
@@ -275,7 +274,8 @@ docker run --rm \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -v $(pwd):/data \
   cytopia/ansible:latest-aws ansible-playbook playbook.yml
-
+```
+```bash
 # With AWS Session Token
 docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
@@ -283,8 +283,9 @@ docker run --rm \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
   -v $(pwd):/data \
   cytopia/ansible:latest-aws ansible-playbook playbook.yml
-
-# With ~/.aws directory mounted (read/only)
+```
+```bash
+# With ~/.aws/ config and credentials directories mounted (read/only)
 # If you want to make explicit use of aws profiles, use this variant
 # Ensure to set same uid/gid as on your local system for Docker user
 # to prevent permission issues during docker mounts
@@ -292,9 +293,88 @@ docker run --rm \
   -e USER=ansible \
   -e MY_UID=1000 \
   -e MY_GID=1000 \
-  -v ${HOME}/.aws:/home/ansible/.aws:ro \
+  -v ${HOME}/.aws/config:/home/ansible/.aws/config:ro \
+  -v ${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
   -v $(pwd):/data \
   cytopia/ansible:latest-aws ansible-playbook playbook.yml
+```
+
+### Run Ansible playbook against AWS and gpg vault initialization
+Imagine your Ansible vault uses a script to gpg encrypt the passphrase for team members against
+multiple gpg keys. Using Docker will not allow you to have a popup open where you can enter the
+gpg key password. To circumvent this, you will need to initialize the gpg key password and then
+run Ansible.
+
+The following Ansible vault script which can be shows how this is setup:
+```bash
+#!/bin/sh
+# Read password from argument
+if [ "${#}" -gt "0" ]; then
+	gpg --pinentry-mode loopback --passphrase "${1}" --decrypt vault/pass.gpg
+# Ask for password or use keyring (does not work inside Docker)
+else
+	gpg --batch --use-agent --decrypt vault/pass.gpg
+fi
+```
+
+With this in mind the Ansible call would look as follows
+```bash
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -v ${HOME}/.aws/config:/home/ansible/.aws/config:ro \
+  -v ${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
+  -v ${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+  -v $(pwd):/data \
+  cytopia/ansible \
+  sh -c './vault/open_vault.sh '''THE_GPG_PASSWORD_HERE'''; ansible-playbook playbook.yml'
+```
+* **Note 1:** the quoting for the GPG password is required in case you are using a `!` as part of the passwort
+* **Note 2:** every `$` sign in your password will require 3 backslashes in front of it: `\\\$`
+
+As the command is getting pretty long, you could wrap it into a Makefile.
+```make
+ifneq (,)
+.error This Makefile requires GNU Make.
+endif
+
+.PHONY: dry run
+
+CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+GPG_PASS =
+
+dry:
+	docker run --rm \
+		-e USER=ansible \
+		-e MY_UID=1000 \
+		-e MY_GID=1000 \
+		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
+		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
+		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+		-v $(CURRENT_DIR):/data \
+		cytopia/ansible \
+		sh -c './vault/open_vault.sh '''$(GPG_PASS)'''; ansible-playbook playbook.yml --check'
+
+run:
+	docker run --rm \
+		-e USER=ansible \
+		-e MY_UID=1000 \
+		-e MY_GID=1000 \
+		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
+		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
+		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+		-v $(CURRENT_DIR):/data \
+		cytopia/ansible \
+		sh -c './vault/open_vault.sh '''$(GPG_PASS)'''; ansible-playbook playbook.yml'
+```
+
+Then you can call it easily:
+```bash
+make dry GPG_PASS='THE_GPG_PASSWORD_HERE'
+make run GPG_PASS='THE_GPG_PASSWORD_HERE'
 ```
 
 
