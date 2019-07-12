@@ -1,0 +1,125 @@
+FROM alpine:3.9 as builder
+
+RUN set -x \
+	&& apk add --no-cache \
+		bc \
+		gcc \
+		git \
+		libffi-dev \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3 \
+		python3-dev
+
+ARG VERSION=latest
+RUN set -x \
+	&& if [ "${VERSION}" = "latest" ]; then \
+		pip3 install --no-cache-dir --no-compile ansible; \
+	else \
+		pip3 install --no-cache-dir --no-compile "ansible>=${VERSION},<$(echo "${VERSION}+0.1" | bc)"; \
+	fi \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& pip3 install --no-cache-dir --no-compile botocore boto boto3 \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& pip3 install --no-cache-dir --no-compile awscli \
+	&& rm -r /usr/lib/python3.6/site-packages/awscli/examples \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf \
+	&& aws --version 2>&1 | grep -E '^aws-cli/[.0-9]+'
+
+RUN set -x \
+	&& pip3 install --no-cache-dir --no-compile openshift \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& apk add --no-cache curl \
+	&& curl -sS -L -o /usr/bin/kubectl \
+		https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+	&& chmod +x /usr/bin/kubectl \
+	&& kubectl version --client --short=true 2>&1 | grep -E 'v[.0-9]+'
+
+ARG HELM
+# Install Helm by major and minor version
+RUN set -x \
+	&& git clone https://github.com/helm/helm \
+	&& cd helm \
+	# Sort by unique minor versions (without patch) \
+	&& version="$(git tag | grep -E "^v${HELM}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1)" \
+	&& echo "${version}" \
+	&& curl -sS -L -O https://get.helm.sh/helm-${version}-linux-amd64.tar.gz \
+	&& tar xvfz helm-${version}-linux-amd64.tar.gz \
+	&& mv linux-amd64/helm /usr/bin/helm \
+	&& chmod +x /usr/bin/helm \
+	&& /usr/bin/helm version | grep -E "${HELM}" | grep -E "${version}"
+
+FROM alpine:3.9 as production
+LABEL \
+	maintainer="cytopia <cytopia@everythingcli.org>" \
+	repo="https://github.com/cytopia/docker-ansible"
+
+COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/bin/ansible /usr/bin/ansible
+COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
+COPY --from=builder /usr/bin/aws /usr/bin/aws
+COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
+COPY --from=builder /usr/bin/helm /usr/bin/helm
+
+ENV \
+	MY_USER=ansible \
+	MY_GROUP=ansible \
+	MY_UID=1000 \
+	MY_GID=1000
+
+RUN set -x \
+	&& addgroup -g ${MY_GID} ${MY_GROUP} \
+	&& adduser -h /home/ansible -s /bin/bash -G ${MY_GROUP} -D -u ${MY_UID} ${MY_USER} \
+	\
+	&& mkdir /home/ansible/.gnupg \
+	&& chown ansible:ansible /home/ansible/.gnupg \
+	&& chmod 0700 /home/ansible/.gnupg \
+	\
+	&& mkdir /home/ansible/.ssh \
+	&& chown ansible:ansible /home/ansible/.ssh \
+	&& chmod 0755 /home/ansible/.ssh \
+	\
+	&& mkdir /home/ansible/.aws \
+	&& chown ansible:ansible /home/ansible/.aws \
+	&& chmod 0700 /home/ansible/.aws \
+	\
+	&& mkdir /data \
+	&& chown ansible:ansible /data \
+	&& chmod 0755 /data \
+	\
+	&& apk add --no-cache \
+		bash \
+		git \
+		gnupg \
+		jq \
+		openssh-client \
+		python3 \
+	\
+	&& ln -sf /usr/bin/python3 /usr/bin/python \
+	&& ln -sf ansible /usr/bin/ansible-config \
+	&& ln -sf ansible /usr/bin/ansible-console \
+	&& ln -sf ansible /usr/bin/ansible-doc \
+	&& ln -sf ansible /usr/bin/ansible-galaxy \
+	&& ln -sf ansible /usr/bin/ansible-inventory \
+	&& ln -sf ansible /usr/bin/ansible-playbook \
+	&& ln -sf ansible /usr/bin/ansible-pull \
+	&& ln -sf ansible /usr/bin/ansible-test \
+	&& ln -sf ansible /usr/bin/ansible-vault \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
+WORKDIR /data
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["ansible"]
