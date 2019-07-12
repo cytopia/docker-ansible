@@ -46,18 +46,19 @@ RUN set -x \
 	&& chmod +x /usr/bin/kubectl \
 	&& kubectl version --client --short=true 2>&1 | grep -E 'v[.0-9]+'
 
-ARG KOPS
-# Install Kops by major and minor version
+ARG HELM
+# Install Helm by major and minor version
 RUN set -x \
-	&& git clone https://github.com/kubernetes/kops \
-	&& cd kops \
-	# Get latest feature version
-	&& version="$(git tag | grep -E "^${KOPS}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1)" \
+	&& git clone https://github.com/helm/helm \
+	&& cd helm \
+	# Sort by unique minor versions (without patch) \
+	&& version="$(git tag | grep -E "^v${HELM}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1)" \
 	&& echo "${version}" \
-	&& curl -sS -L -o /usr/bin/kops https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-amd64 \
-	&& chmod +x /usr/bin/kops \
-	&& /usr/bin/kops version | grep -E "${KOPS}" | grep -E "^Version\s+${version}"
-
+	&& curl -sS -L -O https://get.helm.sh/helm-${version}-linux-amd64.tar.gz \
+	&& tar xvfz helm-${version}-linux-amd64.tar.gz \
+	&& mv linux-amd64/helm /usr/bin/helm \
+	&& chmod +x /usr/bin/helm \
+	&& /usr/bin/helm version | grep -E "${HELM}" | grep -E "${version}"
 
 FROM alpine:3.9 as production
 LABEL \
@@ -69,7 +70,7 @@ COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
 COPY --from=builder /usr/bin/aws /usr/bin/aws
 COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
-COPY --from=builder /usr/bin/kops /usr/bin/kops
+COPY --from=builder /usr/bin/helm /usr/bin/helm
 
 ENV \
 	MY_USER=ansible \
