@@ -4,6 +4,7 @@
 [![Tag](https://img.shields.io/github/tag/cytopia/docker-ansible.svg)](https://github.com/cytopia/docker-ansible/releases)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
+[![](https://img.shields.io/docker/pulls/cytopia/ansible.svg)](https://hub.docker.com/r/cytopia/ansible)
 [![](https://img.shields.io/badge/github-cytopia%2Fdocker--ansible-red.svg)](https://github.com/cytopia/docker-ansible "github.com/cytopia/docker-ansible")
 [![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
@@ -388,11 +389,11 @@ docker run --rm \
   -v ${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
   -v ${HOME}/.gnupg/:/home/ansible/.gnupg/ \
   -v $(pwd):/data \
-  cytopia/ansible \
+  cytopia/ansible:latest-aws \
   sh -c './vault/open_vault.sh '''THE_GPG_PASSWORD_HERE'''; ansible-playbook playbook.yml'
 ```
 * **Note 1:** the quoting for the GPG password is required in case you are using a `!` as part of the passwort
-* **Note 2:** every `$` sign in your password will require 3 backslashes in front of it: `\\\$`
+* **Note 2:** every `$` sign in your GPG password will require 3 backslashes in front of it: `\\\$`
 
 As the command is getting pretty long, you could wrap it into a Makefile.
 ```make
@@ -403,38 +404,79 @@ endif
 .PHONY: dry run
 
 CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-GPG_PASS =
+ANSIBLE = 2.8
+UID = 1000
+GID = 1000
 
 dry:
+ifndef GPG_PASS
 	docker run --rm \
 		-e USER=ansible \
-		-e MY_UID=1000 \
-		-e MY_GID=1000 \
+		-e MY_UID=$(UID) \
+		-e MY_GID=$(GID) \
 		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
 		-v $(CURRENT_DIR):/data \
-		cytopia/ansible \
+		cytopia/ansible:$(ANSIBLE)-aws ansible-playbook playbook.yml --check
+else
+	docker run --rm \
+		-e USER=ansible \
+		-e MY_UID=$(UID) \
+		-e MY_GID=$(GID) \
+		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
+		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
+		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+		-v $(CURRENT_DIR):/data \
+		cytopia/ansible:$(ANSIBLE)-aws \
 		sh -c './vault/open_vault.sh '''$(GPG_PASS)'''; ansible-playbook playbook.yml --check'
+endif
 
 run:
+ifndef GPG_PASS
 	docker run --rm \
 		-e USER=ansible \
-		-e MY_UID=1000 \
-		-e MY_GID=1000 \
+		-e MY_UID=$(UID) \
+		-e MY_GID=$(GID) \
 		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
 		-v $(CURRENT_DIR):/data \
-		cytopia/ansible \
+		cytopia/ansible:$(ANSIBLE)-aws ansible-playbook playbook.yml
+else
+	docker run --rm \
+		-e USER=ansible \
+		-e MY_UID=$(UID) \
+		-e MY_GID=$(GID) \
+		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
+		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
+		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+		-v $(CURRENT_DIR):/data \
+		cytopia/ansible:$(ANSIBLE)-aws \
 		sh -c './vault/open_vault.sh '''$(GPG_PASS)'''; ansible-playbook playbook.yml'
+endif
 ```
 
 Then you can call it easily:
 ```bash
+# With GPG password
 make dry GPG_PASS='THE_GPG_PASSWORD_HERE'
 make run GPG_PASS='THE_GPG_PASSWORD_HERE'
+
+# Without GPG password
+make dry
+make run
+
+# With different Ansible version
+make dry ANSIBLE=2.6
+make run ANSIBLE=2.6
+
+# With different uid/gid
+make dry UID=1001 GID=1001
+make run UID=1001 GID=1001
 ```
+
+* **Note:** every `$` sign in your GPG password will require 3 backslashes in front of it: `\\\$`
 
 
 ## Related [#awesome-ci](https://github.com/topics/awesome-ci) projects
