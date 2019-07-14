@@ -205,7 +205,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.4-awshelm2.14`    | Latest stable Ansible 2.4.x version |
 | `2.3-awshelm2.14`    | Latest stable Ansible 2.3.x version |
 
-#### Heml 2.13 (latest 2.13.x)
+#### Helm 2.13 (latest 2.13.x)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awshelm2.13.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm2.13 "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awshelm2.13.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm2.13 "ansible")
 
