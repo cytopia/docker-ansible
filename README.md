@@ -278,13 +278,21 @@ docker run --rm -v $(pwd):/data cytopia/ansible ansible-playbook playbook.yml
 
 > No changes are required to target hosts. The extension is considered stable and real-world use is encouraged.
 
-**Configuration**
+**Configuration (option 1)**
 
 `ansible.cfg`
 ```ini
 [defaults]
 strategy_plugins = /usr/lib/python3.6/site-packages/ansible_mitogen/plugins/strategy
 strategy         = mitogen_linear
+```
+
+**Configuratoin (option 2)**
+```bash
+# Instead of hardcoding it via ansible.cfg,  you could also add the
+# option on-the-fly via environment variables.
+export ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.6/site-packages/ansible_mitogen/plugins/strategy
+export ANSIBLE_STRATEGY=mitogen_linear
 ```
 
 **Invocation**
