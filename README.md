@@ -40,9 +40,13 @@ View **[Dockerfile](https://github.com/cytopia/docker-ansible/blob/master/Docker
 [![Docker hub](http://dockeri.co/image/cytopia/ansible?&kill_cache=1)](https://hub.docker.com/r/cytopia/ansible)
 
 Tiny Alpine-based multistage-build dockerized version of [Ansible](https://github.com/ansible/ansible)<sup>[1]</sup> in many different flavours.
+It comes with **[Mitogen](https://github.com/dw/mitogen)**<sup>[2]</sup> to speed up your runs by up to **600%**<sup>[3][4]</sup> (see [Examples](#run-ansible-playbook-with-mitogen)).
 The image is built nightly against multiple stable versions and pushed to Dockerhub.
 
-<sup>[1] Official project: https://github.com/ansible/ansible</sup>
+* <sup>[1] Official project: https://github.com/ansible/ansible</sup>
+* <sup>[2] Official project: https://github.com/dw/mitogen</sup>
+* <sup>[3] [How to Speed Up Your Ansible Playbooks Over 600%](https://www.toptechskills.com/ansible-tutorials-courses/speed-up-ansible-playbooks-pipelining-mitogen/)</sup>
+* <sup>[4] [Mitogen for Ansible](https://networkgenomics.com/ansible/)</sup>
 
 
 ## Available Docker image versions
@@ -67,7 +71,7 @@ The following Ansible Docker images are as small as possible and only contain An
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 
-The following Ansible Docker images contain everything from `Ansible base` and additionally: `bash`, `git`, `gpg`, `jq` and `ssh`.
+The following Ansible Docker images contain everything from `Ansible base` and additionally: `bash`, `git`, `gpg`, `jq`, `ssh` and Ansible **`mitogen`** strategy plugin (see [Examples](#run-ansible-playbook-with-mitogen)).
 
 | Docker tag     | Build from                          |
 |----------------|-------------------------------------|
@@ -267,6 +271,35 @@ the root of your project where your Ansible playbooks are.
 ```bash
 docker run --rm -v $(pwd):/data cytopia/ansible ansible-playbook playbook.yml
 ```
+
+### Run Ansible playbook with Mitogen
+
+> [Mitogen](https://github.com/dw/mitogen) updates Ansible’s slow and wasteful shell-centric implementation with pure-Python equivalents, invoked via highly efficient remote procedure calls to persistent interpreters tunnelled over SSH.
+
+> No changes are required to target hosts. The extension is considered stable and real-world use is encouraged.
+
+**Configuration**
+
+`ansible.cfg`
+```ini
+[defaults]
+strategy_plugins = /usr/lib/python3.6/site-packages/ansible_mitogen/plugins/strategy
+strategy         = mitogen_linear
+```
+
+**Invocation**
+
+```bash
+docker run --rm -v $(pwd):/data cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
+**Further readings:**
+
+* [Mitogen on GitHub](https://github.com/dw/mitogen)
+* [Mitogen Documentation](https://networkgenomics.com/ansible/)
+* [How to Speed Up Your Ansible Playbooks Over 600%](https://www.toptechskills.com/ansible-tutorials-courses/speed-up-ansible-playbooks-pipelining-mitogen/)
+* [Speed up Ansible with Mitogen](https://dev.to/sshnaidm/speed-up-ansible-with-mitogen-2c3j)
+
 
 ### Run Ansible playbook with non-root user
 ```bash
