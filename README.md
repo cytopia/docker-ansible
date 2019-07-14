@@ -519,6 +519,77 @@ make run UID=1001 GID=1001
 * **Note:** every `$` sign in your GPG password will require 3 backslashes in front of it: `\\\$`
 
 
+## Build locally
+
+To build locally you require GNU Make to be installed. The default build procedure is to always
+build as the `latest` tag, so you will have to manually retag the image after build.
+Instructions as  shown below.
+
+### Ansible base
+```bash
+# Build latest Ansible base
+make build
+
+# Build Ansible 2.6 base
+make build TAG=2.6
+make tag   TAG=2.6
+```
+### Ansible tools
+```bash
+# Build latest Ansible tools
+make build TAG=latest-tools
+make tag   TAG=latest-tools
+
+# Build Ansible 2.6 aws
+make build TAG=2.6-tools
+make tag   TAG=2.6-tools
+```
+
+### Ansible aws
+```bash
+# Build latest Ansible aws
+make build TAG=latest-aws
+make tag   TAG=latest-aws
+
+# Build Ansible 2.6 aws
+make build TAG=2.6-aws
+make tag   TAG=2.6-aws
+```
+
+### Ansible awsk8s
+```bash
+# Build latest Ansible k8s
+make build TAG=latest-awsk8s
+make tag   TAG=latest-awsk8ks
+
+# Build Ansible 2.6 k8s
+make build TAG=2.6-awsk8s
+make tag   TAG=2.6-awsk8s
+```
+
+### Ansible awskops
+```bash
+# Build latest Ansible with Kops 1.8
+make build TAG=latest-awskops KOPS=1.8
+make tag   TAG=latest-awskops1.8
+
+# Build Ansible 2.6 with Kops 1.8
+make build TAG=2.6-awskops KOPS=1.8
+make tag   TAG=2.6-awskops1.8
+```
+
+### Ansible awshelm
+```bash
+# Build latest Ansible with Helm 2.14
+make build TAG=latest-awshelm HELM=2.14
+make tag   TAG=latest-awshelm2.14
+
+# Build Ansible 2.6 with Helm 2.14
+make build TAG=2.6-awshelm HELM=2.14
+make tag   TAG=2.6-awshelm2.14
+```
+
+
 ## Related [#awesome-ci](https://github.com/topics/awesome-ci) projects
 
 ### Docker images
