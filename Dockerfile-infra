@@ -1,0 +1,91 @@
+FROM alpine:3.9 as builder
+
+RUN set -x \
+	&& apk add --no-cache \
+		bc \
+		gcc \
+		libffi-dev \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3 \
+		python3-dev
+
+ARG VERSION=latest
+RUN set -x \
+	&& if [ "${VERSION}" = "latest" ]; then \
+		pip3 install --no-cache-dir --no-compile ansible; \
+	else \
+		pip3 install --no-cache-dir --no-compile "ansible>=${VERSION},<$(echo "${VERSION}+0.1" | bc)"; \
+	fi \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& pip3 install --no-cache-dir --no-compile mitogen \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -x \
+	&& apk add --no-cache postgresql-dev postgresql-libs \
+	&& pip3 install --no-cache-dir --no-compile docker psycopg2 pymongo PyMySQL \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+
+FROM alpine:3.9 as production
+LABEL \
+	maintainer="cytopia <cytopia@everythingcli.org>" \
+	repo="https://github.com/cytopia/docker-ansible"
+
+COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/bin/ansible /usr/bin/ansible
+COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
+
+ENV \
+	MY_USER=ansible \
+	MY_GROUP=ansible \
+	MY_UID=1000 \
+	MY_GID=1000
+
+RUN set -x \
+	&& addgroup -g ${MY_GID} ${MY_GROUP} \
+	&& adduser -h /home/ansible -s /bin/bash -G ${MY_GROUP} -D -u ${MY_UID} ${MY_USER} \
+	\
+	&& mkdir /home/ansible/.gnupg \
+	&& chown ansible:ansible /home/ansible/.gnupg \
+	&& chmod 0700 /home/ansible/.gnupg \
+	\
+	&& mkdir /home/ansible/.ssh \
+	&& chown ansible:ansible /home/ansible/.ssh \
+	&& chmod 0755 /home/ansible/.ssh \
+	\
+	&& mkdir /data \
+	&& chown ansible:ansible /data \
+	&& chmod 0755 /data \
+	\
+	&& apk add --no-cache \
+		bash \
+		git \
+		gnupg \
+		jq \
+		openssh-client \
+		python3 \
+	\
+	&& ln -sf /usr/bin/python3 /usr/bin/python \
+	&& ln -sf ansible /usr/bin/ansible-config \
+	&& ln -sf ansible /usr/bin/ansible-console \
+	&& ln -sf ansible /usr/bin/ansible-doc \
+	&& ln -sf ansible /usr/bin/ansible-galaxy \
+	&& ln -sf ansible /usr/bin/ansible-inventory \
+	&& ln -sf ansible /usr/bin/ansible-playbook \
+	&& ln -sf ansible /usr/bin/ansible-pull \
+	&& ln -sf ansible /usr/bin/ansible-test \
+	&& ln -sf ansible /usr/bin/ansible-vault \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
+WORKDIR /data
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["ansible"]

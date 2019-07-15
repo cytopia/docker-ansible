@@ -83,6 +83,22 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 | `2.4-tools`    | Latest stable Ansible 2.4.x version |
 | `2.3-tools`    | Latest stable Ansible 2.3.x version |
 
+### Ansible infra
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-infra.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-infra "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-infra.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-infra "ansible")
+
+The following Ansible Docker images contain everything from `Ansible tools` and additionally: `docker`, `psycopg2`, `pymongo` and `PyMySQL` Python libraries.
+
+| Docker tag     | Build from                          |
+|----------------|-------------------------------------|
+| `latest-infra` | Latest stable Ansible version       |
+| `2.8-infra`    | Latest stable Ansible 2.8.x version |
+| `2.7-infra`    | Latest stable Ansible 2.7.x version |
+| `2.6-infra`    | Latest stable Ansible 2.6.x version |
+| `2.5-infra`    | Latest stable Ansible 2.5.x version |
+| `2.4-infra`    | Latest stable Ansible 2.4.x version |
+| `2.3-infra`    | Latest stable Ansible 2.3.x version |
+
 ### Ansible aws
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
@@ -540,9 +556,20 @@ make tag   TAG=2.6
 make build TAG=latest-tools
 make tag   TAG=latest-tools
 
-# Build Ansible 2.6 aws
+# Build Ansible 2.6 tools
 make build TAG=2.6-tools
 make tag   TAG=2.6-tools
+```
+
+### Ansible infra
+```bash
+# Build latest Ansible infra
+make build TAG=latest-infra
+make tag   TAG=latest-infra
+
+# Build Ansible 2.6 infra
+make build TAG=2.6-infra
+make tag   TAG=2.6-infra
 ```
 
 ### Ansible aws
