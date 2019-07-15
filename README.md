@@ -40,9 +40,13 @@ View **[Dockerfile](https://github.com/cytopia/docker-ansible/blob/master/Docker
 [![Docker hub](http://dockeri.co/image/cytopia/ansible?&kill_cache=1)](https://hub.docker.com/r/cytopia/ansible)
 
 Tiny Alpine-based multistage-build dockerized version of [Ansible](https://github.com/ansible/ansible)<sup>[1]</sup> in many different flavours.
+It comes with **[Mitogen](https://github.com/dw/mitogen)**<sup>[2]</sup> to speed up your runs by up to **600%**<sup>[3][4]</sup> (see [Examples](#run-ansible-playbook-with-mitogen)).
 The image is built nightly against multiple stable versions and pushed to Dockerhub.
 
-<sup>[1] Official project: https://github.com/ansible/ansible</sup>
+* <sup>[1] Official project: https://github.com/ansible/ansible</sup>
+* <sup>[2] Official project: https://github.com/dw/mitogen</sup>
+* <sup>[3] [How to Speed Up Your Ansible Playbooks Over 600%](https://www.toptechskills.com/ansible-tutorials-courses/speed-up-ansible-playbooks-pipelining-mitogen/)</sup>
+* <sup>[4] [Mitogen for Ansible](https://networkgenomics.com/ansible/)</sup>
 
 
 ## Available Docker image versions
@@ -67,7 +71,7 @@ The following Ansible Docker images are as small as possible and only contain An
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-tools.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-tools "ansible")
 
-The following Ansible Docker images contain everything from `Ansible base` and additionally: `bash`, `git`, `gpg`, `jq` and `ssh`.
+The following Ansible Docker images contain everything from `Ansible base` and additionally: `bash`, `git`, `gpg`, `jq`, `ssh` and Ansible **`mitogen`** strategy plugin (see [Examples](#run-ansible-playbook-with-mitogen)).
 
 | Docker tag     | Build from                          |
 |----------------|-------------------------------------|
@@ -201,7 +205,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.4-awshelm2.14`    | Latest stable Ansible 2.4.x version |
 | `2.3-awshelm2.14`    | Latest stable Ansible 2.3.x version |
 
-#### Heml 2.13 (latest 2.13.x)
+#### Helm 2.13 (latest 2.13.x)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awshelm2.13.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm2.13 "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awshelm2.13.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm2.13 "ansible")
 
@@ -267,6 +271,43 @@ the root of your project where your Ansible playbooks are.
 ```bash
 docker run --rm -v $(pwd):/data cytopia/ansible ansible-playbook playbook.yml
 ```
+
+### Run Ansible playbook with Mitogen
+
+> [Mitogen](https://github.com/dw/mitogen) updates Ansible’s slow and wasteful shell-centric implementation with pure-Python equivalents, invoked via highly efficient remote procedure calls to persistent interpreters tunnelled over SSH.
+
+> No changes are required to target hosts. The extension is considered stable and real-world use is encouraged.
+
+**Configuration (option 1)**
+
+`ansible.cfg`
+```ini
+[defaults]
+strategy_plugins = /usr/lib/python3.6/site-packages/ansible_mitogen/plugins/strategy
+strategy         = mitogen_linear
+```
+
+**Configuratoin (option 2)**
+```bash
+# Instead of hardcoding it via ansible.cfg,  you could also add the
+# option on-the-fly via environment variables.
+export ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.6/site-packages/ansible_mitogen/plugins/strategy
+export ANSIBLE_STRATEGY=mitogen_linear
+```
+
+**Invocation**
+
+```bash
+docker run --rm -v $(pwd):/data cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
+**Further readings:**
+
+* [Mitogen on GitHub](https://github.com/dw/mitogen)
+* [Mitogen Documentation](https://networkgenomics.com/ansible/)
+* [How to Speed Up Your Ansible Playbooks Over 600%](https://www.toptechskills.com/ansible-tutorials-courses/speed-up-ansible-playbooks-pipelining-mitogen/)
+* [Speed up Ansible with Mitogen](https://dev.to/sshnaidm/speed-up-ansible-with-mitogen-2c3j)
+
 
 ### Run Ansible playbook with non-root user
 ```bash
@@ -476,6 +517,77 @@ make run UID=1001 GID=1001
 ```
 
 * **Note:** every `$` sign in your GPG password will require 3 backslashes in front of it: `\\\$`
+
+
+## Build locally
+
+To build locally you require GNU Make to be installed. The default build procedure is to always
+build as the `latest` tag, so you will have to manually retag the image after build.
+Instructions as  shown below.
+
+### Ansible base
+```bash
+# Build latest Ansible base
+make build
+
+# Build Ansible 2.6 base
+make build TAG=2.6
+make tag   TAG=2.6
+```
+### Ansible tools
+```bash
+# Build latest Ansible tools
+make build TAG=latest-tools
+make tag   TAG=latest-tools
+
+# Build Ansible 2.6 aws
+make build TAG=2.6-tools
+make tag   TAG=2.6-tools
+```
+
+### Ansible aws
+```bash
+# Build latest Ansible aws
+make build TAG=latest-aws
+make tag   TAG=latest-aws
+
+# Build Ansible 2.6 aws
+make build TAG=2.6-aws
+make tag   TAG=2.6-aws
+```
+
+### Ansible awsk8s
+```bash
+# Build latest Ansible k8s
+make build TAG=latest-awsk8s
+make tag   TAG=latest-awsk8ks
+
+# Build Ansible 2.6 k8s
+make build TAG=2.6-awsk8s
+make tag   TAG=2.6-awsk8s
+```
+
+### Ansible awskops
+```bash
+# Build latest Ansible with Kops 1.8
+make build TAG=latest-awskops KOPS=1.8
+make tag   TAG=latest-awskops1.8
+
+# Build Ansible 2.6 with Kops 1.8
+make build TAG=2.6-awskops KOPS=1.8
+make tag   TAG=2.6-awskops1.8
+```
+
+### Ansible awshelm
+```bash
+# Build latest Ansible with Helm 2.14
+make build TAG=latest-awshelm HELM=2.14
+make tag   TAG=latest-awshelm2.14
+
+# Build Ansible 2.6 with Helm 2.14
+make build TAG=2.6-awshelm HELM=2.14
+make tag   TAG=2.6-awshelm2.14
+```
 
 
 ## Related [#awesome-ci](https://github.com/topics/awesome-ci) projects
