@@ -101,6 +101,13 @@ env:
     - VERSION=2.7-aws
     - VERSION=2.8-aws
     - VERSION=latest-aws
+    - VERSION=2.3-azure
+    - VERSION=2.4-azure
+    - VERSION=2.5-azure
+    - VERSION=2.6-azure
+    - VERSION=2.7-azure
+    - VERSION=2.8-azure
+    - VERSION=latest-azure
     - VERSION=2.3-infra
     - VERSION=2.4-infra
     - VERSION=2.5-infra

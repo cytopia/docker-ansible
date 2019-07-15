@@ -51,6 +51,18 @@ The image is built nightly against multiple stable versions and pushed to Docker
 
 ## Available Docker image versions
 
+| Flavour | Available toolkit |
+|---------|-------------------|
+| base    | **Notable Python libs:**<br>`cffi`, `cryptography`, `Jinja2`, `PyYAML` |
+| tools   | Everything from base<br><br>**Notable Python libs:**<br>`mitogen`<br><br>**Notable binaries:**<br>`bash`, `git`, `gnupg`, `jq`, ssh` |
+| infra   | Everything from tools<br><br>**Notable Python libs:**<br>`docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` |
+| azure   | Everything from tools<br><br>**Notable Python libs:**<br>`azure` |
+| aws     | Everything from tools<br><br>**Notable Python libs:**<br>`awscli`, `botocore`, `boto`, `boto3`<br><br>**Notable binaries:**<br>`aws` |
+| awsk8s  | Everything from aws<br><br>**Notable Python libs:**<br>`openshift`<br><br>**Notable binaries:**<br>`kubectl` |
+| awskops | Everything from awsk8s<br><br>**Notable binaries:**<br>`kops` |
+| awshelm | Everything from awsk8s<br><br>**Notable binaries:**<br>`helm` |
+
+
 ### Ansible base
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
@@ -87,7 +99,7 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-infra.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-infra "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-infra.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-infra "ansible")
 
-The following Ansible Docker images contain everything from `Ansible tools` and additionally: `docker`, `psycopg2`, `pymongo` and `PyMySQL` Python libraries.
+The following Ansible Docker images contain everything from `Ansible tools` and additionally: `docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL` and `smbprotocol` Python libraries.
 
 | Docker tag     | Build from                          |
 |----------------|-------------------------------------|
@@ -98,6 +110,22 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | `2.5-infra`    | Latest stable Ansible 2.5.x version |
 | `2.4-infra`    | Latest stable Ansible 2.4.x version |
 | `2.3-infra`    | Latest stable Ansible 2.3.x version |
+
+### Ansible azure
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-azure.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-azure "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-azure.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-azure "ansible")
+
+The following Ansible Docker images contain everything from `Ansible tools` and additionally: `azure`.
+
+| Docker tag     | Build from                          |
+|----------------|-------------------------------------|
+| `latest-azure` | Latest stable Ansible version       |
+| `2.8-azure`    | Latest stable Ansible 2.8.x version |
+| `2.7-azure`    | Latest stable Ansible 2.7.x version |
+| `2.6-azure`    | Latest stable Ansible 2.6.x version |
+| `2.5-azure`    | Latest stable Ansible 2.5.x version |
+| `2.4-azure`    | Latest stable Ansible 2.4.x version |
+| `2.3-azure`    | Latest stable Ansible 2.3.x version |
 
 ### Ansible aws
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
@@ -571,6 +599,17 @@ make tag   TAG=latest-infra
 # Build Ansible 2.6 infra
 make build TAG=2.6-infra
 make tag   TAG=2.6-infra
+```
+
+### Ansible azure
+```bash
+# Build latest Ansible azure
+make build TAG=latest-azure
+make tag   TAG=latest-azure
+
+# Build Ansible 2.6 azure
+make build TAG=2.6-azure
+make tag   TAG=2.6-azure
 ```
 
 ### Ansible aws
