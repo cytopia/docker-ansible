@@ -546,6 +546,10 @@ else
 		ansible-playbook playbook.yml
 endif
 ```
+**Important:** In case your `GPG_KEY` or `GPG_PASS` value contains one or more `$` characters,
+then they must all be escaped with an additional `$` in front.<br/>
+**Example:** If your password is `test$5`, then you must use `GPG_PASS='test$$5'`.
+
 
 Then you can call it easily:
 ```bash
