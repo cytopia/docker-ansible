@@ -51,6 +51,18 @@ The image is built nightly against multiple stable versions and pushed to Docker
 
 ## Available Docker image versions
 
+| Flavour | Available toolkit |
+|---------|-------------------|
+| base    | **Notable Python libs:**<br>`cffi`, `cryptography`, `Jinja2`, `PyYAML` |
+| tools   | Everything from base<br><br>**Notable Python libs:**<br>`mitogen`<br><br>**Notable binaries:**<br>`bash`, `git`, `gnupg`, `jq`, ssh` |
+| infra   | Everything from tools<br><br>**Notable Python libs:**<br>`docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` |
+| azure   | Everything from tools<br><br>**Notable Python libs:**<br>`azure` |
+| aws     | Everything from tools<br><br>**Notable Python libs:**<br>`awscli`, `botocore`, `boto`, `boto3`<br><br>**Notable binaries:**<br>`aws` |
+| awsk8s  | Everything from aws<br><br>**Notable Python libs:**<br>`openshift`<br><br>**Notable binaries:**<br>`kubectl` |
+| awskops | Everything from awsk8s<br><br>**Notable binaries:**<br>`kops` |
+| awshelm | Everything from awsk8s<br><br>**Notable binaries:**<br>`helm` |
+
+
 ### Ansible base
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
@@ -82,6 +94,38 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 | `2.5-tools`    | Latest stable Ansible 2.5.x version |
 | `2.4-tools`    | Latest stable Ansible 2.4.x version |
 | `2.3-tools`    | Latest stable Ansible 2.3.x version |
+
+### Ansible infra
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-infra.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-infra "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-infra.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-infra "ansible")
+
+The following Ansible Docker images contain everything from `Ansible tools` and additionally: `docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL` and `smbprotocol` Python libraries.
+
+| Docker tag     | Build from                          |
+|----------------|-------------------------------------|
+| `latest-infra` | Latest stable Ansible version       |
+| `2.8-infra`    | Latest stable Ansible 2.8.x version |
+| `2.7-infra`    | Latest stable Ansible 2.7.x version |
+| `2.6-infra`    | Latest stable Ansible 2.6.x version |
+| `2.5-infra`    | Latest stable Ansible 2.5.x version |
+| `2.4-infra`    | Latest stable Ansible 2.4.x version |
+| `2.3-infra`    | Latest stable Ansible 2.3.x version |
+
+### Ansible azure
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-azure.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-azure "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-azure.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-azure "ansible")
+
+The following Ansible Docker images contain everything from `Ansible tools` and additionally: `azure`.
+
+| Docker tag     | Build from                          |
+|----------------|-------------------------------------|
+| `latest-azure` | Latest stable Ansible version       |
+| `2.8-azure`    | Latest stable Ansible 2.8.x version |
+| `2.7-azure`    | Latest stable Ansible 2.7.x version |
+| `2.6-azure`    | Latest stable Ansible 2.6.x version |
+| `2.5-azure`    | Latest stable Ansible 2.5.x version |
+| `2.4-azure`    | Latest stable Ansible 2.4.x version |
+| `2.3-azure`    | Latest stable Ansible 2.3.x version |
 
 ### Ansible aws
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-aws.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-aws "ansible")
@@ -252,11 +296,13 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 
 Environment variables are available for all flavours except for `Ansible base`.
 
-| Variable | Default | Allowed values | Description |
-|----------|---------|----------------|-------------|
-| `USER`   | ``      | `ansible`      | Set this to `ansible` to have everything run inside the container by the user `ansible` instead of `root` |
-| `UID`    | `1000`  | integer        | If your local uid is not `1000` set it to your uid to syncronize file/dir permissions during mounting |
-| `GID`    | `1000`  | integer        | If your local gid is not `1000` set it to your gid to syncronize file/dir permissions during mounting |
+| Variable        | Default | Allowed values | Description |
+|-----------------|---------|----------------|-------------|
+| `USER`          | ``      | `ansible`      | Set this to `ansible` to have everything run inside the container by the user `ansible` instead of `root` |
+| `UID`           | `1000`  | integer        | If your local uid is not `1000` set it to your uid to syncronize file/dir permissions during mounting |
+| `GID`           | `1000`  | integer        | If your local gid is not `1000` set it to your gid to syncronize file/dir permissions during mounting |
+| `INIT_GPG_KEY`  | ``      | string         | If your gpg key requires a password you can initialize it during startup and cache the password (requires `INIT_GPG_PASS` as well) |
+| `INIT_GPG_PASS` | ``      | string         | If your gpg key requires a password you can initialize it during startup and cache the password (requires `INIT_GPG_KEY` as well) |
 
 
 ## Docker mounts
@@ -354,6 +400,22 @@ docker run --rm \
   cytopia/ansible:latest-tools ansible-playbook playbook.yml
 ```
 
+### Run Ansible playbook with local gpg keys mounted and initialized
+This is required in case your GPG key itself is encrypted with a password.
+```bash
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -e INIT_GPG_KEY=user@domain.tld \
+  -e INIT_GPG_PASS='my gpg password' \
+  -v ${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
 ### Run Ansible Galaxy
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
@@ -399,25 +461,7 @@ docker run --rm \
   cytopia/ansible:latest-aws ansible-playbook playbook.yml
 ```
 
-### Run Ansible playbook against AWS and gpg vault initialization
-Imagine your Ansible vault uses a script to gpg encrypt the passphrase for team members against
-multiple gpg keys. Using Docker will not allow you to have a popup open where you can enter the
-gpg key password. To circumvent this, you will need to initialize the gpg key password and then
-run Ansible.
-
-The following Ansible vault script which can be shows how this is setup:
-```bash
-#!/bin/sh
-# Read password from argument
-if [ "${#}" -gt "0" ]; then
-	gpg --pinentry-mode loopback --passphrase "${1}" --decrypt vault/pass.gpg
-# Ask for password or use keyring (does not work inside Docker)
-else
-	gpg --batch --use-agent --decrypt vault/pass.gpg
-fi
-```
-
-With this in mind the Ansible call would look as follows
+### Run Ansible playbook against AWS with gpg vault initialization
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
 # to prevent permission issues during docker mounts
@@ -425,16 +469,15 @@ docker run --rm \
   -e USER=ansible \
   -e MY_UID=1000 \
   -e MY_GID=1000 \
+  -e INIT_GPG_KEY=user@domain.tld \
+  -e INIT_GPG_PASS='my gpg password' \
   -v ${HOME}/.aws/config:/home/ansible/.aws/config:ro \
   -v ${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
   -v ${HOME}/.gnupg/:/home/ansible/.gnupg/ \
   -v $(pwd):/data \
   cytopia/ansible:latest-aws \
-  sh -c './vault/open_vault.sh '''THE_GPG_PASSWORD_HERE'''; ansible-playbook playbook.yml'
+  ansible-playbook playbook.yml
 ```
-* **Note 1:** the quoting for the GPG password is required in case you are using a `!` as part of the passwort
-* **Note 2:** every `$` sign in your GPG password will require 3 backslashes in front of it: `\\\$`
-
 As the command is getting pretty long, you could wrap it into a Makefile.
 ```make
 ifneq (,)
@@ -464,12 +507,14 @@ else
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
+		-e INIT_GPG_KEY='$(GPG_KEY)' \
+		-e INIT_GPG_PASS='$(GPG_PASS)' \
 		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
 		-v $(CURRENT_DIR):/data \
-		cytopia/ansible:$(ANSIBLE)-aws \
-		sh -c './vault/open_vault.sh '''$(GPG_PASS)'''; ansible-playbook playbook.yml --check'
+		cytopia/ansible:$(ANSIBLE)INIT_GPG_KEY` -aws \
+		ansible-playbook playbook.yml --check
 endif
 
 run:
@@ -488,20 +533,22 @@ else
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
+		-e INIT_GPG_KEY='$(GPG_KEY)' \
+		-e INIT_GPG_PASS='$(GPG_PASS)' \
 		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
 		-v $(CURRENT_DIR):/data \
 		cytopia/ansible:$(ANSIBLE)-aws \
-		sh -c './vault/open_vault.sh '''$(GPG_PASS)'''; ansible-playbook playbook.yml'
+		ansible-playbook playbook.yml
 endif
 ```
 
 Then you can call it easily:
 ```bash
 # With GPG password
-make dry GPG_PASS='THE_GPG_PASSWORD_HERE'
-make run GPG_PASS='THE_GPG_PASSWORD_HERE'
+make dry GPG_KEY='user@domain.tld' GPG_PASS='THE_GPG_PASSWORD_HERE'
+make run GPG_KEY='user@domain.tld' GPG_PASS='THE_GPG_PASSWORD_HERE'
 
 # Without GPG password
 make dry
@@ -516,14 +563,12 @@ make dry UID=1001 GID=1001
 make run UID=1001 GID=1001
 ```
 
-* **Note:** every `$` sign in your GPG password will require 3 backslashes in front of it: `\\\$`
-
 
 ## Build locally
 
 To build locally you require GNU Make to be installed. The default build procedure is to always
-build as the `latest` tag, so you will have to manually retag the image after build.
-Instructions as  shown below.
+build as the `latest` tag, so you INIT_GPG_KEY` will have to manually retag the image after build.
+Instructions as  shown below.     INIT_GPG_PASS`
 
 ### Ansible base
 ```bash
@@ -540,9 +585,31 @@ make tag   TAG=2.6
 make build TAG=latest-tools
 make tag   TAG=latest-tools
 
-# Build Ansible 2.6 aws
+# Build Ansible 2.6 tools
 make build TAG=2.6-tools
 make tag   TAG=2.6-tools
+```
+
+### Ansible infra
+```bash
+# Build latest Ansible infra
+make build TAG=latest-infra
+make tag   TAG=latest-infra
+
+# Build Ansible 2.6 infra
+make build TAG=2.6-infra
+make tag   TAG=2.6-infra
+```
+
+### Ansible azure
+```bash
+# Build latest Ansible azure
+make build TAG=latest-azure
+make tag   TAG=latest-azure
+
+# Build Ansible 2.6 azure
+make build TAG=2.6-azure
+make tag   TAG=2.6-azure
 ```
 
 ### Ansible aws
