@@ -51,16 +51,19 @@ The image is built nightly against multiple stable versions and pushed to Docker
 
 ## Available Docker image versions
 
-| Flavour | Available toolkit |
-|---------|-------------------|
-| base    | **Notable Python libs:**<br>`cffi`, `cryptography`, `Jinja2`, `PyYAML` |
-| tools   | Everything from base<br><br>**Notable Python libs:**<br>`mitogen`<br><br>**Notable binaries:**<br>`bash`, `git`, `gnupg`, `jq`, ssh` |
-| infra   | Everything from tools<br><br>**Notable Python libs:**<br>`docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` |
-| azure   | Everything from tools<br><br>**Notable Python libs:**<br>`azure` |
-| aws     | Everything from tools<br><br>**Notable Python libs:**<br>`awscli`, `botocore`, `boto`, `boto3`<br><br>**Notable binaries:**<br>`aws` |
-| awsk8s  | Everything from aws<br><br>**Notable Python libs:**<br>`openshift`<br><br>**Notable binaries:**<br>`kubectl` |
-| awskops | Everything from awsk8s<br><br>**Notable binaries:**<br>`kops` |
-| awshelm | Everything from awsk8s<br><br>**Notable binaries:**<br>`helm` |
+This repository provides many different Ansible flavours (each flavour also divided into different Ansible versions).
+The following table shows a quick overview. For more details see further down below.
+
+| Flavour | Inherits from | Additional Python libs | Additional binaries |
+|---------|---------------|------------------------|---------------------|
+| base    | -             | `cffi`, `cryptography`, `Jinja2`, `PyYAML` | - |
+| tools   | base          | `mitogen`              | `bash`, `git`, `gpg`, `jq`, `ssh` |
+| infra   | tools         | `docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | - |
+| azure   | tools         | `azure`               | - |
+| aws     | tools         | `awscli`, `botocore`, `boto`, `boto3` | `aws` |
+| awsk8s  | aws           | `openshift`           | `kubectl` |
+| awskops | awsk8s        | -                     | `kops` |
+| awshelm | awsk8s        | -                     | `helm` |
 
 
 ### Ansible base
