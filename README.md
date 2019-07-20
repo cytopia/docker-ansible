@@ -494,9 +494,12 @@ ANSIBLE = 2.8
 UID = 1000
 GID = 1000
 
+# Ansible check mode uses mitogen_linear strategy for much faster roll-outs
 dry:
 ifndef GPG_PASS
-	docker run --rm \
+	docker run --rm it \
+		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.6/site-packages/ansible_mitogen/plugins/strategy \
+		-e ANSIBLE_STRATEGY=mitogen_linear \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
@@ -506,12 +509,14 @@ ifndef GPG_PASS
 		-v $(CURRENT_DIR):/data \
 		cytopia/ansible:$(ANSIBLE)-aws ansible-playbook playbook.yml --check
 else
-	docker run --rm \
+	docker run --rm it \
+		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.6/site-packages/ansible_mitogen/plugins/strategy \
+		-e ANSIBLE_STRATEGY=mitogen_linear \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
-		-e INIT_GPG_KEY='$(GPG_KEY)' \
-		-e INIT_GPG_PASS='$(GPG_PASS)' \
+		-e INIT_GPG_KEY=$${GPG_KEY} \
+		-e INIT_GPG_PASS=$${GPG_PASS} \
 		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
@@ -520,9 +525,10 @@ else
 		ansible-playbook playbook.yml --check
 endif
 
+# Ansible real run uses default strategy
 run:
 ifndef GPG_PASS
-	docker run --rm \
+	docker run --rm it \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
@@ -532,12 +538,12 @@ ifndef GPG_PASS
 		-v $(CURRENT_DIR):/data \
 		cytopia/ansible:$(ANSIBLE)-aws ansible-playbook playbook.yml
 else
-	docker run --rm \
+	docker run --rm it \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
-		-e INIT_GPG_KEY='$(GPG_KEY)' \
-		-e INIT_GPG_PASS='$(GPG_PASS)' \
+		-e INIT_GPG_KEY=$${GPG_KEY} \
+		-e INIT_GPG_PASS=$${GPG_PASS} \
 		-v $${HOME}/.aws/config:/home/ansible/.aws/config:ro \
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
@@ -546,14 +552,28 @@ else
 		ansible-playbook playbook.yml
 endif
 ```
-**Important:** In case your `GPG_KEY` or `GPG_PASS` value contains one or more `$` characters,
-then they must all be escaped with an additional `$` in front.<br/>
-**Example:** If your password is `test$5`, then you must use `GPG_PASS='test$$5'`.
+**Important:**
+
+THE `GPG_KEY` and `GPG_PASS` will not be echo'ed out by the Make command and you are advised to
+export those values via your shell's `export` command to the env in order to hide it.
+
+If you still want to specify them on the command line via `make dry GPG_KEY='pass'`
+and your pass or key contains one or more `$` characters
+then they must all be escaped with an additional `$` in front. This is not necessary if you export
+them.
+
+**Example:** If your password is `test$5`, then you must use `make dry GPG_PASS='test$$5'`.
 
 
 Then you can call it easily:
 ```bash
-# With GPG password
+# With GPG password from the env
+export GPG_KEY='user@domain.tld'
+export GPG_PASS='THE_GPG_PASSWORD_HERE'
+make dry
+make run
+
+# With GPG password on the cli
 make dry GPG_KEY='user@domain.tld' GPG_PASS='THE_GPG_PASSWORD_HERE'
 make run GPG_KEY='user@domain.tld' GPG_PASS='THE_GPG_PASSWORD_HERE'
 
@@ -574,8 +594,8 @@ make run UID=1001 GID=1001
 ## Build locally
 
 To build locally you require GNU Make to be installed. The default build procedure is to always
-build as the `latest` tag, so you INIT_GPG_KEY` will have to manually retag the image after build.
-Instructions as  shown below.     INIT_GPG_PASS`
+build as the `latest` tag, so you  will have to manually retag the image after build.
+Instructions as  shown below.
 
 ### Ansible base
 ```bash
