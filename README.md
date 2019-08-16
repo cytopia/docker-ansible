@@ -59,7 +59,7 @@ The following table shows a quick overview. For more details see further down be
 | Flavour | Inherits from | Additional Python libs | Additional binaries |
 |---------|---------------|------------------------|---------------------|
 | base    | -             | `cffi`, `cryptography`, `Jinja2`, `PyYAML` | - |
-| tools   | base          | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh` |
+| tools   | base          | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
 | infra   | tools         | `docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | - |
 | azure   | tools         | `azure`                | - |
 | aws     | tools         | `awscli`, `botocore`, `boto`, `boto3` | `aws` |
