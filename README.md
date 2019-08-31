@@ -407,6 +407,16 @@ docker run --rm \
 ```
 
 ### Run Ansible playbook with local gpg keys mounted
+This will only work if your GPG key does not have a password set or its password is already
+stored and accessible in the keyring.
+```bash
+# If your GPG key has a password and you want to save it in the keyring,
+# initialize it outside on the host sustem and it will be also available after
+# Docker starts.
+# Important: your keyring must be configured to save the password for some time
+echo "test" | gpg --encrypt -r <your-gpg-key-id> | gpg --decrypt >/dev/null
+```
+
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
 # to prevent permission issues during docker mounts
@@ -420,7 +430,9 @@ docker run --rm \
 ```
 
 ### Run Ansible playbook with local gpg keys mounted and initialized
-This is required in case your GPG key itself is encrypted with a password.
+This is required in case your GPG key itself is encrypted with a password and
+you do not want to make use of the GPG keyring.
+Note that the password needs to be in *single quotes*.
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
 # to prevent permission issues during docker mounts
@@ -434,7 +446,25 @@ docker run --rm \
   -v $(pwd):/data \
   cytopia/ansible:latest-tools ansible-playbook playbook.yml
 ```
-
+Alternatively you can also export your GPG key and password to the shell's environment:
+```bash
+# Ensure to write the password in single quotes
+export MY_GPG_KEY='user@domain.tld'
+export MY_GPG_PASS='my gpg password'
+```
+```bash
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -e INIT_GPG_KEY=${MY_GPG_KEY} \
+  -e INIT_GPG_PASS=${MY_GPG_PASS} \
+  -v ${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
 ### Run Ansible Galaxy
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
