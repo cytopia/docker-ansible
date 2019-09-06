@@ -47,7 +47,28 @@ update_uid_gid() {
 	fi
 }
 
-init_gpg_key() {
+init_gpg_key_cmd() {
+	local user="${1}"
+	local cmd="${2}"
+
+	if [ "${user}" = "root" ]; then
+		if ! eval "${cmd}"; then
+			>&2 echo "[ERR]  Failed to initialize GPG via: ${cmd}"
+			exit 1
+		else
+			echo "[INFO] GPG initialized successfully via: ${cmd}"
+		fi
+	else
+		if ! su "${user}" -c "${cmd}"; then
+			>&2 echo "[ERR]  Failed to initialize GPG via: ${cmd}"
+			exit 1
+		else
+			echo "[INFO] GPG initialized successfully via: ${cmd}"
+		fi
+	fi
+}
+
+init_gpg_key_pass() {
 	local user="${1}"
 	local key="${2}"
 	local pass="${3}"
@@ -93,21 +114,37 @@ init_gpg_key() {
 ###
 ### Initialize GPG key
 ###
-if env | grep -q '^INIT_GPG_KEY='; then
-	if ! env | grep -q '^INIT_GPG_PASS='; then
-		>&2 echo "[ERR]  When using \$INIT_GPG_KEY, you also need to specify \$INIT_GPG_PASS"
+INIT_GPG=
+
+# Custom specified command to initliaze GPG key
+if [ -n "${INIT_GPG_CMD:=}" ]; then
+	if [ -n "${INIT_GPG_KEY:=}" ]; then
+		>&2 echo "[ERR]  When using \$INIT_GPG_CMD, you cannot specify \$INIT_GPG_KEY."
 		exit 1
 	fi
-fi
-if env | grep -q '^INIT_GPG_PASS='; then
-	if ! env | grep -q '^INIT_GPG_KEY='; then
-		>&2 echo "[ERR]  When using \$INIT_GPG_PASS, you also need to specify \$INIT_GPG_KEY"
+	if [ -n "${INIT_GPG_PASS:=}" ]; then
+		>&2 echo "[ERR]  When using \$INIT_GPG_CMD, you cannot specify \$INIT_GPG_PASS."
 		exit 1
-	else
-		echo "[INFO] Initializing gpg key for ${INIT_GPG_KEY}"
-		INIT_GPG=1
 	fi
+	echo "[INFO] Initializing gpg key with custom command: ${INIT_GPG_CMD}"
+	INIT_GPG="CMD"
+
+# Use GPG key/pass from environment
+elif [ -n "${INIT_GPG_KEY:=}" ] && [ -n "${INIT_GPG_PASS:=}" ]; then
+	echo "[INFO] Initializing gpg key for ${INIT_GPG_KEY}"
+	INIT_GPG="PASS"
+
+# GPG_KEY set, but GPG_PASS missing
+elif [ -n "${INIT_GPG_KEY:=}" ] && [ -z "${INIT_GPG_PASS:=}" ]; then
+	>&2 echo "[ERR]  When using \$INIT_GPG_KEY, you also need to specify \$INIT_GPG_PASS"
+	exit 1
+
+# GPG_KEY missing, but GPG_PASS set
+elif [ -z "${INIT_GPG_KEY:=}" ] && [ -n "${INIT_GPG_PASS:=}" ]; then
+	>&2 echo "[ERR]  When using \$INIT_GPG_PASS, you also need to specify \$INIT_GPG_KEY"
+	exit 1
 fi
+
 
 
 ###
@@ -151,16 +188,20 @@ if [ "${USE_NONROOT}" = "1" ]; then
 
 	update_uid_gid "${MY_USER}" "${MY_GROUP}" "${MY_UID}" "${MY_GID}"
 
-	if [ "${INIT_GPG}" = "1" ]; then
-		init_gpg_key "${MY_USER}" "${INIT_GPG_KEY}" "${INIT_GPG_PASS}"
+	if [ "${INIT_GPG}" = "CMD" ]; then
+		init_gpg_key_cmd "${MY_USER}" "${INIT_GPG_CMD}"
+	elif [ "${INIT_GPG}" = "PASS" ]; then
+		init_gpg_key_pass "${MY_USER}" "${INIT_GPG_KEY}" "${INIT_GPG_PASS}"
 	fi
 	echo "[INFO] ansible> ${*}"
 	exec su "${MY_USER}" -c "${*}"
 
 else
 
-	if [ "${INIT_GPG}" = "1" ]; then
-		init_gpg_key "root" "${INIT_GPG_KEY}" "${INIT_GPG_PASS}"
+	if [ "${INIT_GPG}" = "CMD" ]; then
+		init_gpg_key_cmd "root" "${INIT_GPG_CMD}"
+	elif [ "${INIT_GPG}" = "PASS" ]; then
+		init_gpg_key_pass "root" "${INIT_GPG_KEY}" "${INIT_GPG_PASS}"
 	fi
 	echo "[INFO] root> ${*}"
 	exec "${@}"

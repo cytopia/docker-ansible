@@ -322,6 +322,7 @@ Environment variables are available for all flavours except for `Ansible base`.
 | `GID`           | `1000`  | integer        | If your local gid is not `1000` set it to your gid to syncronize file/dir permissions during mounting |
 | `INIT_GPG_KEY`  | ``      | string         | If your gpg key requires a password you can initialize it during startup and cache the password (requires `INIT_GPG_PASS` as well) |
 | `INIT_GPG_PASS` | ``      | string         | If your gpg key requires a password you can initialize it during startup and cache the password (requires `INIT_GPG_KEY` as well) |
+| `INIT_GPG_CMD`  | ``      | string         | A custom command which will initialize the GPG key password. This allows for interactive mode to enter your password manually during startup. (Mutually exclusive to `INIT_GPG_KEY` and `INIT_GPG_PASS`) |
 
 
 ## Docker mounts
@@ -406,17 +407,7 @@ docker run --rm \
   cytopia/ansible:latest-tools ansible-playbook playbook.yml
 ```
 
-### Run Ansible playbook with local gpg keys mounted
-This will only work if your GPG key does not have a password set or its password is already
-stored and accessible in the keyring.
-```bash
-# If your GPG key has a password and you want to save it in the keyring,
-# initialize it outside on the host sustem and it will be also available after
-# Docker starts.
-# Important: your keyring must be configured to save the password for some time
-echo "test" | gpg --encrypt -r <your-gpg-key-id> | gpg --decrypt >/dev/null
-```
-
+### Run Ansible playbook with local password-less gpg keys mounted
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
 # to prevent permission issues during docker mounts
@@ -429,9 +420,8 @@ docker run --rm \
   cytopia/ansible:latest-tools ansible-playbook playbook.yml
 ```
 
-### Run Ansible playbook with local gpg keys mounted and initialized
-This is required in case your GPG key itself is encrypted with a password and
-you do not want to make use of the GPG keyring.
+### Run Ansible playbook with local gpg keys mounted and automatically initialized
+This is required in case your GPG key itself is encrypted with a password.
 Note that the password needs to be in *single quotes*.
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
@@ -465,6 +455,23 @@ docker run --rm \
   -v $(pwd):/data \
   cytopia/ansible:latest-tools ansible-playbook playbook.yml
 ```
+
+### Run Ansible playbook with local gpg keys mounted and interactively interactively
+The following will work with password-less and password-set GPG keys.
+In case it requires a password, it will ask for the password and you need to enter it.
+```bash
+# Ensure to set same uid/gid as on your local system for Docker user
+# to prevent permission issues during docker mounts
+docker run --rm \
+  -e USER=ansible \
+  -e MY_UID=1000 \
+  -e MY_GID=1000 \
+  -e INIT_GPG_CMD='echo test | gpg --encrypt -r user@domain.tld | gpg --decrypt --pinentry-mode loopback' \
+  -v ${HOME}/.gnupg/:/home/ansible/.gnupg/ \
+  -v $(pwd):/data \
+  cytopia/ansible:latest-tools ansible-playbook playbook.yml
+```
+
 ### Run Ansible Galaxy
 ```bash
 # Ensure to set same uid/gid as on your local system for Docker user
