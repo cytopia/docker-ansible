@@ -50,9 +50,10 @@ _test_version:
 		LATEST="$$( \
 			curl -L -sS  https://github.com/ansible/ansible/releases/ \
 				| tac | tac \
-				| grep -Eo "ansible/ansible/releases/tag/v[.0-9]+" \
+				| grep -Eo "ansible/ansible/releases/tag/v[.0-9]+\"" \
 				| head -1 \
 				| sed 's/.*v//g' \
+				| sed 's/\"//g' \
 		)"; \
 		echo "Testing for latest: $${LATEST}"; \
 		if ! docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $${LATEST}$$"; then \
