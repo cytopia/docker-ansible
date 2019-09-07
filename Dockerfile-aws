@@ -70,7 +70,7 @@ RUN set -x \
 	\
 	&& mkdir /home/ansible/.ssh \
 	&& chown ansible:ansible /home/ansible/.ssh \
-	&& chmod 0755 /home/ansible/.ssh \
+	&& chmod 0700 /home/ansible/.ssh \
 	\
 	&& mkdir /home/ansible/.aws \
 	&& chown ansible:ansible /home/ansible/.aws \
