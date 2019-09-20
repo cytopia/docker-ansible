@@ -323,6 +323,7 @@ Environment variables are available for all flavours except for `Ansible base`.
 | `INIT_GPG_KEY`  | ``      | string         | If your gpg key requires a password you can initialize it during startup and cache the password (requires `INIT_GPG_PASS` as well) |
 | `INIT_GPG_PASS` | ``      | string         | If your gpg key requires a password you can initialize it during startup and cache the password (requires `INIT_GPG_KEY` as well) |
 | `INIT_GPG_CMD`  | ``      | string         | A custom command which will initialize the GPG key password. This allows for interactive mode to enter your password manually during startup. (Mutually exclusive to `INIT_GPG_KEY` and `INIT_GPG_PASS`) |
+| `KUBECONTEXT`   | ``      | string         | When set, the docker container starts with a `kubectl` bash alias named `kubectl` that will always use the specified kubectl context. |
 
 
 ## Docker mounts

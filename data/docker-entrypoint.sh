@@ -108,7 +108,7 @@ init_gpg_key_pass() {
 
 
 # ------------------------------------------------------------------------------
-# ENTRYPOINT (ENV VARIABLES
+# ENTRYPOINT (ENV VARIABLES)
 # ------------------------------------------------------------------------------
 
 ###
@@ -177,6 +177,25 @@ elif env | grep -q '^GID='; then
 	# Change GID
 	MY_GID="$( env | grep '^GID=' | sed 's/^GID=//g' )"
 	echo "[INFO] Changing GID to ${MY_GID}"
+fi
+
+
+###
+### Check for KUBECONTEXT and create alias
+###
+if env | grep -q '^KUBECONTEXT='; then
+	{
+		echo "if [ -n \"\${KUBECONTEXT:-}\" ]; then"
+		echo "  kubectl() {"
+		echo "    local cmd"
+		echo "    cmd=\"\$( which kubectl | head -1 )\""
+		echo "    >&2 echo"
+		echo "    >&2 echo \"[ALIAS] kubectl --context \${KUBECONTEXT} \${*}\""
+		echo "    >&2 echo"
+		echo "    \$cmd --context \"\${KUBECONTEXT}\" \"\${@}\""
+		echo "  }"
+		echo "fi"
+	} > /etc/profile.d/kubectl.sh
 fi
 
 
