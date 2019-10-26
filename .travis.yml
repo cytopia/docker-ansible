@@ -187,7 +187,7 @@ script:
         while ! make push TAG="${VERSION}${KOPS=}${HELM=}-${TRAVIS_TAG}"; do sleep 1; done;
       elif [ "${TRAVIS_BRANCH}" == "master" ]; then
         while ! make push TAG=${VERSION}${KOPS=}${HELM=}; do sleep 1; done;
-      elif [[ ${TRAVIS_BRANCH} =~ ^(release-[.0-9]+)$ ]]; then
+      elif [[ ${TRAVIS_BRANCH} =~ ^(release-[.0-9]+.*)$ ]]; then
         while ! make push TAG="${VERSION}${KOPS=}${HELM=}-${TRAVIS_BRANCH}"; do sleep 1; done;
       else
         echo "Skipping branch ${TRAVIS_BRANCH}";
