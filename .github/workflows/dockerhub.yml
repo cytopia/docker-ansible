@@ -33,6 +33,7 @@ jobs:
       - name: Show environment
         run: |
           env
+          git branch
 
       - name: Build
         run: |
