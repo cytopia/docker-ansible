@@ -8,6 +8,12 @@
 [![](https://img.shields.io/badge/github-cytopia%2Fdocker--ansible-red.svg)](https://github.com/cytopia/docker-ansible "github.com/cytopia/docker-ansible")
 [![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
+[![Build Status](https://github.com/cytopia/docker-ansible/workflows/linting/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=linting)
+[![Build Status](https://github.com/cytopia/docker-ansible/workflows/Ansible%20Standard/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=Ansible%20Standard)
+[![Build Status](https://github.com/cytopia/docker-ansible/workflows/Ansible%20Kops/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=Ansible%20Kops)
+[![Build Status](https://github.com/cytopia/docker-ansible/workflows/Ansible%20Helm/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=Ansible%20Helm)
+
+
 > #### All [#awesome-ci](https://github.com/topics/awesome-ci) Docker images
 >
 > [ansible][ansible-git-lnk] **•**
