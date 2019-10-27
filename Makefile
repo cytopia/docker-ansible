@@ -2,15 +2,31 @@ ifneq (,)
 .error This Makefile requires GNU Make.
 endif
 
+# -------------------------------------------------------------------------------------------------
+# Default configuration
+# -------------------------------------------------------------------------------------------------
 .PHONY: build rebuild lint test _test_version _test_run tag pull login push enter
 
 CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
+# -------------------------------------------------------------------------------------------------
+# File-lint configuration
+# -------------------------------------------------------------------------------------------------
+FL_VERSION = 0.2
+FL_IGNORES = .git/,.github/,tests/
+
+# -------------------------------------------------------------------------------------------------
+# Docker configuration
+# -------------------------------------------------------------------------------------------------
 DIR = .
 FILE = Dockerfile
 IMAGE = cytopia/ansible
 TAG = latest
 
+
+# -------------------------------------------------------------------------------------------------
+# Default Target
+# -------------------------------------------------------------------------------------------------
 build:
 	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
 		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
@@ -20,6 +36,10 @@ build:
 		docker build --build-arg KOPS=$(KOPS) --build-arg HELM=$(HELM) --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
 	fi
 
+
+# -------------------------------------------------------------------------------------------------
+# Targets
+# -------------------------------------------------------------------------------------------------
 rebuild: pull
 	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
 		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
@@ -30,12 +50,12 @@ rebuild: pull
 	fi
 
 lint:
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-cr --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-crlf --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-trailing-single-newline --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-trailing-space --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-utf8 --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-utf8-bom --text --ignore '.git/,.github/,tests/' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '$(FL_IGNORES)' --path .
 
 test:
 	@$(MAKE) --no-print-directory _test_version
