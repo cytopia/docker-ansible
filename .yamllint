@@ -6,3 +6,4 @@ rules:
   line-length:
     max: 100
   truthy: disable
+
