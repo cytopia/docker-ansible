@@ -68,7 +68,7 @@ The following table shows a quick overview. For more details see further down be
 | tools   | base          | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh` |
 | infra   | tools         | `docker`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | - |
 | azure   | tools         | `azure`                | - |
-| aws     | tools         | `awscli`, `botocore`, `boto`, `boto3` | `aws` |
+| aws     | tools         | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
 | awsk8s  | aws           | `openshift`            | `kubectl` |
 | awskops | awsk8s        | -                      | `kops` |
 | awshelm | awsk8s        | -                      | `helm` |
