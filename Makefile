@@ -27,6 +27,29 @@ TAG = latest
 # -------------------------------------------------------------------------------------------------
 # Default Target
 # -------------------------------------------------------------------------------------------------
+help:
+	@echo "lint                              Lint repository"
+	@echo "build   [TAG=] [KOPS=] [HELM=]    Build image"
+	@echo "rebuild [TAG=] [KOPS=] [HELM=]    Build image without cache"
+	@echo "test    [TAG=]                    Test build image"
+	@echo "tag     [TAG=]                    Tag build image"
+	@echo "pull                              Pull FROM image"
+	@echo "login   [USER=] [PASS=]           Login to Dockerhub"
+	@echo "push    [TAG=]                    Push image to Dockerhub"
+	@echo "enter   [TAG=]                    Run and enter build image"
+
+
+# -------------------------------------------------------------------------------------------------
+# Targets
+# -------------------------------------------------------------------------------------------------
+lint:
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '$(FL_IGNORES)' --path .
+
 build:
 	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
 		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
@@ -37,9 +60,6 @@ build:
 	fi
 
 
-# -------------------------------------------------------------------------------------------------
-# Targets
-# -------------------------------------------------------------------------------------------------
 rebuild: pull
 	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
 		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
@@ -48,14 +68,6 @@ rebuild: pull
 	else \
 		docker build --no-cache --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
 	fi
-
-lint:
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '$(FL_IGNORES)' --path .
 
 test:
 	@$(MAKE) --no-print-directory _test_version
@@ -100,9 +112,6 @@ _test_run:
 	fi; \
 	echo "Success";
 
-tag:
-	docker tag $(IMAGE) $(IMAGE):$(TAG)
-
 pull:
 	@grep -E '^\s*FROM' Dockerfile \
 		| sed -e 's/^FROM//g' -e 's/[[:space:]]*as[[:space:]]*.*$$//g' \
@@ -110,6 +119,9 @@ pull:
 
 login:
 	yes | docker login --username $(USER) --password $(PASS)
+
+tag:
+	docker tag $(IMAGE) $(IMAGE):$(TAG)
 
 push:
 	@$(MAKE) tag TAG=$(TAG)
