@@ -116,6 +116,20 @@ _test_version:
 			exit 1; \
 		fi; \
 	fi; \
+	if echo "$(TAG)" | grep -Eq 'awskops'; then \
+		echo "Testing for Kops"; \
+		if ! docker run --rm $(IMAGE) kops version | grep -E "[.0-9]+"; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
+	fi; \
+	if echo "$(TAG)" | grep -Eq 'awshelm'; then \
+		echo "Testing for Kops"; \
+		if ! docker run --rm $(IMAGE) helm version --client --short | grep -E "v[.0-9]+"; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
+	fi; \
 	echo "Success"; \
 
 

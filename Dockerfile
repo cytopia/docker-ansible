@@ -1,6 +1,6 @@
 FROM alpine:3.9 as builder
 
-RUN set -x \
+RUN set -eux \
 	&& apk add --no-cache \
 		bc \
 		gcc \
@@ -11,8 +11,8 @@ RUN set -x \
 		python3 \
 		python3-dev
 
-ARG VERSION=latest
-RUN set -x \
+ARG VERSION
+RUN set -eux \
 	&& if [ "${VERSION}" = "latest" ]; then \
 		pip3 install --no-cache-dir --no-compile ansible; \
 	else \
@@ -23,7 +23,7 @@ RUN set -x \
 
 
 FROM alpine:3.9 as production
-ARG VERSION=latest
+ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
 #LABEL "org.opencontainers.image.version"=""
@@ -39,7 +39,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} base"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} base"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} base"
 
-RUN set -x \
+RUN set -eux \
 	&& apk add --no-cache python3 \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf ansible /usr/bin/ansible-config \
