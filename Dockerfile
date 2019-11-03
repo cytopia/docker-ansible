@@ -23,9 +23,22 @@ RUN set -x \
 
 
 FROM alpine:3.9 as production
-LABEL \
-	maintainer="cytopia <cytopia@everythingcli.org>" \
-	repo="https://github.com/cytopia/docker-ansible"
+ARG VERSION=latest
+# https://github.com/opencontainers/image-spec/blob/master/annotations.md
+#LABEL "org.opencontainers.image.created"=""
+#LABEL "org.opencontainers.image.version"=""
+#LABEL "org.opencontainers.image.revision"=""
+LABEL "maintainer"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.authors"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.vendor"="cytopia"
+LABEL "org.opencontainers.image.licenses"="MIT"
+LABEL "org.opencontainers.image.url"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.documentation"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.source"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} base"
+LABEL "org.opencontainers.image.title"="Ansible ${VERSION} base"
+LABEL "org.opencontainers.image.description"="Ansible ${VERSION} base"
+
 RUN set -x \
 	&& apk add --no-cache python3 \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \

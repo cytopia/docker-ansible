@@ -33,9 +33,21 @@ RUN set -x \
 
 
 FROM alpine:3.9 as production
-LABEL \
-	maintainer="cytopia <cytopia@everythingcli.org>" \
-	repo="https://github.com/cytopia/docker-ansible"
+ARG VERSION=latest
+# https://github.com/opencontainers/image-spec/blob/master/annotations.md
+#LABEL "org.opencontainers.image.created"=""
+#LABEL "org.opencontainers.image.version"=""
+#LABEL "org.opencontainers.image.revision"=""
+LABEL "maintainer"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.authors"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.vendor"="cytopia"
+LABEL "org.opencontainers.image.licenses"="MIT"
+LABEL "org.opencontainers.image.url"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.documentation"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.source"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} tools"
+LABEL "org.opencontainers.image.title"="Ansible ${VERSION} tools"
+LABEL "org.opencontainers.image.description"="Ansible ${VERSION} tools"
 
 COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
 COPY --from=builder /usr/bin/ansible /usr/bin/ansible

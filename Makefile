@@ -22,6 +22,7 @@ DIR = .
 FILE = Dockerfile
 IMAGE = cytopia/ansible
 TAG = latest
+NO_CACHE =
 
 
 # -------------------------------------------------------------------------------------------------
@@ -50,29 +51,44 @@ lint:
 	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '$(FL_IGNORES)' --path .
 	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '$(FL_IGNORES)' --path .
 
+
 build:
-	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
+	if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
 		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
 		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
-		docker build --build-arg KOPS=$(KOPS) --build-arg HELM=$(HELM) --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
+		docker build \
+			$(NO_CACHE) \
+			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
+			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
+			--label "org.opencontainers.image.version"="${TAG}" \
+			--build-arg KOPS=$(KOPS) \
+			--build-arg HELM=$(HELM) \
+			--build-arg VERSION=$${VERSION} \
+			-t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
 	else \
-		docker build --build-arg KOPS=$(KOPS) --build-arg HELM=$(HELM) --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
+		docker build \
+			$(NO_CACHE) \
+			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
+			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
+			--label "org.opencontainers.image.version"="${TAG}" \
+			--build-arg VERSION=$(TAG) \
+			-t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
 	fi
 
 
+rebuild: NO_CACHE=--no-cache
 rebuild: pull
-	@if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
-		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
-		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
-		docker build --no-cache --build-arg VERSION=$${VERSION} -t $(IMAGE) -f $(DIR)/$(FILE)$${SUFFIX} $(DIR); \
-	else \
-		docker build --no-cache --build-arg VERSION=$(TAG) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
-	fi
+rebuild: build
+
 
 test:
 	@$(MAKE) --no-print-directory _test_version
 	@$(MAKE) --no-print-directory _test_run
 
+
+# -------------------------------------------------------------------------------------------------
+# Helper Targets
+# -------------------------------------------------------------------------------------------------
 _test_version:
 	@echo "------------------------------------------------------------"
 	@echo "- Testing correct version"
@@ -102,6 +118,7 @@ _test_version:
 	fi; \
 	echo "Success"; \
 
+
 _test_run:
 	@echo "------------------------------------------------------------"
 	@echo "- Testing playbook"
@@ -112,6 +129,7 @@ _test_run:
 	fi; \
 	echo "Success";
 
+
 pull:
 	@grep -E '^\s*FROM' Dockerfile \
 		| sed -e 's/^FROM//g' -e 's/[[:space:]]*as[[:space:]]*.*$$//g' \
@@ -120,12 +138,15 @@ pull:
 login:
 	yes | docker login --username $(USER) --password $(PASS)
 
+
 tag:
 	docker tag $(IMAGE) $(IMAGE):$(TAG)
+
 
 push:
 	@$(MAKE) tag TAG=$(TAG)
 	docker push $(IMAGE):$(TAG)
+
 
 enter:
 	docker run --rm --name $(subst /,-,$(IMAGE)) -it --entrypoint=/bin/sh $(ARG) $(IMAGE):$(TAG)
