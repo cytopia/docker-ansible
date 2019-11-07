@@ -1,0 +1,232 @@
+---
+
+# -------------------------------------------------------------------------------------------------
+# Job Name
+# -------------------------------------------------------------------------------------------------
+name: Ansible-CI
+
+
+# -------------------------------------------------------------------------------------------------
+# When to run
+# -------------------------------------------------------------------------------------------------
+on:
+  # Runs on Pull Requests
+  pull_request:
+
+  # Runs on master Branch and Tags
+  push:
+    branches:
+      - master
+    tags:
+      - '[0-9]+.[0-9]+*'
+
+  # Runs daily (on master branch)
+  schedule:
+    - cron: '0 0 * * *'
+
+
+# -------------------------------------------------------------------------------------------------
+# What to run
+# -------------------------------------------------------------------------------------------------
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        version:
+          - "2.3"
+          - "2.4"
+          - "2.5"
+          - "2.6"
+          - "2.7"
+          - "2.8"
+          - "2.9"
+          - latest
+        flavour:
+          - "base"
+          - "tools"
+          - "infra"
+          - "azure"
+          - "aws"
+          - "awsk8s"
+          # Kops
+          - "awskops-1.8"
+          - "awskops-1.9"
+          - "awskops-1.10"
+          - "awskops-1.11"
+          - "awskops-1.12"
+          - "awskops-1.13"
+          - "awskops-1.14"
+          # Helm
+          - "awshelm-2.11"
+          - "awshelm-2.12"
+          - "awshelm-2.13"
+          - "awshelm-2.14"
+          - "awshelm-2.15"
+          - "awshelm-2.16"
+
+    name: "[ Ansible ${{ matrix.version }} (${{ matrix.flavour }}) ]"
+    steps:
+
+      # ------------------------------------------------------------
+      # Checkout repository
+      # ------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Show environment
+        run: |
+          env
+
+      - name: Set variables
+        id: vars
+        run: |
+          # Set image tag and flavour for builds and tests
+          HELM=
+          KOPS=
+          if [[ ${FLAVOUR} =~ ^base$ ]]; then
+            TAG="${VERSION}"
+          elif [[ ${FLAVOUR} =~ ^tools$ ]]; then
+            TAG="${VERSION}-tools"
+          elif [[ ${FLAVOUR} =~ ^infra$ ]]; then
+            TAG="${VERSION}-infra"
+          elif [[ ${FLAVOUR} =~ ^azure$ ]]; then
+            TAG="${VERSION}-azure"
+          elif [[ ${FLAVOUR} =~ ^aws$ ]]; then
+            TAG="${VERSION}-aws"
+          elif [[ ${FLAVOUR} =~ ^awsk8s-[.0-9]+$ ]]; then
+            TAG="${VERSION}-awsk8s"
+          elif [[ ${FLAVOUR} =~ ^awskops-[.0-9]+$ ]]; then
+            TAG="${VERSION}-awskops"
+            KOPS="${FLAVOUR/awskops-}"
+          elif [[ ${FLAVOUR} =~ ^awshelm-[.0-9]+$ ]]; then
+            TAG="${VERSION}-awshelm"
+            HELM="${FLAVOUR/awshelm-}"
+          fi
+
+          # Set git branch or git tag as slug
+          if [[ ${GITHUB_REF} =~ ^refs\/tags\/ ]]; then
+            GIT_TYPE=TAG
+            GIT_SLUG="${GITHUB_REF/refs\/tags\//}"
+          else
+            GIT_TYPE=BRANCH
+            if [ -n "${GITHUB_HEAD_REF}" ]; then
+              GIT_SLUG="${GITHUB_HEAD_REF}"
+            else
+              GIT_SLUG="${GITHUB_REF/refs\/heads\//}"
+            fi
+          fi
+
+          # Set Docker image tag for push
+          if [ -n "${GIT_TYPE" = "TAG" ] || [ "${GIT_SLUG}" != "master" ]; then
+            IMAGE_TAG="${TAG}${KOPS}${HELM}-${GIT_SLUG}"
+          else
+            IMAGE_TAG="${TAG}${KOPS}${HELM}"
+          fi
+
+
+          # Print variables
+          echo "TAG:       ${TAG}"
+          echo "HELM:      ${HELM}"
+          echo "KOPS:      ${KOPS}"
+          echo "GIT_TYPE:  ${GIT_TYPE}"
+          echo "GIT_SLUG:  ${GIT_SLUG}"
+          echo "IMAGE_TAG: ${IMAGE_TAG}"
+
+          # Export variables for other steps
+          echo ::set-output name=TAG::${TAG}
+          echo ::set-output name=HELM::${HELM}
+          echo ::set-output name=KOPS::${KOPS}
+          echo ::set-output name=GIT_TYPE::${GIT_TYPE}
+          echo ::set-output name=GIT_SLUG::${GIT_SLUG}
+          echo ::set-output name=IMAGE_TAG::${IMAGE_TAG}
+        env:
+          VERSION: ${{ matrix.version }}
+          FLAVOUR: ${{ matrix.flavour }}
+
+
+      # ------------------------------------------------------------
+      # Build
+      # ------------------------------------------------------------
+      - name: Build
+        run: |
+          # Retry function to mitigate potential network outages
+          retry() {
+            for ((n=0; n<10; n++)); do
+              echo "[${n}] ${*}";
+              if eval "${*}"; then
+                return 0;
+              fi;
+              sleep 5;
+            done;
+            return 1;
+          }
+          # Build
+          echo "make build TAG=${TAG} KOPS=${KOPS} HELM=${HELM}"
+          retry make build TAG=${TAG} KOPS=${KOPS} HELM=${HELM}
+        env:
+          TAG: ${{ steps.vars.TAG }}
+          HELM: ${{ steps.vars.HELM }}
+          KOPS: ${{ steps.vars.KOPS }}
+
+
+      # ------------------------------------------------------------
+      # Test
+      # ------------------------------------------------------------
+      - name: Test
+        run: |
+          # Retry function to mitigate potential network outages
+          retry() {
+            for ((n=0; n<10; n++)); do
+              echo "[${n}] ${*}";
+              if eval "${*}"; then
+                return 0;
+              fi;
+              sleep 5;
+            done;
+            return 1;
+          }
+          # Build
+          echo "make test TAG=${TAG} KOPS=${KOPS} HELM=${HELM}"
+          retry make test TAG=${TAG} KOPS=${KOPS} HELM=${HELM}
+        env:
+          TAG: ${{ steps.vars.TAG }}
+          HELM: ${{ steps.vars.HELM }}
+          KOPS: ${{ steps.vars.KOPS }}
+
+
+      # ------------------------------------------------------------
+      # Push
+      # ------------------------------------------------------------
+      - name: Push (only repo owner)
+        run: |
+          # Retry function to mitigate potential network outages
+          retry() {
+            for ((n=0; n<10; n++)); do
+              echo "[${n}] ${*}";
+              if eval "${*}"; then
+                return 0;
+              fi;
+              sleep 5;
+            done;
+            return 1;
+          }
+
+          # Push (currently Noop)
+          echo "retry make login USER= PASS="
+          echo "retry make push TAG=${IMAGE_TAG}"
+
+        env:
+          IMAGE_TAG: ${{ steps.vars.IMAGE_TAG }}
+
+        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+            && (
+              (github.event_name == 'schedule'     && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'         && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'pull_request' && (startsWith(github.head_ref, 'release-')))
+            )
