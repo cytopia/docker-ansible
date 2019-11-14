@@ -191,11 +191,12 @@ env:
 ###
 install:
   - retry() {
-      for ((n=0; n<10; n++)); do
+      for ((n=0; n<60; n++)); do
         echo "[${n}] ${*}";
         if eval "${*}"; then
           return 0;
         fi;
+        sleep 1;
       done;
       return 1;
     }
