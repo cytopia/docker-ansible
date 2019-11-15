@@ -5,7 +5,7 @@ endif
 # -------------------------------------------------------------------------------------------------
 # Default configuration
 # -------------------------------------------------------------------------------------------------
-.PHONY: build rebuild lint test _test_version _test_run tag pull login push enter
+.PHONY: build rebuild lint test _test-ansible-version _test-helm-version _test-kops-version _test-run tag pull login push enter
 
 CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -82,16 +82,18 @@ rebuild: build
 
 
 test:
-	@$(MAKE) --no-print-directory _test_version
-	@$(MAKE) --no-print-directory _test_run
+	@$(MAKE) --no-print-directory _test-ansible-version
+	@$(MAKE) --no-print-directory _test-helm-version
+	@$(MAKE) --no-print-directory _test-kops-version
+	@$(MAKE) --no-print-directory _test-run
 
 
 # -------------------------------------------------------------------------------------------------
 # Helper Targets
 # -------------------------------------------------------------------------------------------------
-_test_version:
+_test-ansible-version:
 	@echo "------------------------------------------------------------"
-	@echo "- Testing correct version"
+	@echo "- Testing correct Ansible version"
 	@echo "------------------------------------------------------------"
 	@if echo '$(TAG)' | grep -Eq 'latest\-?'; then \
 		echo "Fetching latest version from GitHub"; \
@@ -116,24 +118,77 @@ _test_version:
 			exit 1; \
 		fi; \
 	fi; \
-	if echo "$(TAG)" | grep -Eq 'awskops'; then \
-		echo "Testing for Kops"; \
-		if ! docker run --rm $(IMAGE) kops version | grep -E "[.0-9]+"; then \
+	echo "Success"; \
+	echo
+
+
+_test-helm-version:
+ifneq ($(HELM),)
+	@echo "------------------------------------------------------------"
+	@echo "- Testing correct Helm version"
+	@echo "------------------------------------------------------------"
+	@if echo '$(HELM)' | grep -Eq 'latest\-?'; then \
+		echo "Fetching latest version from GitHub"; \
+		LATEST="$$( \
+			curl -L -sS https://github.com/helm/helm/releases \
+				| tac | tac \
+				| grep -Eo "helm/helm/releases/tag/v[.0-9]+\"" \
+				| head -1 \
+				| sed 's/.*v//g' \
+				| sed 's/\"//g' \
+		)"; \
+		echo "Testing for latest: $${LATEST}"; \
+		if ! docker run --rm $(IMAGE) helm version --client --short | grep -E "^(Client: )?v$${LATEST}"; then \
 			echo "Failed"; \
 			exit 1; \
 		fi; \
-	fi; \
-	if echo "$(TAG)" | grep -Eq 'awshelm'; then \
-		echo "Testing for Kops"; \
-		if ! docker run --rm $(IMAGE) helm version --client --short | grep -E "v[.0-9]+"; then \
+	else \
+		VERSION="$$( echo '$(HELM)' | grep -Eo '^[.0-9]+?' )"; \
+		echo "Testing for version: $${VERSION}"; \
+		if ! docker run --rm $(IMAGE) helm version --client --short | grep -E "^(Client: )?v$${VERSION}\."; then \
 			echo "Failed"; \
 			exit 1; \
 		fi; \
 	fi; \
 	echo "Success"; \
+	echo
+endif
 
 
-_test_run:
+_test-kops-version:
+ifneq ($(KOPS),)
+	@echo "------------------------------------------------------------"
+	@echo "- Testing correct Kops version"
+	@echo "------------------------------------------------------------"
+	@if echo '$(KOPS)' | grep -Eq 'latest\-?'; then \
+		echo "Fetching latest version from GitHub"; \
+		LATEST="$$( \
+			curl -L -sS https://github.com/kubernetes/kops/releases \
+				| tac | tac \
+				| grep -Eo "kubernetes/kops/releases/tag/v[.0-9]+\"" \
+				| head -1 \
+				| sed 's/.*v//g' \
+				| sed 's/\"//g' \
+		)"; \
+		echo "Testing for latest: $${LATEST}"; \
+		if ! docker run --rm $(IMAGE) kops version | grep -E "^Version $${LATEST}"; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
+	else \
+		VERSION="$$( echo '$(KOPS)' | grep -Eo '^[.0-9]+?' )"; \
+		echo "Testing for version: $${VERSION}"; \
+		if ! docker run --rm $(IMAGE) kops version | grep -E "^Version $${VERSION}\."; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
+	fi; \
+	echo "Success"; \
+	echo
+endif
+
+
+_test-run:
 	@echo "------------------------------------------------------------"
 	@echo "- Testing playbook"
 	@echo "------------------------------------------------------------"

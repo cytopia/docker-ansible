@@ -288,6 +288,21 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 ### Ansible awshelm
 The following Ansible Docker images contain everything from `Ansible awsk8s` and additionally: `helm` in its latest patch level version.
 
+#### Helm 3.0 (latest 3.0.x)
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awshelm3.0.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm3.0 "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awshelm3.0.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm3.0 "ansible")
+
+| Docker tag           | Build from                          |
+|----------------------|-------------------------------------|
+| `latest-awshelm3.0` | Latest stable Ansible version       |
+| `2.9-awshelm3.0`    | Latest stable Ansible 2.9.x version |
+| `2.8-awshelm3.0`    | Latest stable Ansible 2.8.x version |
+| `2.7-awshelm3.0`    | Latest stable Ansible 2.7.x version |
+| `2.6-awshelm3.0`    | Latest stable Ansible 2.6.x version |
+| `2.5-awshelm3.0`    | Latest stable Ansible 2.5.x version |
+| `2.4-awshelm3.0`    | Latest stable Ansible 2.4.x version |
+| `2.3-awshelm3.0`    | Latest stable Ansible 2.3.x version |
+
 #### Helm 2.16 (latest 2.16.x)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awshelm2.16.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm2.16 "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awshelm2.16.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm2.16 "ansible")
