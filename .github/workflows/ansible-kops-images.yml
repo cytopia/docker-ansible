@@ -37,6 +37,7 @@ jobs:
           - "1.12"
           - "1.13"
           - "1.14"
+          - "1.15"
 
     name: "[ Ansible ${{ matrix.version }} (Kops ${{ matrix.kops }}) ]"
     steps:
