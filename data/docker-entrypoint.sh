@@ -45,6 +45,36 @@ update_uid_gid() {
 		>&2 echo "[ERR]  Failed to add user ${user} (uid:${uid})"
 		exit 1
 	fi
+
+	# Adjust filesystem permissions accordingly
+	if [ -d /home/ansible/.gnupg ]; then
+		echo "[INFO] Adjusting permissions on directory: ~/.gnupg/"
+		if ! chown ${user}:${group} /home/ansible/.gnupg/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.gnupg'"
+			exit 1
+		fi
+	fi
+	if [ -d /home/ansible/.ssh ]; then
+		echo "[INFO] Adjusting permissions on directory: ~/.ssh/"
+		if ! chown ${user}:${group} /home/ansible/.ssh/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.ssh'"
+			exit 1
+		fi
+	fi
+	if [ -d /home/ansible/.aws ]; then
+		echo "[INFO] Adjusting permissions on directory: ~/.aws/"
+		if ! chown ${user}:${group} /home/ansible/.aws/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.aws'"
+			exit 1
+		fi
+	fi
+	if [ -d /home/ansible/.helm ]; then
+		echo "[INFO] Adjusting permissions on directory: ~/.helm/"
+		if ! chown ${user}:${group} /home/ansible/.helm/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.helm'"
+			exit 1
+		fi
+	fi
 }
 
 init_gpg_key_cmd() {
