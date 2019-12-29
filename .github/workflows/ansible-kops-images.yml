@@ -60,7 +60,7 @@ jobs:
             done;
             return 1;
           }
-          retry make build TAG=${VERSION}-awskops KOPS=${KOPS}
+          retry make build ANSIBLE=${VERSION}-awskops KOPS=${KOPS}
         env:
           VERSION: ${{ matrix.version }}
           KOPS: ${{ matrix.kops }}
@@ -76,7 +76,7 @@ jobs:
             done;
             return 1;
           }
-          retry make test TAG=${VERSION}-awskops KOPS=${KOPS}
+          retry make test ANSIBLE=${VERSION}-awskops KOPS=${KOPS}
         env:
           VERSION: ${{ matrix.version }}
           KOPS: ${{ matrix.kops }}

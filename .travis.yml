@@ -215,8 +215,8 @@ install:
 ###
 before_script:
   - retry make lint
-  - retry make build TAG=${VERSION} KOPS=${KOPS=} HELM=${HELM=}
-  - retry make test  TAG=${VERSION}
+  - retry make build ANSIBLE=${VERSION} KOPS=${KOPS=} HELM=${HELM=}
+  - retry make test  ANSIBLE=${VERSION}
 
 
 ###
