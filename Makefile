@@ -5,7 +5,7 @@ endif
 # -------------------------------------------------------------------------------------------------
 # Default configuration
 # -------------------------------------------------------------------------------------------------
-.PHONY: build rebuild lint test _test-ansible-version _test-helm-version _test-kops-version _test-run tag pull login push enter
+.PHONY: build rebuild lint test _test-ansible-version _test-helm-version _test-kops-version _test-run-root _test-run-ansible tag pull login push enter
 
 CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -120,7 +120,8 @@ test:
 	@$(MAKE) --no-print-directory _test-ansible-version
 	@$(MAKE) --no-print-directory _test-helm-version
 	@$(MAKE) --no-print-directory _test-kops-version
-	@$(MAKE) --no-print-directory _test-run
+	@$(MAKE) --no-print-directory _test-run-ansible
+	@$(MAKE) --no-print-directory _test-run-root
 
 
 # -------------------------------------------------------------------------------------------------
@@ -223,13 +224,26 @@ ifneq ($(KOPS),)
 endif
 
 
-_test-run:
+_test-run-root:
 	@echo "------------------------------------------------------------"
-	@echo "- Testing playbook"
+	@echo "- Testing playbook (root)"
 	@echo "------------------------------------------------------------"
-	@if ! docker run --rm -v $(CURRENT_DIR)/tests:/data $(IMAGE) ansible-playbook -i inventory playbook.yml ; then \
+	@if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE) ansible-playbook -i inventory playbook.yml ; then \
 		echo "Failed"; \
 		exit 1; \
+	fi; \
+	echo "Success";
+
+
+_test-run-ansible:
+	@echo "------------------------------------------------------------"
+	@echo "- Testing playbook (ansible)"
+	@echo "------------------------------------------------------------"
+	@if echo "$(ANSIBLE)" | grep -Ev '^[.0-9]+$$'; then \
+		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data -e USER=ansible -e MY_UID=$$(id -u) -e MY_GID=$$(id -g) $(IMAGE) ansible-playbook -i inventory playbook.yml ; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
 	fi; \
 	echo "Success";
 

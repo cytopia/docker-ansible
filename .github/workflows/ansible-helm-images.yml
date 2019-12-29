@@ -75,6 +75,7 @@ jobs:
             return 1;
           }
           retry make test ANSIBLE=${VERSION}-awshelm HELM=${HELM}
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
         env:
           VERSION: ${{ matrix.version }}
           HELM: ${{ matrix.helm }}

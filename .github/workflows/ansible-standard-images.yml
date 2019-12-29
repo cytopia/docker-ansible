@@ -83,6 +83,7 @@ jobs:
           else
             retry make test ANSIBLE=${VERSION}-${FLAVOUR}
           fi
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
         env:
           VERSION: ${{ matrix.version }}
           FLAVOUR: ${{ matrix.flavour }}
