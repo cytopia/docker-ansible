@@ -59,9 +59,9 @@ jobs:
             return 1;
           }
           if [ "${FLAVOUR}" = "base" ]; then
-            retry make build TAG=${VERSION}
+            retry make build ANSIBLE=${VERSION}
           else
-            retry make build TAG=${VERSION}-${FLAVOUR}
+            retry make build ANSIBLE=${VERSION}-${FLAVOUR}
           fi
         env:
           VERSION: ${{ matrix.version }}
@@ -79,11 +79,11 @@ jobs:
             return 1;
           }
           if [ "${FLAVOUR}" = "base" ]; then
-            retry make test TAG=${VERSION}
+            retry make test ANSIBLE=${VERSION}
           else
-            retry make test TAG=${VERSION}-${FLAVOUR}
+            retry make test ANSIBLE=${VERSION}-${FLAVOUR}
           fi
-          retry make test TAG=${VERSION}
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
         env:
           VERSION: ${{ matrix.version }}
           FLAVOUR: ${{ matrix.flavour }}

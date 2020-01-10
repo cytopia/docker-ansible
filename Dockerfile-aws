@@ -134,4 +134,4 @@ RUN set -eux \
 COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["ansible"]
+CMD ["/bin/bash"]

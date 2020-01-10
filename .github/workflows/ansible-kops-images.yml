@@ -37,6 +37,7 @@ jobs:
           - "1.12"
           - "1.13"
           - "1.14"
+          - "1.15"
 
     name: "[ Ansible ${{ matrix.version }} (Kops ${{ matrix.kops }}) ]"
     steps:
@@ -59,7 +60,7 @@ jobs:
             done;
             return 1;
           }
-          retry make build TAG=${VERSION}-awskops KOPS=${KOPS}
+          retry make build ANSIBLE=${VERSION}-awskops KOPS=${KOPS}
         env:
           VERSION: ${{ matrix.version }}
           KOPS: ${{ matrix.kops }}
@@ -75,7 +76,8 @@ jobs:
             done;
             return 1;
           }
-          retry make test TAG=${VERSION}-awskops KOPS=${KOPS}
+          retry make test ANSIBLE=${VERSION}-awskops KOPS=${KOPS}
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
         env:
           VERSION: ${{ matrix.version }}
           KOPS: ${{ matrix.kops }}

@@ -11,9 +11,6 @@ set -o pipefail
 # MY_UID=1000
 # MY_GID=1000
 
-DEFAULT_UID=1000
-DEFAULT_GID=1000
-
 USE_NONROOT=0
 INIT_GPG=0
 
@@ -37,13 +34,43 @@ update_uid_gid() {
 	fi
 
 	# Add new user/group
-	if ! addgroup -g ${gid} ${group}; then
+	if ! addgroup -g "${gid}" "${group}"; then
 		>&2 echo "[ERR]  Failed to add group ${group} (gid:${gid})"
 		exit 1
 	fi
-	if ! adduser -h /home/ansible -s /bin/bash -G ${group} -D -u ${uid} ${user}; then
+	if ! adduser -h /home/ansible -s /bin/bash -G "${group}" -D -u "${uid}" "${user}"; then
 		>&2 echo "[ERR]  Failed to add user ${user} (uid:${uid})"
 		exit 1
+	fi
+
+	# Adjust filesystem permissions accordingly
+	if [ -d /home/ansible/.gnupg ]; then
+		echo "[INFO] Adjusting ownership on directory: ~/.gnupg/"
+		if ! chown "${user}:${group}" /home/ansible/.gnupg/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.gnupg'"
+			exit 1
+		fi
+	fi
+	if [ -d /home/ansible/.ssh ]; then
+		echo "[INFO] Adjusting ownership on directory: ~/.ssh/"
+		if ! chown "${user}:${group}" /home/ansible/.ssh/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.ssh'"
+			exit 1
+		fi
+	fi
+	if [ -d /home/ansible/.aws ]; then
+		echo "[INFO] Adjusting ownership on directory: ~/.aws/"
+		if ! chown "${user}:${group}" /home/ansible/.aws/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.aws'"
+			exit 1
+		fi
+	fi
+	if [ -d /home/ansible/.helm ]; then
+		echo "[INFO] Adjusting ownership on directory: ~/.helm/"
+		if ! chown "${user}:${group}" /home/ansible/.helm/; then
+			>&2 echo "[ERR]  Failed to 'chown ${user}:${group} ~/.helm'"
+			exit 1
+		fi
 	fi
 }
 

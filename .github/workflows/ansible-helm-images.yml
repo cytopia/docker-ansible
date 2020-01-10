@@ -58,7 +58,7 @@ jobs:
             done;
             return 1;
           }
-          retry make build TAG=${VERSION}-awshelm HELM=${HELM}
+          retry make build ANSIBLE=${VERSION}-awshelm HELM=${HELM}
         env:
           VERSION: ${{ matrix.version }}
           HELM: ${{ matrix.helm }}
@@ -74,7 +74,8 @@ jobs:
             done;
             return 1;
           }
-          retry make test TAG=${VERSION}-awshelm HELM=${HELM}
+          retry make test ANSIBLE=${VERSION}-awshelm HELM=${HELM}
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
         env:
           VERSION: ${{ matrix.version }}
           HELM: ${{ matrix.helm }}

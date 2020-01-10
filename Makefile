@@ -5,7 +5,7 @@ endif
 # -------------------------------------------------------------------------------------------------
 # Default configuration
 # -------------------------------------------------------------------------------------------------
-.PHONY: build rebuild lint test _test-ansible-version _test-helm-version _test-kops-version _test-run tag pull login push enter
+.PHONY: build rebuild lint test _test-ansible-version _test-helm-version _test-kops-version _test-run-root _test-run-ansible tag pull login push enter
 
 CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -22,6 +22,7 @@ DIR = .
 FILE = Dockerfile
 IMAGE = cytopia/ansible
 TAG = latest
+ANSIBLE = latest
 NO_CACHE =
 
 
@@ -29,16 +30,50 @@ NO_CACHE =
 # Default Target
 # -------------------------------------------------------------------------------------------------
 help:
-	@echo "lint                              Lint repository"
-	@echo "build   [TAG=] [KOPS=] [HELM=]    Build image"
-	@echo "rebuild [TAG=] [KOPS=] [HELM=]    Build image without cache"
-	@echo "test    [TAG=]                    Test build image"
-	@echo "tag     [TAG=]                    Tag build image"
-	@echo "pull                              Pull FROM image"
-	@echo "login   [USER=] [PASS=]           Login to Dockerhub"
-	@echo "push    [TAG=]                    Push image to Dockerhub"
-	@echo "enter   [TAG=]                    Run and enter build image"
-
+	@echo "--------------------------------------------------------------------------------"
+	@echo " Build Targets"
+	@echo "--------------------------------------------------------------------------------"
+	@echo
+	@echo "All Docker images are build a $(IMAGE):latest"
+	@echo "and you have to retag them yourself accordingly."
+	@echo
+	@echo "build   [ANSIBLE=] [KOPS=] [HELM=]      Build Docker image."
+	@echo "rebuild [ANSIBLE=] [KOPS=] [HELM=]      Build Docker image without cache."
+	@echo
+	@echo "    make build ANSIBLE=2.3"
+	@echo "    make build ANSIBLE=2.3-tools"
+	@echo "    make build ANSIBLE=2.3-infra"
+	@echo "    make build ANSIBLE=2.3-azure"
+	@echo "    make build ANSIBLE=2.3-aws"
+	@echo "    make build ANSIBLE=2.3-awsk8s"
+	@echo "    make build ANSIBLE=2.3-aws-helm HELM=2.11"
+	@echo "    make build ANSIBLE=2.3-aws-kops HELM=1.15"
+	@echo
+	@echo "--------------------------------------------------------------------------------"
+	@echo " Test Targets"
+	@echo "--------------------------------------------------------------------------------"
+	@echo
+	@echo "test [ANSIBLE=] [KOPS=] [HELM=]         Test built Docker image."
+	@echo
+	@echo "    make TEST ANSIBLE=2.5"
+	@echo "    make TEST ANSIBLE=2.5-tools"
+	@echo "    make TEST ANSIBLE=2.5-infra"
+	@echo "    make TEST ANSIBLE=2.5-azure"
+	@echo "    make TEST ANSIBLE=2.5-aws"
+	@echo "    make TEST ANSIBLE=2.5-awsk8s"
+	@echo "    make TEST ANSIBLE=2.5-awshelm HELM=2.11"
+	@echo "    make TEST ANSIBLE=2.5-awskops KOPS=1.15"
+	@echo
+	@echo "--------------------------------------------------------------------------------"
+	@echo " CI Targets"
+	@echo "--------------------------------------------------------------------------------"
+	@echo
+	@echo "lint                                    Lint repository."
+	@echo "tag   [TAG=]                            Tag built Docker image."
+	@echo "pull                                    Pull the base Docker image."
+	@echo "login [USER=] [PASS=]                   Login to Dockerhub."
+	@echo "push  [TAG=]                            Push Docker image to Dockerhub."
+	@echo "enter [TAG=]                            Run and enter Docker built image."
 
 # -------------------------------------------------------------------------------------------------
 # Targets
@@ -53,14 +88,14 @@ lint:
 
 
 build:
-	if echo '$(TAG)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
-		VERSION="$$( echo '$(TAG)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
-		SUFFIX="$$( echo '$(TAG)' | grep -Eo '\-.+' )"; \
+	if echo '$(ANSIBLE)' | grep -Eq '^(latest|[.0-9]+?)\-'; then \
+		VERSION="$$( echo '$(ANSIBLE)' | grep -Eo '^(latest|[.0-9]+?)' )"; \
+		SUFFIX="$$( echo '$(ANSIBLE)' | grep -Eo '\-.+' )"; \
 		docker build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-			--label "org.opencontainers.image.version"="${TAG}" \
+			--label "org.opencontainers.image.version"="${ANSIBLE}" \
 			--build-arg KOPS=$(KOPS) \
 			--build-arg HELM=$(HELM) \
 			--build-arg VERSION=$${VERSION} \
@@ -70,8 +105,8 @@ build:
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-			--label "org.opencontainers.image.version"="${TAG}" \
-			--build-arg VERSION=$(TAG) \
+			--label "org.opencontainers.image.version"="${ANSIBLE}" \
+			--build-arg VERSION=$(ANSIBLE) \
 			-t $(IMAGE) -f $(DIR)/$(FILE) $(DIR); \
 	fi
 
@@ -85,7 +120,8 @@ test:
 	@$(MAKE) --no-print-directory _test-ansible-version
 	@$(MAKE) --no-print-directory _test-helm-version
 	@$(MAKE) --no-print-directory _test-kops-version
-	@$(MAKE) --no-print-directory _test-run
+	@$(MAKE) --no-print-directory _test-run-ansible
+	@$(MAKE) --no-print-directory _test-run-root
 
 
 # -------------------------------------------------------------------------------------------------
@@ -95,7 +131,7 @@ _test-ansible-version:
 	@echo "------------------------------------------------------------"
 	@echo "- Testing correct Ansible version"
 	@echo "------------------------------------------------------------"
-	@if echo '$(TAG)' | grep -Eq 'latest\-?'; then \
+	@if echo '$(ANSIBLE)' | grep -Eq 'latest\-?'; then \
 		echo "Fetching latest version from GitHub"; \
 		LATEST="$$( \
 			curl -L -sS  https://github.com/ansible/ansible/releases/ \
@@ -111,7 +147,7 @@ _test-ansible-version:
 			exit 1; \
 		fi; \
 	else \
-		VERSION="$$( echo '$(TAG)' | grep -Eo '^[.0-9]+?' )"; \
+		VERSION="$$( echo '$(ANSIBLE)' | grep -Eo '^[.0-9]+?' )"; \
 		echo "Testing for tag: $${VERSION}"; \
 		if ! docker run --rm $(IMAGE) ansible --version | grep -E "^[Aa]nsible $${VERSION}"; then \
 			echo "Failed"; \
@@ -188,13 +224,26 @@ ifneq ($(KOPS),)
 endif
 
 
-_test-run:
+_test-run-root:
 	@echo "------------------------------------------------------------"
-	@echo "- Testing playbook"
+	@echo "- Testing playbook (root)"
 	@echo "------------------------------------------------------------"
-	@if ! docker run --rm -v $(CURRENT_DIR)/tests:/data $(IMAGE) ansible-playbook -i inventory playbook.yml ; then \
+	@if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE) ansible-playbook -i inventory playbook.yml ; then \
 		echo "Failed"; \
 		exit 1; \
+	fi; \
+	echo "Success";
+
+
+_test-run-ansible:
+	@echo "------------------------------------------------------------"
+	@echo "- Testing playbook (ansible)"
+	@echo "------------------------------------------------------------"
+	@if echo "$(ANSIBLE)" | grep -Ev '^[.0-9]+$$'; then \
+		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data -e USER=ansible -e MY_UID=$$(id -u) -e MY_GID=$$(id -g) $(IMAGE) ansible-playbook -i inventory playbook.yml ; then \
+			echo "Failed"; \
+			exit 1; \
+		fi; \
 	fi; \
 	echo "Success";
 
@@ -218,4 +267,4 @@ push:
 
 
 enter:
-	docker run --rm --name $(subst /,-,$(IMAGE)) -it --entrypoint=/bin/sh $(ARG) $(IMAGE):$(TAG)
+	docker run --rm --name $(subst /,-,$(IMAGE)) -it $(IMAGE):$(TAG)

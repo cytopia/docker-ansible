@@ -133,6 +133,10 @@ RUN set -eux \
 	&& chown ansible:ansible /home/ansible/.aws \
 	&& chmod 0700 /home/ansible/.aws \
 	\
+	&& mkdir /home/ansible/.helm \
+	&& chown ansible:ansible /home/ansible/.helm \
+	&& chmod 0755 /home/ansible/.helm \
+	\
 	&& mkdir /data \
 	&& chown ansible:ansible /data \
 	&& chmod 0755 /data \
@@ -161,4 +165,4 @@ RUN set -eux \
 COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["ansible"]
+CMD ["/bin/bash"]

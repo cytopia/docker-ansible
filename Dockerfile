@@ -57,4 +57,4 @@ COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-pa
 COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
 WORKDIR /data
-CMD ["ansible"]
+CMD ["/bin/sh"]

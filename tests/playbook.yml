@@ -1,6 +1,14 @@
 ---
 - hosts: localhost
   connection: local
+  vars:
+    var1: value1
+    var2: value2
   tasks:
-    - debug:
+    - name: Ensure message is printed
+      debug:
         msg: Test
+    - name: Ensure template is created
+      template:
+        src: "{{ playbook_dir }}/test.yml.j2"
+        dest: "{{ playbook_dir }}/test.yml"
