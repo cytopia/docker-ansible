@@ -75,6 +75,10 @@ RUN set -eux \
 	&& chown ansible:ansible /data \
 	&& chmod 0755 /data \
 	\
+  && wget https://github.com/mikefarah/yq/releases/download/3.0.0-beta/yq_linux_amd64 -O yq \
+  && mv yq /usr/bin/ \
+  && chmod a+x /usr/bin/yq \
+  \
 	&& apk add --no-cache \
 		bash \
 		git \
