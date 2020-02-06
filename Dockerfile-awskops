@@ -79,7 +79,13 @@ RUN set -eux \
 	# Get latest feature version
 	&& version="$(git tag | grep -E "^${KOPS}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1)" \
 	&& echo "${version}" \
-	&& curl -sS -L -o /usr/bin/kops https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-amd64 \
+	&& if [ "$(curl -sS -L -I -o /dev/null -w "%{http_code}" "https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-amd64")" = "404" ]; then \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/v${version}/kops-linux-amd64"; \
+	else \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-amd64"; \
+	fi \
+	&& echo "${KOPS_URL}" \
+	&& curl -sS -L -o /usr/bin/kops "${KOPS_URL}" \
 	&& chmod +x /usr/bin/kops \
 	&& /usr/bin/kops version | grep -E "${KOPS}" | grep -E "^Version\s+${version}"
 
