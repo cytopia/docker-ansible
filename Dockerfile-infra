@@ -91,6 +91,7 @@ RUN set -eux \
 		git \
 		gnupg \
 		jq \
+		libpq \
 		openssh-client \
 		python3 \
 	\
