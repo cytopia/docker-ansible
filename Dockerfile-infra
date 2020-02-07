@@ -17,9 +17,9 @@ RUN set -eux \
 		pip3 install --no-cache-dir --no-compile ansible; \
 	else \
 		pip3 install --no-cache-dir --no-compile "ansible>=${VERSION},<$(echo "${VERSION}+0.1" | bc)"; \
-	fi #\
-    # && find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
-    #&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+	fi \
+    && find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+    && find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
 RUN set -eux \
 	&& pip3 install --no-cache-dir --no-compile dnspython \
