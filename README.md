@@ -180,6 +180,21 @@ The following Ansible Docker images contain everything from `Ansible aws` and ad
 ### Ansible awskops
 The following Ansible Docker images contain everything from `Ansible awsk8s` and additionally: `kops` in its latest patch level version.
 
+#### Kops 1.16 (latest 1.16.x)
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awskops1.16.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.16 "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awskops1.16.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.16 "ansible")
+
+| Docker tag           | Build from                          |
+|----------------------|-------------------------------------|
+| `latest-awskops1.16` | Latest stable Ansible version       |
+| `2.9-awskops1.16`    | Latest stable Ansible 2.9.x version |
+| `2.8-awskops1.16`    | Latest stable Ansible 2.8.x version |
+| `2.7-awskops1.16`    | Latest stable Ansible 2.7.x version |
+| `2.6-awskops1.16`    | Latest stable Ansible 2.6.x version |
+| `2.5-awskops1.16`    | Latest stable Ansible 2.5.x version |
+| `2.4-awskops1.16`    | Latest stable Ansible 2.4.x version |
+| `2.3-awskops1.16`    | Latest stable Ansible 2.3.x version |
+
 #### Kops 1.15 (latest 1.15.x)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awskops1.15.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.15 "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awskops1.15.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.15 "ansible")
