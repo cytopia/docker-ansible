@@ -46,6 +46,11 @@ RUN set -eux \
 	&& aws --version 2>&1 | grep -E '^aws-cli/[.0-9]+'
 
 RUN set -eux \
+	&& YQ="$( curl -L -sS -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest | sed 's/^.*\///g' )" \
+	&& curl -L -sS https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64 > /usr/bin/yq \
+	&& chmod +x /usr/bin/yq
+
+RUN set -eux \
 	&& git clone https://github.com/kubernetes-sigs/aws-iam-authenticator /tmp/aws-iam-authenticator \
 	&& cd /tmp/aws-iam-authenticator \
 	&& IAM_AUTH_VERSION="$( git tag --sort=-creatordate \
@@ -110,6 +115,7 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} awskops"
 COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
 COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
+COPY --from=builder /usr/bin/yq /usr/bin/yq
 COPY --from=builder /usr/bin/aws /usr/bin/aws
 COPY --from=builder /usr/bin/aws-iam-authenticator /usr/bin/aws-iam-authenticator
 COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
