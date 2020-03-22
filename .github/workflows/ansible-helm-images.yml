@@ -36,6 +36,7 @@ jobs:
           - "2.14"
           - "2.15"
           - "3.0"
+          - "3.1"
 
     name: "[ Ansible ${{ matrix.version }} (Helm ${{ matrix.helm }}) ]"
     steps:
