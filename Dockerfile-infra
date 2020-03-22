@@ -93,6 +93,7 @@ RUN set -eux \
 		jq \
 		openssh-client \
 		python3 \
+		rsync \
 	\
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf ansible /usr/bin/ansible-config \
