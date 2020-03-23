@@ -66,8 +66,8 @@ The following table shows a quick overview. For more details see further down be
 | Flavour | Inherits from | Additional Python libs | Additional binaries |
 |---------|---------------|------------------------|---------------------|
 | base    | -             | `cffi`, `cryptography`, `Jinja2`, `PyYAML` | - |
-| tools   | base          | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh` |
-| infra   | tools         | `docker`, `paramiko`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | - |
+| tools   | base          | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
+| infra   | tools         | `docker`, `docker-compose`, `paramiko`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
 | azure   | tools         | `azure`                | - |
 | aws     | tools         | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
 | awsk8s  | aws           | `openshift`            | `kubectl` |
