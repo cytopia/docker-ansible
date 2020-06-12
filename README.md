@@ -70,7 +70,7 @@ The following table shows a quick overview. For more details see further down be
 | base    | -             | `cffi`, `cryptography`, `Jinja2`, `PyYAML` | - |
 | tools   | base          | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
 | infra   | tools         | `docker`, `docker-compose`, `paramiko`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
-| azure   | tools         | `azure`                | - |
+| azure   | tools         | `azure-*`              | - |
 | aws     | tools         | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
 | awsk8s  | aws           | `openshift`            | `kubectl` |
 | awskops | awsk8s        | -                      | `kops` |
