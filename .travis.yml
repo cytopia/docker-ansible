@@ -88,6 +88,14 @@ env:
     - VERSION=2.8-awshelm HELM=3.1
     - VERSION=2.9-awshelm HELM=3.1
     - VERSION=latest-awshelm HELM=3.1
+    - VERSION=2.3-awshelm HELM=3.2
+    - VERSION=2.4-awshelm HELM=3.2
+    - VERSION=2.5-awshelm HELM=3.2
+    - VERSION=2.6-awshelm HELM=3.2
+    - VERSION=2.7-awshelm HELM=3.2
+    - VERSION=2.8-awshelm HELM=3.2
+    - VERSION=2.9-awshelm HELM=3.2
+    - VERSION=latest-awshelm HELM=3.2
     - VERSION=2.3-awskops KOPS=1.8
     - VERSION=2.4-awskops KOPS=1.8
     - VERSION=2.5-awskops KOPS=1.8
@@ -160,6 +168,14 @@ env:
     - VERSION=2.8-awskops KOPS=1.16
     - VERSION=2.9-awskops KOPS=1.16
     - VERSION=latest-awskops KOPS=1.16
+    - VERSION=2.3-awskops KOPS=1.17
+    - VERSION=2.4-awskops KOPS=1.17
+    - VERSION=2.5-awskops KOPS=1.17
+    - VERSION=2.6-awskops KOPS=1.17
+    - VERSION=2.7-awskops KOPS=1.17
+    - VERSION=2.8-awskops KOPS=1.17
+    - VERSION=2.9-awskops KOPS=1.17
+    - VERSION=latest-awskops KOPS=1.17
     - VERSION=2.3-awsk8s
     - VERSION=2.4-awsk8s
     - VERSION=2.5-awsk8s

@@ -27,6 +27,8 @@
 > [goimports][gimp-git-lnk] **•**
 > [golint][glint-git-lnk] **•**
 > [jsonlint][jlint-git-lnk] **•**
+> [linkcheck][linkcheck-git-lnk] **•**
+> [mypy][mypy-git-lnk] **•**
 > [phpcbf][pcbf-git-lnk] **•**
 > [phpcs][pcs-git-lnk] **•**
 > [phplint][plint-git-lnk] **•**
@@ -68,7 +70,7 @@ The following table shows a quick overview. For more details see further down be
 | base    | -             | `cffi`, `cryptography`, `Jinja2`, `PyYAML` | - |
 | tools   | base          | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
 | infra   | tools         | `docker`, `docker-compose`, `paramiko`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
-| azure   | tools         | `azure`                | - |
+| azure   | tools         | `azure-*`              | - |
 | aws     | tools         | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
 | awsk8s  | aws           | `openshift`            | `kubectl` |
 | awskops | awsk8s        | -                      | `kops` |
@@ -179,6 +181,23 @@ The following Ansible Docker images contain everything from `Ansible aws` and ad
 
 ### Ansible awskops
 The following Ansible Docker images contain everything from `Ansible awsk8s` and additionally: `kops` in its latest patch level version.
+
+> https://github.com/kubernetes/kops/releases
+
+#### Kops 1.17 (latest 1.17.x)
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awskops1.17.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.17 "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awskops1.17.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.17 "ansible")
+
+| Docker tag           | Build from                          |
+|----------------------|-------------------------------------|
+| `latest-awskops1.17` | Latest stable Ansible version       |
+| `2.9-awskops1.17`    | Latest stable Ansible 2.9.x version |
+| `2.8-awskops1.17`    | Latest stable Ansible 2.8.x version |
+| `2.7-awskops1.17`    | Latest stable Ansible 2.7.x version |
+| `2.6-awskops1.17`    | Latest stable Ansible 2.6.x version |
+| `2.5-awskops1.17`    | Latest stable Ansible 2.5.x version |
+| `2.4-awskops1.17`    | Latest stable Ansible 2.4.x version |
+| `2.3-awskops1.17`    | Latest stable Ansible 2.3.x version |
 
 #### Kops 1.16 (latest 1.16.x)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awskops1.16.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.16 "ansible")
@@ -317,6 +336,23 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 
 ### Ansible awshelm
 The following Ansible Docker images contain everything from `Ansible awsk8s` and additionally: `helm` in its latest patch level version.
+
+> https://github.com/helm/helm/releases
+
+#### Helm 3.2 (latest 3.2.x)
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awshelm3.2.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm3.2 "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awshelm3.2.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm3.2 "ansible")
+
+| Docker tag           | Build from                          |
+|----------------------|-------------------------------------|
+| `latest-awshelm3.2` | Latest stable Ansible version       |
+| `2.9-awshelm3.2`    | Latest stable Ansible 2.9.x version |
+| `2.8-awshelm3.2`    | Latest stable Ansible 2.8.x version |
+| `2.7-awshelm3.2`    | Latest stable Ansible 2.7.x version |
+| `2.6-awshelm3.2`    | Latest stable Ansible 2.6.x version |
+| `2.5-awshelm3.2`    | Latest stable Ansible 2.5.x version |
+| `2.4-awshelm3.2`    | Latest stable Ansible 2.4.x version |
+| `2.3-awshelm3.2`    | Latest stable Ansible 2.3.x version |
 
 #### Helm 3.1 (latest 3.1.x)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awshelm3.1.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awshelm3.1 "ansible")
@@ -876,6 +912,7 @@ linter below for reproducible local or remote CI tests:
 |--------|-----------|------|-------------|
 | [awesome-ci][aci-git-lnk]        | [![aci-hub-img]][aci-hub-lnk]         | Basic      | Tools for git, file and static source code analysis |
 | [file-lint][flint-git-lnk]       | [![flint-hub-img]][flint-hub-lnk]     | Basic      | Baisc source code analysis |
+| [linkcheck][linkcheck-git-lnk]   | [![linkcheck-hub-img]][flint-hub-lnk] | Basic      | Search for URLs in files and validate their HTTP status code |
 | [ansible][ansible-git-lnk]       | [![ansible-hub-img]][ansible-hub-lnk] | Ansible    | Multiple versions and flavours of Ansible |
 | [ansible-lint][alint-git-lnk]    | [![alint-hub-img]][alint-hub-lnk]     | Ansible    | Lint Ansible |
 | [gofmt][gfmt-git-lnk]            | [![gfmt-hub-img]][gfmt-hub-lnk]       | Go         | Format Go source code **<sup>[1]</sup>** |
@@ -889,6 +926,7 @@ linter below for reproducible local or remote CI tests:
 | [phplint][plint-git-lnk]         | [![plint-hub-img]][plint-hub-lnk]     | PHP        | PHP Code Linter **<sup>[1]</sup>** |
 | [php-cs-fixer][pcsf-git-lnk]     | [![pcsf-hub-img]][pcsf-hub-lnk]       | PHP        | PHP Coding Standards Fixer |
 | [black][black-git-lnk]           | [![black-hub-img]][black-hub-lnk]     | Python     | The uncompromising Python code formatter |
+| [mypy][mypy-git-lnk]             | [![mypy-hub-img]][mypy-hub-lnk]       | Python     | Static source code analysis |
 | [pycodestyle][pycs-git-lnk]      | [![pycs-hub-img]][pycs-hub-lnk]       | Python     | Python style guide checker |
 | [pydocstyle][pyds-git-lnk]       | [![pyds-hub-img]][pyds-hub-lnk]       | Python     | Python docstyle checker |
 | [pylint][pylint-git-lnk]         | [![pylint-hub-img]][pylint-hub-lnk]   | Python     | Python source code, bug and quality checker |
@@ -907,6 +945,10 @@ linter below for reproducible local or remote CI tests:
 [flint-git-lnk]: https://github.com/cytopia/docker-file-lint
 [flint-hub-img]: https://img.shields.io/docker/pulls/cytopia/file-lint.svg
 [flint-hub-lnk]: https://hub.docker.com/r/cytopia/file-lint
+
+[linkcheck-git-lnk]: https://github.com/cytopia/docker-linkcheck
+[linkcheck-hub-img]: https://img.shields.io/docker/pulls/cytopia/linkcheck.svg
+[linkcheck-hub-lnk]: https://hub.docker.com/r/cytopia/linkcheck
 
 [jlint-git-lnk]: https://github.com/cytopia/docker-jsonlint
 [jlint-hub-img]: https://img.shields.io/docker/pulls/cytopia/jsonlint.svg
@@ -959,6 +1001,10 @@ linter below for reproducible local or remote CI tests:
 [black-git-lnk]: https://github.com/cytopia/docker-black
 [black-hub-img]: https://img.shields.io/docker/pulls/cytopia/black.svg
 [black-hub-lnk]: https://hub.docker.com/r/cytopia/black
+
+[mypy-git-lnk]: https://github.com/cytopia/docker-mypy
+[mypy-hub-img]: https://img.shields.io/docker/pulls/cytopia/mypy.svg
+[mypy-hub-lnk]: https://hub.docker.com/r/cytopia/mypy
 
 [pycs-git-lnk]: https://github.com/cytopia/docker-pycodestyle
 [pycs-hub-img]: https://img.shields.io/docker/pulls/cytopia/pycodestyle.svg
