@@ -33,6 +33,11 @@ RUN set -eux \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
 RUN set -eux \
+	&& pip3 install --no-cache-dir --no-compile jsondiff \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+RUN set -eux \
 	&& YQ="$( curl -L -sS -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest | sed 's/^.*\///g' )" \
 	&& curl -L -sS https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64 > /usr/bin/yq \
 	&& chmod +x /usr/bin/yq
