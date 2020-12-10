@@ -31,6 +31,7 @@ env:
     - VERSION=2.7-awshelm HELM=2.11
     - VERSION=2.8-awshelm HELM=2.11
     - VERSION=2.9-awshelm HELM=2.11
+    - VERSION=2.10-awshelm HELM=2.11
     - VERSION=latest-awshelm HELM=2.11
     - VERSION=2.3-awshelm HELM=2.12
     - VERSION=2.4-awshelm HELM=2.12
@@ -39,6 +40,7 @@ env:
     - VERSION=2.7-awshelm HELM=2.12
     - VERSION=2.8-awshelm HELM=2.12
     - VERSION=2.9-awshelm HELM=2.12
+    - VERSION=2.10-awshelm HELM=2.12
     - VERSION=latest-awshelm HELM=2.12
     - VERSION=2.3-awshelm HELM=2.13
     - VERSION=2.4-awshelm HELM=2.13
@@ -47,6 +49,7 @@ env:
     - VERSION=2.7-awshelm HELM=2.13
     - VERSION=2.8-awshelm HELM=2.13
     - VERSION=2.9-awshelm HELM=2.13
+    - VERSION=2.10-awshelm HELM=2.13
     - VERSION=latest-awshelm HELM=2.13
     - VERSION=2.3-awshelm HELM=2.14
     - VERSION=2.4-awshelm HELM=2.14
@@ -55,6 +58,7 @@ env:
     - VERSION=2.7-awshelm HELM=2.14
     - VERSION=2.8-awshelm HELM=2.14
     - VERSION=2.9-awshelm HELM=2.14
+    - VERSION=2.10-awshelm HELM=2.14
     - VERSION=latest-awshelm HELM=2.14
     - VERSION=2.3-awshelm HELM=2.15
     - VERSION=2.4-awshelm HELM=2.15
@@ -63,6 +67,7 @@ env:
     - VERSION=2.7-awshelm HELM=2.15
     - VERSION=2.8-awshelm HELM=2.15
     - VERSION=2.9-awshelm HELM=2.15
+    - VERSION=2.10-awshelm HELM=2.15
     - VERSION=latest-awshelm HELM=2.15
     - VERSION=2.3-awshelm HELM=2.16
     - VERSION=2.4-awshelm HELM=2.16
@@ -71,6 +76,7 @@ env:
     - VERSION=2.7-awshelm HELM=2.16
     - VERSION=2.8-awshelm HELM=2.16
     - VERSION=2.9-awshelm HELM=2.16
+    - VERSION=2.10-awshelm HELM=2.16
     - VERSION=latest-awshelm HELM=2.16
     - VERSION=2.3-awshelm HELM=3.0
     - VERSION=2.4-awshelm HELM=3.0
@@ -79,6 +85,7 @@ env:
     - VERSION=2.7-awshelm HELM=3.0
     - VERSION=2.8-awshelm HELM=3.0
     - VERSION=2.9-awshelm HELM=3.0
+    - VERSION=2.10-awshelm HELM=3.0
     - VERSION=latest-awshelm HELM=3.0
     - VERSION=2.3-awshelm HELM=3.1
     - VERSION=2.4-awshelm HELM=3.1
@@ -87,6 +94,7 @@ env:
     - VERSION=2.7-awshelm HELM=3.1
     - VERSION=2.8-awshelm HELM=3.1
     - VERSION=2.9-awshelm HELM=3.1
+    - VERSION=2.10-awshelm HELM=3.1
     - VERSION=latest-awshelm HELM=3.1
     - VERSION=2.3-awshelm HELM=3.2
     - VERSION=2.4-awshelm HELM=3.2
@@ -95,6 +103,7 @@ env:
     - VERSION=2.7-awshelm HELM=3.2
     - VERSION=2.8-awshelm HELM=3.2
     - VERSION=2.9-awshelm HELM=3.2
+    - VERSION=2.10-awshelm HELM=3.2
     - VERSION=latest-awshelm HELM=3.2
     - VERSION=2.3-awskops KOPS=1.8
     - VERSION=2.4-awskops KOPS=1.8
@@ -103,6 +112,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.8
     - VERSION=2.8-awskops KOPS=1.8
     - VERSION=2.9-awskops KOPS=1.8
+    - VERSION=2.10-awskops KOPS=1.8
     - VERSION=latest-awskops KOPS=1.8
     - VERSION=2.3-awskops KOPS=1.9
     - VERSION=2.4-awskops KOPS=1.9
@@ -111,6 +121,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.9
     - VERSION=2.8-awskops KOPS=1.9
     - VERSION=2.9-awskops KOPS=1.9
+    - VERSION=2.10-awskops KOPS=1.9
     - VERSION=latest-awskops KOPS=1.9
     - VERSION=2.3-awskops KOPS=1.10
     - VERSION=2.4-awskops KOPS=1.10
@@ -119,6 +130,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.10
     - VERSION=2.8-awskops KOPS=1.10
     - VERSION=2.9-awskops KOPS=1.10
+    - VERSION=2.10-awskops KOPS=1.10
     - VERSION=latest-awskops KOPS=1.10
     - VERSION=2.3-awskops KOPS=1.11
     - VERSION=2.4-awskops KOPS=1.11
@@ -127,6 +139,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.11
     - VERSION=2.8-awskops KOPS=1.11
     - VERSION=2.9-awskops KOPS=1.11
+    - VERSION=2.10-awskops KOPS=1.11
     - VERSION=latest-awskops KOPS=1.11
     - VERSION=2.3-awskops KOPS=1.12
     - VERSION=2.4-awskops KOPS=1.12
@@ -135,6 +148,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.12
     - VERSION=2.8-awskops KOPS=1.12
     - VERSION=2.9-awskops KOPS=1.12
+    - VERSION=2.10-awskops KOPS=1.12
     - VERSION=latest-awskops KOPS=1.12
     - VERSION=2.3-awskops KOPS=1.13
     - VERSION=2.4-awskops KOPS=1.13
@@ -143,6 +157,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.13
     - VERSION=2.8-awskops KOPS=1.13
     - VERSION=2.9-awskops KOPS=1.13
+    - VERSION=2.10-awskops KOPS=1.13
     - VERSION=latest-awskops KOPS=1.13
     - VERSION=2.3-awskops KOPS=1.14
     - VERSION=2.4-awskops KOPS=1.14
@@ -151,6 +166,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.14
     - VERSION=2.8-awskops KOPS=1.14
     - VERSION=2.9-awskops KOPS=1.14
+    - VERSION=2.10-awskops KOPS=1.14
     - VERSION=latest-awskops KOPS=1.14
     - VERSION=2.3-awskops KOPS=1.15
     - VERSION=2.4-awskops KOPS=1.15
@@ -159,6 +175,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.15
     - VERSION=2.8-awskops KOPS=1.15
     - VERSION=2.9-awskops KOPS=1.15
+    - VERSION=2.10-awskops KOPS=1.15
     - VERSION=latest-awskops KOPS=1.15
     - VERSION=2.3-awskops KOPS=1.16
     - VERSION=2.4-awskops KOPS=1.16
@@ -167,6 +184,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.16
     - VERSION=2.8-awskops KOPS=1.16
     - VERSION=2.9-awskops KOPS=1.16
+    - VERSION=2.10-awskops KOPS=1.16
     - VERSION=latest-awskops KOPS=1.16
     - VERSION=2.3-awskops KOPS=1.17
     - VERSION=2.4-awskops KOPS=1.17
@@ -175,6 +193,7 @@ env:
     - VERSION=2.7-awskops KOPS=1.17
     - VERSION=2.8-awskops KOPS=1.17
     - VERSION=2.9-awskops KOPS=1.17
+    - VERSION=2.10-awskops KOPS=1.17
     - VERSION=latest-awskops KOPS=1.17
     - VERSION=2.3-awsk8s
     - VERSION=2.4-awsk8s
@@ -183,6 +202,7 @@ env:
     - VERSION=2.7-awsk8s
     - VERSION=2.8-awsk8s
     - VERSION=2.9-awsk8s
+    - VERSION=2.10-awsk8s
     - VERSION=latest-awsk8s
     - VERSION=2.3-aws
     - VERSION=2.4-aws
@@ -191,6 +211,7 @@ env:
     - VERSION=2.7-aws
     - VERSION=2.8-aws
     - VERSION=2.9-aws
+    - VERSION=2.10-aws
     - VERSION=latest-aws
     - VERSION=2.3-azure
     - VERSION=2.4-azure
@@ -199,6 +220,7 @@ env:
     - VERSION=2.7-azure
     - VERSION=2.8-azure
     - VERSION=2.9-azure
+    - VERSION=2.10-azure
     - VERSION=latest-azure
     - VERSION=2.3-infra
     - VERSION=2.4-infra
@@ -207,6 +229,7 @@ env:
     - VERSION=2.7-infra
     - VERSION=2.8-infra
     - VERSION=2.9-infra
+    - VERSION=2.10-infra
     - VERSION=latest-infra
     - VERSION=2.3-tools
     - VERSION=2.4-tools
@@ -215,6 +238,7 @@ env:
     - VERSION=2.7-tools
     - VERSION=2.8-tools
     - VERSION=2.9-tools
+    - VERSION=2.10-tools
     - VERSION=latest-tools
     - VERSION=2.3
     - VERSION=2.4
@@ -223,6 +247,7 @@ env:
     - VERSION=2.7
     - VERSION=2.8
     - VERSION=2.9
+    - VERSION=2.10
     - VERSION=latest
 
 
