@@ -1,0 +1,78 @@
+ARG VERSION
+
+# --------------------------------------------------------------------------------------------------
+# Builder Image
+# --------------------------------------------------------------------------------------------------
+FROM alpine:3.9 as builder
+
+# Required tools for building Python packages
+RUN set -eux \
+	&& apk add --no-cache \
+		bc \
+		curl \
+		gcc \
+		git \
+		libffi-dev \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3 \
+		python3-dev
+
+# Python packages (copied to final image)
+RUN set -eux \
+	&& pip3 install --no-cache-dir --no-compile \
+		awscli \
+		botocore \
+		boto \
+		boto3 \
+	&& aws --version 2>&1 | grep -E '^aws-cli/[.0-9]+' \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+# aws-iam-authemticator (copied to final image)
+RUN set -eux \
+	&& git clone https://github.com/kubernetes-sigs/aws-iam-authenticator /tmp/aws-iam-authenticator \
+	&& cd /tmp/aws-iam-authenticator \
+	&& IAM_AUTH_VERSION="$( git tag --sort=-creatordate \
+		| grep -E 'v[0-9]+\.[0-9]+\.[0-9]+$' \
+		| head -1 \
+		| sed 's/^v//g' \
+	)" \
+	&& curl -sS -L -b cookies.txt -c cookies.txt \
+		-o /usr/bin/aws-iam-authenticator \
+		-H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36" \
+		"https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v${IAM_AUTH_VERSION}/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_amd64" \
+	&& chmod +x /usr/bin/aws-iam-authenticator \
+	&& aws-iam-authenticator version | grep "\"${IAM_AUTH_VERSION}\"" \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+
+# --------------------------------------------------------------------------------------------------
+# Final Image
+# --------------------------------------------------------------------------------------------------
+FROM cytopia/ansible:${VERSION}-tools as production
+ARG VERSION
+# https://github.com/opencontainers/image-spec/blob/master/annotations.md
+#LABEL "org.opencontainers.image.created"=""
+#LABEL "org.opencontainers.image.version"=""
+#LABEL "org.opencontainers.image.revision"=""
+LABEL "maintainer"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.authors"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.vendor"="cytopia"
+LABEL "org.opencontainers.image.licenses"="MIT"
+LABEL "org.opencontainers.image.url"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.documentation"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.source"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} aws"
+LABEL "org.opencontainers.image.title"="Ansible ${VERSION} aws"
+LABEL "org.opencontainers.image.description"="Ansible ${VERSION} aws"
+
+COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/bin/aws /usr/bin/aws
+COPY --from=builder /usr/bin/aws-iam-authenticator /usr/bin/aws-iam-authenticator
+
+WORKDIR /data
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/bash"]

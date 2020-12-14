@@ -1,0 +1,456 @@
+---
+
+# -------------------------------------------------------------------------------------------------
+# Job Name
+# -------------------------------------------------------------------------------------------------
+name: nightly
+
+
+# -------------------------------------------------------------------------------------------------
+# When to run
+# -------------------------------------------------------------------------------------------------
+on:
+  # Runs daily
+  schedule:
+    - cron: '0 0 * * *'
+
+
+# -------------------------------------------------------------------------------------------------
+# What to run
+# -------------------------------------------------------------------------------------------------
+jobs:
+  nightly:
+    name: "[ Ansible-${{ matrix.version }} ] (ref: ${{ matrix.refs }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: False
+      matrix:
+        version:
+          - '2.3'
+          - '2.4'
+          - '2.5'
+          - '2.6'
+          - '2.7'
+          - '2.8'
+          - '2.9'
+          - '2.10'
+          - 'latest'
+        refs:
+          - 'master'
+          - '0.27'
+    steps:
+
+      # ------------------------------------------------------------
+      # Setup repository
+      # ------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ matrix.refs }}
+
+      - name: Set variables
+        id: vars
+        run: |
+
+          # Retrieve git info (tags, etc)
+          git fetch --all
+
+          # Branch, Tag or Commit
+          GIT_TYPE="$( \
+            curl -sS https://raw.githubusercontent.com/cytopia/git-tools/master/git-info.sh \
+            | sh \
+            | grep '^GIT_TYPE' \
+            | sed 's|.*=||g' \
+          )"
+          # Branch name, Tag name or Commit Hash
+          GIT_SLUG="$( \
+            curl -sS https://raw.githubusercontent.com/cytopia/git-tools/master/git-info.sh \
+            | sh \
+            | grep '^GIT_NAME' \
+            | sed 's|.*=||g' \
+          )"
+          # Docker Tag
+          if [ "${GIT_TYPE}" = "BRANCH" ] && [ "${GIT_SLUG}" = "master" ]; then
+            DOCKER_TAG_BASE="${VERSION}"
+            DOCKER_TAG_TOOLS="${VERSION}-tools"
+            DOCKER_TAG_INFRA="${VERSION}-infra"
+            DOCKER_TAG_AZURE="${VERSION}-azure"
+            DOCKER_TAG_AWS="${VERSION}-aws"
+            DOCKER_TAG_AWSK8S="${VERSION}-awsk8s"
+          else
+            DOCKER_TAG_BASE="${VERSION}-${GIT_SLUG}"
+            DOCKER_TAG_TOOLS="${VERSION}-tools-${GIT_SLUG}"
+            DOCKER_TAG_INFRA="${VERSION}-infra-${GIT_SLUG}"
+            DOCKER_TAG_AZURE="${VERSION}-azure-${GIT_SLUG}"
+            DOCKER_TAG_AWS="${VERSION}-aws-${GIT_SLUG}"
+            DOCKER_TAG_AWSK8S="${VERSION}-awsk8s-${GIT_SLUG}"
+          fi
+
+          # Output
+          echo "GIT_TYPE=${GIT_TYPE}"
+          echo "GIT_SLUG=${GIT_SLUG}"
+          echo "DOCKER_TAG_BASE=${DOCKER_TAG_BASE}"
+          echo "DOCKER_TAG_TOOLS=${DOCKER_TAG_TOOLS}"
+          echo "DOCKER_TAG_INFRA=${DOCKER_TAG_INFRA}"
+          echo "DOCKER_TAG_AZURE=${DOCKER_TAG_AZURE}"
+          echo "DOCKER_TAG_AWS=${DOCKER_TAG_AWS}"
+          echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}"
+
+          # Export variable
+          # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#environment-files
+          echo "GIT_TYPE=${GIT_TYPE}"                   >> ${GITHUB_ENV}
+          echo "GIT_SLUG=${GIT_SLUG}"                   >> ${GITHUB_ENV}
+          echo "DOCKER_TAG_BASE=${DOCKER_TAG_BASE}"     >> ${GITHUB_ENV}
+          echo "DOCKER_TAG_TOOLS=${DOCKER_TAG_TOOLS}"   >> ${GITHUB_ENV}
+          echo "DOCKER_TAG_INFRA=${DOCKER_TAG_INFRA}"   >> ${GITHUB_ENV}
+          echo "DOCKER_TAG_AZURE=${DOCKER_TAG_AZURE}"   >> ${GITHUB_ENV}
+          echo "DOCKER_TAG_AWS=${DOCKER_TAG_AWS}"       >> ${GITHUB_ENV}
+          echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}" >> ${GITHUB_ENV}
+        env:
+          VERSION: ${{ matrix.version }}
+
+
+      # ------------------------------------------------------------
+      # Base
+      # ------------------------------------------------------------
+      - name: Pull Base Image
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make pull-base-image
+        env:
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Build Ansible Base
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build ANSIBLE=${VERSION} FLAVOUR=base
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Test Ansible Base
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test ANSIBLE=${VERSION} FLAVOUR=base
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+
+      # ------------------------------------------------------------
+      # Tools
+      # ------------------------------------------------------------
+      - name: Build Ansible Tools
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build ANSIBLE=${VERSION} FLAVOUR=tools
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Test Ansible Tools
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test ANSIBLE=${VERSION} FLAVOUR=tools
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+
+      # ------------------------------------------------------------
+      # Infra
+      # ------------------------------------------------------------
+      - name: Build Ansible Infra
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build ANSIBLE=${VERSION} FLAVOUR=infra
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Test Ansible Infra
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test ANSIBLE=${VERSION} FLAVOUR=infra
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+
+      # ------------------------------------------------------------
+      # Azure
+      # ------------------------------------------------------------
+      - name: Build Ansible Azure
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build ANSIBLE=${VERSION} FLAVOUR=azure
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Test Ansible Azure
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test ANSIBLE=${VERSION} FLAVOUR=azure
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+
+      # ------------------------------------------------------------
+      # AWS
+      # ------------------------------------------------------------
+      - name: Build Ansible AWS
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build ANSIBLE=${VERSION} FLAVOUR=aws
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Test Ansible AWS
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test ANSIBLE=${VERSION} FLAVOUR=aws
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+
+      # ------------------------------------------------------------
+      # AWS K8s
+      # ------------------------------------------------------------
+      - name: Build Ansible AWS K8s
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build ANSIBLE=${VERSION} FLAVOUR=awsk8s
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Test Ansible AWS K8s
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test ANSIBLE=${VERSION} FLAVOUR=awsk8s
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+
+      # ------------------------------------------------------------
+      # Deploy
+      # ------------------------------------------------------------
+      - name: Publish images (only repo owner)
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+
+          # Output
+          echo "GIT_TYPE=${GIT_TYPE}"
+          echo "GIT_SLUG=${GIT_SLUG}"
+          echo "DOCKER_TAG_BASE=${DOCKER_TAG_BASE}"
+          echo "DOCKER_TAG_TOOLS=${DOCKER_TAG_TOOLS}"
+          echo "DOCKER_TAG_INFRA=${DOCKER_TAG_INFRA}"
+          echo "DOCKER_TAG_AZURE=${DOCKER_TAG_AZURE}"
+          echo "DOCKER_TAG_AWS=${DOCKER_TAG_AWS}"
+          echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}"
+
+          # Tag image
+          retry make tag ANSIBLE=${VERSION} FLAVOUR=base   TAG=${DOCKER_TAG_BASE}
+          retry make tag ANSIBLE=${VERSION} FLAVOUR=tools  TAG=${DOCKER_TAG_TOOLS}
+          retry make tag ANSIBLE=${VERSION} FLAVOUR=infra  TAG=${DOCKER_TAG_INFRA}
+          retry make tag ANSIBLE=${VERSION} FLAVOUR=azure  TAG=${DOCKER_TAG_AZURE}
+          retry make tag ANSIBLE=${VERSION} FLAVOUR=aws    TAG=${DOCKER_TAG_AWS}
+          retry make tag ANSIBLE=${VERSION} FLAVOUR=awsk8s TAG=${DOCKER_TAG_AWSK8S}
+          docker images | grep cytopia/ansible
+
+          # Login
+          retry make login USERNAME=${{ secrets.DOCKERHUB_USERNAME }} PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
+
+          # Push
+          retry make push TAG=${DOCKER_TAG_BASE}
+          retry make push TAG=${DOCKER_TAG_TOOLS}
+          retry make push TAG=${DOCKER_TAG_INFRA}
+          retry make push TAG=${DOCKER_TAG_AZURE}
+          retry make push TAG=${DOCKER_TAG_AWS}
+          retry make push TAG=${DOCKER_TAG_AWSK8S}
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+            && (
+              (github.event_name == 'schedule' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && startsWith(github.ref, 'refs/heads/release-'))
+            )

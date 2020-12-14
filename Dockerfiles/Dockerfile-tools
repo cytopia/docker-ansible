@@ -1,5 +1,11 @@
+ARG VERSION
+
+# --------------------------------------------------------------------------------------------------
+# Builder Image
+# --------------------------------------------------------------------------------------------------
 FROM alpine:3.9 as builder
 
+# Required tools for building Python packages
 RUN set -eux \
 	&& apk add --no-cache \
 		bc \
@@ -12,33 +18,25 @@ RUN set -eux \
 		python3 \
 		python3-dev
 
-ARG VERSION
+# Python packages (copied to final image)
 RUN set -eux \
-	&& if [ "${VERSION}" = "latest" ]; then \
-		pip3 install --no-cache-dir --no-compile ansible; \
-	else \
-		pip3 install --no-cache-dir --no-compile "ansible>=${VERSION},<$(echo "${VERSION}+0.1" | bc)"; \
-	fi \
+	&& pip3 install --no-cache-dir --no-compile \
+		dnspython \
+		mitogen \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
-RUN set -eux \
-	&& pip3 install --no-cache-dir --no-compile dnspython \
-	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
-	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
-
-RUN set -eux \
-	&& pip3 install --no-cache-dir --no-compile mitogen \
-	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
-	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
-
+# Binaries (copied to final image)
 RUN set -eux \
 	&& YQ="$( curl -L -sS -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest | sed 's/^.*\///g' )" \
 	&& curl -L -sS https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64 > /usr/bin/yq \
 	&& chmod +x /usr/bin/yq
 
 
-FROM alpine:3.9 as production
+# --------------------------------------------------------------------------------------------------
+# Final Image
+# --------------------------------------------------------------------------------------------------
+FROM cytopia/ansible:${VERSION} as production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
@@ -55,17 +53,14 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} tools"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} tools"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} tools"
 
-COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
-COPY --from=builder /usr/bin/ansible /usr/bin/ansible
-COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
-COPY --from=builder /usr/bin/yq /usr/bin/yq
-
+# Define uid/gid and user/group names
 ENV \
 	MY_USER=ansible \
 	MY_GROUP=ansible \
 	MY_UID=1000 \
 	MY_GID=1000
 
+# Add user and group
 RUN set -eux \
 	&& addgroup -g ${MY_GID} ${MY_GROUP} \
 	&& adduser -h /home/ansible -s /bin/bash -G ${MY_GROUP} -D -u ${MY_UID} ${MY_USER} \
@@ -76,34 +71,21 @@ RUN set -eux \
 	\
 	&& mkdir /home/ansible/.ssh \
 	&& chown ansible:ansible /home/ansible/.ssh \
-	&& chmod 0700 /home/ansible/.ssh \
-	\
-	&& mkdir /data \
-	&& chown ansible:ansible /data \
-	&& chmod 0755 /data \
-	\
+	&& chmod 0700 /home/ansible/.ssh
+
+# Additional binaries
+RUN set -eux \
 	&& apk add --no-cache \
 		bash \
 		git \
 		gnupg \
 		jq \
-		openssh-client \
-		python3 \
-	\
-	&& ln -sf /usr/bin/python3 /usr/bin/python \
-	&& ln -sf ansible /usr/bin/ansible-config \
-	&& ln -sf ansible /usr/bin/ansible-console \
-	&& ln -sf ansible /usr/bin/ansible-doc \
-	&& ln -sf ansible /usr/bin/ansible-galaxy \
-	&& ln -sf ansible /usr/bin/ansible-inventory \
-	&& ln -sf ansible /usr/bin/ansible-playbook \
-	&& ln -sf ansible /usr/bin/ansible-pull \
-	&& ln -sf ansible /usr/bin/ansible-test \
-	&& ln -sf ansible /usr/bin/ansible-vault \
-	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
-	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+		openssh-client
 
+COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/bin/yq /usr/bin/yq
 COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
+
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/bin/bash"]

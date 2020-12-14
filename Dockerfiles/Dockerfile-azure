@@ -1,0 +1,94 @@
+ARG VERSION
+
+# --------------------------------------------------------------------------------------------------
+# Builder Image
+# --------------------------------------------------------------------------------------------------
+FROM alpine:3.9 as builder
+
+# Required tools for building Python packages
+RUN set -eux \
+	&& apk add --no-cache \
+		bc \
+		cmake \
+		curl \
+		g++ \
+		gcc \
+		libffi-dev \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3 \
+		python3-dev
+
+# Python packages (copied to final image)
+# pip3 search results in exception
+#RUN set -eux \
+#	&& pip3 install --no-cache-dir --no-compile \
+#		$(pip3 search azure \
+#			| grep -E '^azure' \
+#			| grep 'Microsoft Azure' \
+#			| grep Client \
+#			| awk '{print $1}' \
+#			| grep -v '^azure$' \
+#			| grep -v '^azure-mgmt$' \
+#			| xargs \
+#		)
+RUN set -eux \
+	&& pip3 install --no-cache-dir --no-compile \
+		azure-applicationinsights \
+		azure-batch \
+		azure-cognitiveservices-personalizer \
+		azure-common \
+		azure-cosmos \
+		azure-eventgrid \
+		azure-eventhub \
+		azure-graphrbac \
+		azure-keyvault \
+		azure-loganalytics \
+		azure-mgmt-advisor \
+		azure-mgmt-automation \
+		azure-mgmt-billing \
+		azure-mgmt-commerce \
+		azure-mgmt-consumption \
+		azure-mgmt-hanaonazure \
+		azure-mgmt-maps \
+		azure-mgmt-monitor \
+		azure-mgmt-relay \
+		azure-mgmt-reservations \
+		azure-mgmt-serialconsole \
+		azure-monitor \
+		azure-search \
+		azure-servicebus \
+		azure-servicefabric \
+		azure-storage-queue \
+		azure-synapse \
+		azure-template \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+
+# --------------------------------------------------------------------------------------------------
+# Final Image
+# --------------------------------------------------------------------------------------------------
+FROM cytopia/ansible:${VERSION}-tools as production
+ARG VERSION
+# https://github.com/opencontainers/image-spec/blob/master/annotations.md
+#LABEL "org.opencontainers.image.created"=""
+#LABEL "org.opencontainers.image.version"=""
+#LABEL "org.opencontainers.image.revision"=""
+LABEL "maintainer"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.authors"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.vendor"="cytopia"
+LABEL "org.opencontainers.image.licenses"="MIT"
+LABEL "org.opencontainers.image.url"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.documentation"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.source"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} azure"
+LABEL "org.opencontainers.image.title"="Ansible ${VERSION} azure"
+LABEL "org.opencontainers.image.description"="Ansible ${VERSION} azure"
+
+COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+
+WORKDIR /data
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/bash"]
