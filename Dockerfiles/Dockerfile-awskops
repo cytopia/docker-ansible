@@ -1,0 +1,68 @@
+ARG VERSION
+
+# --------------------------------------------------------------------------------------------------
+# Builder Image
+# --------------------------------------------------------------------------------------------------
+FROM alpine:3.9 as builder
+
+# Required tools for building Python packages
+RUN set -eux \
+	&& apk add --no-cache \
+		bc \
+		curl \
+		gcc \
+		git \
+		libffi-dev \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3 \
+		python3-dev
+
+
+# Install Kops by major and minor version
+ARG KOPS
+
+# Kops (copied to final image)
+RUN set -eux \
+	&& git clone https://github.com/kubernetes/kops \
+	&& cd kops \
+	# Get latest feature version
+	&& version="$( git tag | grep -E "^v?${KOPS}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1 | sed 's/^v//g' )" \
+	&& echo "${version}" \
+	&& if [ "$(curl -sS -L -I -o /dev/null -w "%{http_code}" "https://github.com/kubernetes/kops/releases/download/v${version}/kops-linux-amd64")" != "404" ]; then \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/v${version}/kops-linux-amd64"; \
+	else \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-amd64"; \
+	fi \
+	&& echo "${KOPS_URL}" \
+	&& curl -sS -L -o /usr/bin/kops "${KOPS_URL}" \
+	&& chmod +x /usr/bin/kops \
+	&& /usr/bin/kops version | grep -E "${KOPS}" | grep -E "^Version\s+v?${version}"
+
+
+# --------------------------------------------------------------------------------------------------
+# Final Image
+# --------------------------------------------------------------------------------------------------
+FROM cytopia/ansible:${VERSION}-awsk8s as production
+ARG VERSION
+# https://github.com/opencontainers/image-spec/blob/master/annotations.md
+#LABEL "org.opencontainers.image.created"=""
+#LABEL "org.opencontainers.image.version"=""
+#LABEL "org.opencontainers.image.revision"=""
+LABEL "maintainer"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.authors"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.vendor"="cytopia"
+LABEL "org.opencontainers.image.licenses"="MIT"
+LABEL "org.opencontainers.image.url"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.documentation"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.source"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} awskops"
+LABEL "org.opencontainers.image.title"="Ansible ${VERSION} awskops"
+LABEL "org.opencontainers.image.description"="Ansible ${VERSION} awskops"
+
+COPY --from=builder /usr/bin/kops /usr/bin/kops
+
+WORKDIR /data
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/bash"]
