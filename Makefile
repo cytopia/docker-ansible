@@ -262,16 +262,19 @@ test-python-libs:
 		LIBS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) pip3 freeze )"; \
 	fi; \
 	\
+	\
 	REQUIRED_BASE="cffi cryptography paramiko Jinja2 PyYAML"; \
 	REQUIRED_TOOLS="dnspython mitogen"; \
 	REQUIRED_INFRA="docker docker-compose jsondiff pexpect psycopg2 pypsexec pymongo PyMySQL smbprotocol"; \
 	REQUIRED_AZURE="azure\-.*"; \
 	REQUIRED_AWS="awscli botocore boto boto3"; \
 	REQUIRED_AWSK8S="openshift"; \
+	REQUIRED_AWSKOPS=""; \
+	REQUIRED_AWSHELM=""; \
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		for lib in $${REQUIRED_BASE}; do \
+		for lib in $$( echo $${REQUIRED_BASE} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -289,7 +292,7 @@ test-python-libs:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "tools" ]; then \
-		for lib in $${REQUIRED_TOOLS}; do \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -307,7 +310,7 @@ test-python-libs:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "infra" ]; then \
-		for lib in $${REQUIRED_INFRA}; do \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_INFRA} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -325,7 +328,7 @@ test-python-libs:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "azure" ]; then \
-		for lib in $${REQUIRED_AZURE}; do \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AZURE} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -343,7 +346,7 @@ test-python-libs:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "aws" ]; then \
-		for lib in $${REQUIRED_AWS}; do \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -361,7 +364,7 @@ test-python-libs:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awsk8s" ]; then \
-		for lib in $${REQUIRED_AWSK8S}; do \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -369,9 +372,17 @@ test-python-libs:
 				exit 1; \
 			fi; \
 		done; \
+		for lib in $$( echo $${REQUIRED_AWSKOPS} $${REQUIRED_AWSHELM} ); do \
+			if ! echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
+				echo "[OK] unwanted lib not available: $${lib}"; \
+			else \
+				echo "[FAILED] unwanted lib available: $${lib}"; \
+				exit 1; \
+			fi; \
+		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
-		for lib in $${REQUIRED_AWSK8S}; do \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSKOPS} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -381,7 +392,7 @@ test-python-libs:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
-		for lib in $${REQUIRED_AWSK8S}; do \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSHELM} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -408,16 +419,19 @@ test-binaries:
 		BINS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
 	fi; \
 	\
+	\
 	REQUIRED_BASE="python"; \
 	REQUIRED_TOOLS="git gpg jq yq ssh"; \
 	REQUIRED_INFRA="rsync"; \
 	REQUIRED_AZURE=""; \
 	REQUIRED_AWS="aws aws-iam-authenticator"; \
-	REQUIRED_AWSK8S="kubectl"; \
+	REQUIRED_AWSK8S="kubectl oc"; \
+	REQUIRED_AWSKOPS="kops"; \
+	REQUIRED_AWSHELM="helm"; \
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		for bin in $${REQUIRED_BASE}; do \
+		for bin in $$( echo $${REQUIRED_BASE} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
@@ -435,7 +449,7 @@ test-binaries:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "tools" ]; then \
-		for bin in $${REQUIRED_TOOLS}; do \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
@@ -453,7 +467,7 @@ test-binaries:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "infra" ]; then \
-		for bin in $${REQUIRED_INFRA}; do \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_INFRA} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
@@ -471,7 +485,7 @@ test-binaries:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "azure" ]; then \
-		for bin in $${REQUIRED_AZURE}; do \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AZURE} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
@@ -489,7 +503,7 @@ test-binaries:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "aws" ]; then \
-		for bin in $${REQUIRED_AWS}; do \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
@@ -507,7 +521,7 @@ test-binaries:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awsk8s" ]; then \
-		for bin in $${REQUIRED_AWSK8S}; do \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
@@ -515,9 +529,17 @@ test-binaries:
 				exit 1; \
 			fi; \
 		done; \
+		for bin in $$( echo $${REQUIRED_AWSKOPS} $${REQUIRED_AWSHELM} ); do \
+			if ! echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
+				echo "[OK] unwanted bin not available: $${bin}"; \
+			else \
+				echo "[FAILED] unwanted bin available: $${bin}"; \
+				exit 1; \
+			fi; \
+		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
-		for bin in $${REQUIRED_AWSK8S}; do \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSKOPS} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
@@ -527,7 +549,7 @@ test-binaries:
 		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
-		for bin in $${REQUIRED_AWSK8S}; do \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSHELM} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \
