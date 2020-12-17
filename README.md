@@ -75,7 +75,7 @@ The following table shows a quick overview. For more details see further down be
 | infra   | tools    | `docker`, `docker-compose`, `jsondiff`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
 | azure   | tools    | `azure-*`              | - |
 | aws     | tools    | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
-| awsk8s  | aws      | `openshift`            | `kubectl` |
+| awsk8s  | aws      | `openshift`            | `kubectl`, `oc` |
 | awskops | awsk8s   | -                      | `kops` |
 | awshelm | awsk8s   | -                      | `helm` |
 
