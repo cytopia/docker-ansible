@@ -60,6 +60,7 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} infra"
 # Additional binaries
 RUN set -eux \
 	&& apk add --no-cache \
+		libpq \
 		rsync
 
 COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
