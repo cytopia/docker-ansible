@@ -33,6 +33,16 @@ RUN set -eux \
 	&& chmod +x /usr/bin/kubectl \
 	&& kubectl version --client --short=true 2>&1 | grep -E 'v[.0-9]+'
 
+# openshift client (copied to final image)
+RUN set -eux \
+	&& curl -sS -L -o /tmp/openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
+	&& mkdir /tmp/openshift-client-linux/ \
+	&& tar -xzf /tmp/openshift-client-linux.tar.gz -C /tmp/openshift-client-linux/ \
+	&& mv /tmp/openshift-client-linux/oc /usr/bin/oc-dynamically-linked \
+	&& echo -e '#!/bin/sh\n/lib/ld-musl-x86_64.so.1 --library-path /lib /usr/bin/oc-dynamically-linked "$@"' > /usr/bin/oc \
+	&& chmod +x /usr/bin/oc \
+	&& oc version --client
+
 
 # --------------------------------------------------------------------------------------------------
 # Final Image
@@ -56,6 +66,8 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} awsk8s"
 
 COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
 COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
+COPY --from=builder /usr/bin/oc-dynamically-linked /usr/bin/oc-dynamically-linked
+COPY --from=builder /usr/bin/oc /usr/bin/oc
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
