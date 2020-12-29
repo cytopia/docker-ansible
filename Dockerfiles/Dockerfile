@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
+FROM alpine:3.12 as builder
 
 # Required tools for building Python packages
 RUN set -eux \
@@ -13,7 +13,8 @@ RUN set -eux \
 		musl-dev \
 		openssl-dev \
 		python3 \
-		python3-dev
+		python3-dev \
+		py3-pip
 
 ARG VERSION
 RUN set -eux \
@@ -41,7 +42,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as production
+FROM alpine:3.12 as production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
@@ -74,7 +75,7 @@ RUN set -eux \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
-COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
 
