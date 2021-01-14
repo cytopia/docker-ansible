@@ -14,7 +14,7 @@ RUN set -eux \
 		openssl-dev \
 		python3 \
 		python3-dev \
-		cmd:pip3
+		py3-pip
 
 ARG VERSION
 RUN set -eux \
