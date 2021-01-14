@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
+FROM alpine:3.12 as builder
 
 # Required tools for building Python packages
 RUN set -eux \
@@ -41,7 +41,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as production
+FROM alpine:3.12 as production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
