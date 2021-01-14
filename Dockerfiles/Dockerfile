@@ -13,7 +13,8 @@ RUN set -eux \
 		musl-dev \
 		openssl-dev \
 		python3 \
-		python3-dev
+		python3-dev \
+		cmd:pip3
 
 ARG VERSION
 RUN set -eux \

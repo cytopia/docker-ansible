@@ -18,7 +18,7 @@ RUN set -eux \
 		openssl-dev \
 		python3 \
 		python3-dev \
-        cmd:pip3
+		cmd:pip3
 
 # Python packages (copied to final image)
 RUN set -eux \
