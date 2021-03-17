@@ -26,8 +26,6 @@ jobs:
       fail-fast: False
       matrix:
         version:
-          - '2.3'
-          - '2.4'
           - '2.5'
           - '2.6'
           - '2.7'
@@ -49,7 +47,7 @@ jobs:
           - "1.18"
         refs:
           - 'master'
-          - '0.29'
+          - '0.30'
     steps:
 
       # ------------------------------------------------------------
@@ -105,7 +103,7 @@ jobs:
 
 
       # ------------------------------------------------------------
-      # Base
+      # Builder
       # ------------------------------------------------------------
       - name: Pull Base Image
         run: |
@@ -126,6 +124,29 @@ jobs:
           RETRIES: 20
           PAUSE: 10
 
+      - name: Build Builder Image
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make _build_builder
+        env:
+          VERSION: ${{ matrix.version }}
+          RETRIES: 20
+          PAUSE: 10
+
+      # ------------------------------------------------------------
+      # Base
+      # ------------------------------------------------------------
       - name: Build Ansible Base
         run: |
           retry() {

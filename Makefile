@@ -12,7 +12,7 @@ CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 # -------------------------------------------------------------------------------------------------
 # File-lint configuration
 # -------------------------------------------------------------------------------------------------
-FL_VERSION = 0.2
+FL_VERSION = 0.4
 FL_IGNORES = .git/,.github/,tests/
 
 # -------------------------------------------------------------------------------------------------
@@ -146,6 +146,11 @@ lint-workflow:
 # -------------------------------------------------------------------------------------------------
 # Build Targets
 # -------------------------------------------------------------------------------------------------
+
+_build_builder:
+	docker build $(NO_CACHE) -t cytopia/ansible-builder -f ${DIR}/builder ${DIR}
+
+build: _build_builder
 build:
 	@ \
 	if [ "$(FLAVOUR)" = "base" ]; then \
@@ -719,6 +724,7 @@ pull-base-image:
 	@grep -E '^\s*FROM' $(DIR)/Dockerfile \
 		| sed -e 's/^FROM//g' -e 's/[[:space:]]*as[[:space:]]*.*$$//g' \
 		| sort -u \
+		| grep -v 'cytopia/' \
 		| xargs -n1 docker pull;
 
 enter:

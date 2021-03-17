@@ -1,19 +1,8 @@
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
-
-# Required tools for building Python packages
-RUN set -eux \
-	&& apk add --no-cache \
-		bc \
-		gcc \
-		libffi-dev \
-		make \
-		musl-dev \
-		openssl-dev \
-		python3 \
-		python3-dev
+# See ./builder for this image
+FROM cytopia/ansible-builder as builder
 
 ARG VERSION
 RUN set -eux \
@@ -37,11 +26,17 @@ RUN set -eux \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
+# Clean-up some site-packages to safe space
+RUN set -eux \
+	&& pip3 uninstall --yes \
+		setuptools \
+		wheel
+
 
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as production
+FROM alpine:3.13 as production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
@@ -60,6 +55,7 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} base"
 
 RUN set -eux \
 	&& apk add --no-cache \
+		py3-pip \
 		python3 \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf ansible /usr/bin/ansible-config \
@@ -74,7 +70,7 @@ RUN set -eux \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
-COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
 

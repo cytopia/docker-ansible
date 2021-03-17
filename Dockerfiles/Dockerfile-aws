@@ -3,21 +3,8 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
-
-# Required tools for building Python packages
-RUN set -eux \
-	&& apk add --no-cache \
-		bc \
-		curl \
-		gcc \
-		git \
-		libffi-dev \
-		make \
-		musl-dev \
-		openssl-dev \
-		python3 \
-		python3-dev
+# See ./builder for this image
+FROM cytopia/ansible-builder as builder
 
 # Python packages (copied to final image)
 RUN set -eux \
@@ -69,7 +56,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} aws"
 
-COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 COPY --from=builder /usr/bin/aws /usr/bin/aws
 COPY --from=builder /usr/bin/aws-iam-authenticator /usr/bin/aws-iam-authenticator
 

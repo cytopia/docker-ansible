@@ -3,22 +3,8 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
-
-# Required tools for building Python packages
-RUN set -eux \
-	&& apk add --no-cache \
-		bc \
-		curl \
-		gcc \
-		git \
-		libffi-dev \
-		make \
-		musl-dev \
-		openssl-dev \
-		python3 \
-		python3-dev
-
+# See ./builder for this image
+FROM cytopia/ansible-builder as builder
 
 # Install Kops by major and minor version
 ARG KOPS
