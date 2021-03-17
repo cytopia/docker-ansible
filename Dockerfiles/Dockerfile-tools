@@ -3,20 +3,8 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
-
-# Required tools for building Python packages
-RUN set -eux \
-	&& apk add --no-cache \
-		bc \
-		curl \
-		gcc \
-		libffi-dev \
-		make \
-		musl-dev \
-		openssl-dev \
-		python3 \
-		python3-dev
+# See ./builder for this image
+FROM cytopia/ansible-builder as builder
 
 # Python packages (copied to final image)
 RUN set -eux \
@@ -29,8 +17,9 @@ RUN set -eux \
 # Binaries (copied to final image)
 RUN set -eux \
 	&& YQ="$( curl -L -sS -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest | sed 's/^.*\///g' )" \
-	&& curl -L -sS https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64 > /usr/bin/yq \
-	&& chmod +x /usr/bin/yq
+	&& curl -L -sS "https://github.com/mikefarah/yq/releases/download/${YQ}/yq_linux_amd64" > /usr/bin/yq \
+	&& chmod +x /usr/bin/yq \
+	&& yq --version
 
 
 # --------------------------------------------------------------------------------------------------
@@ -82,7 +71,7 @@ RUN set -eux \
 		jq \
 		openssh-client
 
-COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 COPY --from=builder /usr/bin/yq /usr/bin/yq
 COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
 

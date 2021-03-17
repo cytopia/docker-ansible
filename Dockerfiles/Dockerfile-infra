@@ -3,26 +3,17 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
+# See ./builder for this image
+FROM cytopia/ansible-builder as builder
 
 # Required tools for building Python packages
 RUN set -eux \
 	&& apk add --no-cache \
-		bc \
-		curl \
-		gcc \
-		libffi-dev \
-		make \
-		musl-dev \
-		openssl-dev \
 		postgresql-dev \
-		postgresql-libs \
-		python3 \
-		python3-dev
+		postgresql-libs
 
 # Python packages (copied to final image)
 RUN set -eux \
-	&& apk add --no-cache  \
 	&& pip3 install --no-cache-dir --no-compile \
 		PyMySQL \
 		docker \
@@ -63,7 +54,7 @@ RUN set -eux \
 		libpq \
 		rsync
 
-COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]

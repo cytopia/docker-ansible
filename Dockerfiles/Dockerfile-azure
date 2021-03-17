@@ -3,22 +3,8 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.9 as builder
-
-# Required tools for building Python packages
-RUN set -eux \
-	&& apk add --no-cache \
-		bc \
-		cmake \
-		curl \
-		g++ \
-		gcc \
-		libffi-dev \
-		make \
-		musl-dev \
-		openssl-dev \
-		python3 \
-		python3-dev
+# See ./builder for this image
+FROM cytopia/ansible-builder as builder
 
 # Python packages (copied to final image)
 # pip3 search results in exception
@@ -87,7 +73,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} azure"
 
-COPY --from=builder /usr/lib/python3.6/site-packages/ /usr/lib/python3.6/site-packages/
+COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
