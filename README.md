@@ -200,6 +200,23 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 
 > https://github.com/kubernetes/kops/releases
 
+#### Kops 1.20 (latest 1.20.x)
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awskops1.20.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.20 "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awskops1.20.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.20 "ansible")
+
+| Docker tag           | Build from                           |
+|----------------------|--------------------------------------|
+| `latest-awskops1.20` | Latest stable Ansible version        |
+| `2.11-awskops1.20`   | Latest stable Ansible 2.11.x version |
+| `2.10-awskops1.20`   | Latest stable Ansible 2.10.x version |
+| `2.9-awskops1.20`    | Latest stable Ansible 2.9.x version  |
+| `2.8-awskops1.20`    | Latest stable Ansible 2.8.x version  |
+| `2.7-awskops1.20`    | Latest stable Ansible 2.7.x version  |
+| `2.6-awskops1.20`    | Latest stable Ansible 2.6.x version  |
+| `2.5-awskops1.20`    | Latest stable Ansible 2.5.x version  |
+| `2.4-awskops1.20`    | Latest stable Ansible 2.4.x version  |
+| `2.3-awskops1.20`    | Latest stable Ansible 2.3.x version  |
+
 #### Kops 1.19 (latest 1.19.x)
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awskops1.19.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.19 "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awskops1.19.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awskops1.19 "ansible")
