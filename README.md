@@ -90,6 +90,7 @@ The following Ansible Docker images are as small as possible and only contain An
 | Docker tag | Build from                           |
 |------------|--------------------------------------|
 | `latest`   | Latest stable Ansible version        |
+| `2.11`     | Latest stable Ansible 2.11.x version |
 | `2.10`     | Latest stable Ansible 2.10.x version |
 | `2.9`      | Latest stable Ansible 2.9.x version  |
 | `2.8`      | Latest stable Ansible 2.8.x version  |
@@ -108,6 +109,7 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 | Docker tag     | Build from                           |
 |----------------|--------------------------------------|
 | `latest-tools` | Latest stable Ansible version        |
+| `2.11-tools`   | Latest stable Ansible 2.11.x version |
 | `2.10-tools`   | Latest stable Ansible 2.10.x version |
 | `2.9-tools`    | Latest stable Ansible 2.9.x version  |
 | `2.8-tools`    | Latest stable Ansible 2.8.x version  |
@@ -126,6 +128,7 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | Docker tag     | Build from                           |
 |----------------|--------------------------------------|
 | `latest-infra` | Latest stable Ansible version        |
+| `2.11-infra`   | Latest stable Ansible 2.11.x version |
 | `2.10-infra`   | Latest stable Ansible 2.10.x version |
 | `2.9-infra`    | Latest stable Ansible 2.9.x version  |
 | `2.8-infra`    | Latest stable Ansible 2.8.x version  |
@@ -144,6 +147,7 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | Docker tag     | Build from                           |
 |----------------|--------------------------------------|
 | `latest-azure` | Latest stable Ansible version        |
+| `2.11-azure`   | Latest stable Ansible 2.11.x version |
 | `2.10-azure`   | Latest stable Ansible 2.10.x version |
 | `2.9-azure`    | Latest stable Ansible 2.9.x version  |
 | `2.8-azure`    | Latest stable Ansible 2.8.x version  |
@@ -162,6 +166,7 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | Docker tag   | Build from                           |
 |--------------|--------------------------------------|
 | `latest-aws` | Latest stable Ansible version        |
+| `2.11-aws`   | Latest stable Ansible 2.11.x version |
 | `2.10-aws`   | Latest stable Ansible 2.10.x version |
 | `2.9-aws`    | Latest stable Ansible 2.9.x version  |
 | `2.8-aws`    | Latest stable Ansible 2.8.x version  |
@@ -180,6 +185,7 @@ The following Ansible Docker images contain everything from `Ansible aws` and ad
 | Docker tag      | Build from                           |
 |-----------------|--------------------------------------|
 | `latest-awsk8s` | Latest stable Ansible version        |
+| `2.11-awsk8s`   | Latest stable Ansible 2.11.x version |
 | `2.10-awsk8s`   | Latest stable Ansible 2.10.x version |
 | `2.9-awsk8s`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awsk8s`    | Latest stable Ansible 2.8.x version  |
@@ -201,6 +207,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.19` | Latest stable Ansible version        |
+| `2.11-awskops1.19`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.19`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.19`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.19`    | Latest stable Ansible 2.8.x version  |
@@ -217,6 +224,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.18` | Latest stable Ansible version        |
+| `2.11-awskops1.18`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.18`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.18`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.18`    | Latest stable Ansible 2.8.x version  |
@@ -233,6 +241,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.17` | Latest stable Ansible version        |
+| `2.11-awskops1.17`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.17`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.17`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.17`    | Latest stable Ansible 2.8.x version  |
@@ -249,6 +258,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.16` | Latest stable Ansible version        |
+| `2.11-awskops1.16`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.16`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.16`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.16`    | Latest stable Ansible 2.8.x version  |
@@ -265,6 +275,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.15` | Latest stable Ansible version        |
+| `2.11-awskops1.15`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.15`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.15`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.15`    | Latest stable Ansible 2.8.x version  |
@@ -281,6 +292,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.14` | Latest stable Ansible version        |
+| `2.11-awskops1.14`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.14`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.14`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.14`    | Latest stable Ansible 2.8.x version  |
@@ -297,6 +309,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.13` | Latest stable Ansible version        |
+| `2.11-awskops1.13`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.13`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.13`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.13`    | Latest stable Ansible 2.8.x version  |
@@ -313,6 +326,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.12` | Latest stable Ansible version        |
+| `2.11-awskops1.12`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.12`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.12`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.12`    | Latest stable Ansible 2.8.x version  |
@@ -329,6 +343,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.11` | Latest stable Ansible version        |
+| `2.11-awskops1.11`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.11`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.11`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.11`    | Latest stable Ansible 2.8.x version  |
@@ -345,6 +360,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.10` | Latest stable Ansible version        |
+| `2.11-awskops1.10`   | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.10`   | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.10`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.10`    | Latest stable Ansible 2.8.x version  |
@@ -361,6 +377,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.9`  | Latest stable Ansible version        |
+| `2.11-awskops1.9`    | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.9`    | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.9`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.9`     | Latest stable Ansible 2.8.x version  |
@@ -377,6 +394,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awskops1.8`  | Latest stable Ansible version        |
+| `2.11-awskops1.8`    | Latest stable Ansible 2.11.x version |
 | `2.10-awskops1.8`    | Latest stable Ansible 2.10.x version |
 | `2.9-awskops1.8`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awskops1.8`     | Latest stable Ansible 2.8.x version  |
@@ -398,6 +416,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm3.5`  | Latest stable Ansible version        |
+| `2.11-awshelm3.5`    | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm3.5`    | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm3.5`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm3.5`     | Latest stable Ansible 2.8.x version  |
@@ -414,6 +433,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm3.4`  | Latest stable Ansible version        |
+| `2.11-awshelm3.4`    | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm3.4`    | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm3.4`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm3.4`     | Latest stable Ansible 2.8.x version  |
@@ -430,6 +450,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm3.3`  | Latest stable Ansible version        |
+| `2.11-awshelm3.3`    | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm3.3`    | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm3.3`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm3.3`     | Latest stable Ansible 2.8.x version  |
@@ -446,6 +467,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm3.2`  | Latest stable Ansible version        |
+| `2.11-awshelm3.2`    | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm3.2`    | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm3.2`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm3.2`     | Latest stable Ansible 2.8.x version  |
@@ -462,6 +484,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm3.1`  | Latest stable Ansible version        |
+| `2.11-awshelm3.1`    | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm3.1`    | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm3.1`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm3.1`     | Latest stable Ansible 2.8.x version  |
@@ -478,6 +501,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm3.0`  | Latest stable Ansible version        |
+| `2.11-awshelm3.0`    | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm3.0`    | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm3.0`     | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm3.0`     | Latest stable Ansible 2.8.x version  |
@@ -494,6 +518,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm2.16` | Latest stable Ansible version        |
+| `2.11-awshelm2.16`   | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm2.16`   | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm2.16`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm2.16`    | Latest stable Ansible 2.8.x version  |
@@ -510,6 +535,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm2.15` | Latest stable Ansible version        |
+| `2.11-awshelm2.15`   | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm2.15`   | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm2.15`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm2.15`    | Latest stable Ansible 2.8.x version  |
@@ -526,6 +552,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm2.14` | Latest stable Ansible version        |
+| `2.11-awshelm2.14`   | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm2.14`   | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm2.14`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm2.14`    | Latest stable Ansible 2.8.x version  |
@@ -542,6 +569,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm2.13` | Latest stable Ansible version        |
+| `2.11-awshelm2.13`   | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm2.13`   | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm2.13`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm2.13`    | Latest stable Ansible 2.8.x version  |
@@ -558,6 +586,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm2.12` | Latest stable Ansible version        |
+| `2.11-awshelm2.12`   | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm2.12`   | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm2.12`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm2.12`    | Latest stable Ansible 2.8.x version  |
@@ -574,6 +603,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker tag           | Build from                           |
 |----------------------|--------------------------------------|
 | `latest-awshelm2.11` | Latest stable Ansible version        |
+| `2.11-awshelm2.11`   | Latest stable Ansible 2.11.x version |
 | `2.10-awshelm2.11`   | Latest stable Ansible 2.10.x version |
 | `2.9-awshelm2.11`    | Latest stable Ansible 2.9.x version  |
 | `2.8-awshelm2.11`    | Latest stable Ansible 2.8.x version  |
