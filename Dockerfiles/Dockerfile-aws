@@ -31,7 +31,7 @@ RUN set -eux \
 		-H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36" \
 		"https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v${IAM_AUTH_VERSION}/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_amd64" \
 	&& chmod +x /usr/bin/aws-iam-authenticator \
-	&& aws-iam-authenticator version | grep "\"${IAM_AUTH_VERSION}\"" \
+	&& aws-iam-authenticator version | grep -E "\"(${IAM_AUTH_VERSION}|unversioned)\"" \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
