@@ -22,6 +22,8 @@ RUN set -eux \
 RUN set -eux \
 	&& apk add --no-cache  \
 	&& pip3 install --no-cache-dir --no-compile \
+		junit-xml \
+		lxml \
 		paramiko \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
