@@ -225,9 +225,10 @@ test-ansible-version:
 			curl -L -sS  https://github.com/ansible/ansible/releases/ \
 				| tac | tac \
 				| grep -Eo "ansible/ansible/releases/tag/v[.0-9]+\"" \
-				| head -1 \
 				| sed 's/.*v//g' \
 				| sed 's/\"//g' \
+				| sort -V \
+				| tail -1 \
 		)"; \
 	else \
 		TEST_VERSION="$$( echo '$(ANSIBLE)' )"; \
@@ -238,13 +239,13 @@ test-ansible-version:
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		if ! docker run --rm $(IMAGE):$(ANSIBLE) ansible --version | grep -E "^[Aa]nsible $${TEST_VERSION}"; then \
+		if ! docker run --rm $(IMAGE):$(ANSIBLE) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
 			echo "[FAILED]"; \
 			docker run --rm $(IMAGE):$(ANSIBLE) ansible --version; \
 			exit 1; \
 		fi; \
 	else \
-		if ! docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible --version | grep -E "^[Aa]nsible $${TEST_VERSION}"; then \
+		if ! docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
 			echo "[FAILED]"; \
 			docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible --version; \
 			exit 1; \

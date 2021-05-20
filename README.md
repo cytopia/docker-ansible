@@ -71,7 +71,7 @@ The following table shows a quick overview. For more details see further down be
 
 | Flavour | Based on | Additional Python libs | Additional binaries |
 |---------|---------------|------------------------|---------------------|
-| base    | -        | `cffi`, `cryptography`, `Jinja2`, `paramiko`, `PyYAML` | - |
+| base    | -        | `cffi`, `cryptography`, `Jinja2`, `junit-xml`, `lxml`, `paramiko`, `PyYAML` | - |
 | tools   | base     | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
 | infra   | tools    | `docker`, `docker-compose`, `jsondiff`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
 | azure   | tools    | `azure-*`              | - |
