@@ -20,8 +20,8 @@ FL_IGNORES = .git/,.github/,tests/
 # -------------------------------------------------------------------------------------------------
 DIR = Dockerfiles/
 FILE = Dockerfile
-IMAGE = cytopia/ansible
-IMAGE_BUILDER = $(IMAGE)-builder
+IMAGE = morganchristiansson/ansible
+IMAGE_BUILDER = $(IMAGE):builder
 TAG = latest
 NO_CACHE =
 
