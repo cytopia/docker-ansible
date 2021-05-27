@@ -21,6 +21,7 @@ FL_IGNORES = .git/,.github/,tests/
 DIR = Dockerfiles/
 FILE = Dockerfile
 IMAGE = cytopia/ansible
+IMAGE_BUILDER = $(IMAGE)-builder
 TAG = latest
 NO_CACHE =
 
@@ -148,7 +149,7 @@ lint-workflow:
 # -------------------------------------------------------------------------------------------------
 
 _build_builder:
-	docker build $(NO_CACHE) -t cytopia/ansible-builder -f ${DIR}/builder ${DIR}
+	docker build $(NO_CACHE) -t $(IMAGE_BUILDER) -f ${DIR}/builder ${DIR}
 
 build: _build_builder
 build:
@@ -159,6 +160,7 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
 			--build-arg VERSION=$(ANSIBLE) \
 			-t $(IMAGE):$(ANSIBLE) -f $(DIR)/$(FILE) $(DIR); \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
@@ -171,6 +173,7 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg HELM=$(HELM) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
@@ -184,6 +187,7 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg KOPS=$(KOPS) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
@@ -193,6 +197,7 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
 			--build-arg VERSION=$(ANSIBLE) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	fi
@@ -722,11 +727,7 @@ endif
 # Helper Targets
 # --------------------------------------------------------------------------------------------------
 pull-base-image:
-	@grep -E '^\s*FROM' $(DIR)/Dockerfile \
-		| sed -e 's/^FROM//g' -e 's/[[:space:]]*as[[:space:]]*.*$$//g' \
-		| sort -u \
-		| grep -v 'cytopia/' \
-		| xargs -n1 docker pull;
+	docker pull $(IMAGE_BUILDER)
 
 enter:
 	if [ "$(FLAVOUR)" = "base" ]; then \

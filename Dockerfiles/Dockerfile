@@ -2,7 +2,8 @@
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-FROM cytopia/ansible-builder as builder
+ARG IMAGE_BUILDER=cytopia/ansible
+FROM ${IMAGE_BUILDER} as builder
 
 ARG VERSION
 RUN set -eux \

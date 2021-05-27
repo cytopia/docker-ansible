@@ -4,7 +4,8 @@ ARG VERSION
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-FROM cytopia/ansible-builder as builder
+ARG IMAGE_BUILDER=cytopia/ansible
+FROM ${IMAGE_BUILDER} as builder
 
 # Install Helm by major and minor version
 ARG HELM

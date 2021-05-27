@@ -4,7 +4,8 @@ ARG VERSION
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-FROM cytopia/ansible-builder as builder
+ARG IMAGE_BUILDER=cytopia/ansible
+FROM ${IMAGE_BUILDER} as builder
 
 # Python packages (copied to final image)
 # pip3 search results in exception
