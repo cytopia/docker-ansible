@@ -17,10 +17,10 @@ RUN set -eux \
 	# Get latest feature version
 	&& version="$( git tag | grep -E "^v?${KOPS}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1 | sed 's/^v//g' )" \
 	&& echo "${version}" \
-	&& if [ "$(curl -sS -L -I -o /dev/null -w "%{http_code}" "https://github.com/kubernetes/kops/releases/download/v${version}/kops-linux-amd64")" != "404" ]; then \
-		KOPS_URL="https://github.com/kubernetes/kops/releases/download/v${version}/kops-linux-amd64"; \
+	&& if [ "$(curl -sS -L -I -o /dev/null -w "%{http_code}" "https://github.com/kubernetes/kops/releases/download/v${version}/kops-${TARGETPLATFORM/\//-}")" != "404" ]; then \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/v${version}/kops-${TARGETPLATFORM/\//-}"; \
 	else \
-		KOPS_URL="https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-amd64"; \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/${version}/kops-${TARGETPLATFORM/\//-}"; \
 	fi \
 	&& echo "${KOPS_URL}" \
 	&& curl -sS -L -o /usr/bin/kops "${KOPS_URL}" \

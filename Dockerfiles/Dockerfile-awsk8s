@@ -17,19 +17,9 @@ RUN set -eux \
 # kubectl (copied to final image)
 RUN set -eux \
 	&& curl -sS -L -o /usr/bin/kubectl \
-		https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+		https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/${TARGETPLATFORM}/kubectl \
 	&& chmod +x /usr/bin/kubectl \
 	&& kubectl version --client --short=true 2>&1 | grep -E 'v[.0-9]+'
-
-# openshift client (copied to final image)
-RUN set -eux \
-	&& curl -sS -L -o /tmp/openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
-	&& mkdir /tmp/openshift-client-linux/ \
-	&& tar -xzf /tmp/openshift-client-linux.tar.gz -C /tmp/openshift-client-linux/ \
-	&& mv /tmp/openshift-client-linux/oc /usr/bin/oc-dynamically-linked \
-	&& echo -e '#!/bin/sh\n/lib/ld-musl-x86_64.so.1 --library-path /lib /usr/bin/oc-dynamically-linked "$@"' > /usr/bin/oc \
-	&& chmod +x /usr/bin/oc \
-	&& oc version --client
 
 
 # --------------------------------------------------------------------------------------------------
