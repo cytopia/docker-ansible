@@ -15,9 +15,9 @@ RUN set -eux \
 	# Sort by unique minor versions (without patch) \
 	&& version="$(git tag | grep -E "^v${HELM}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1)" \
 	&& echo "${version}" \
-	&& curl -sS -L -O https://get.helm.sh/helm-${version}-linux-amd64.tar.gz \
-	&& tar xvfz helm-${version}-linux-amd64.tar.gz \
-	&& mv linux-amd64/helm /usr/bin/helm \
+	&& curl -sS -L -O https://get.helm.sh/helm-${version}-${TARGETPLATFORM/\//-}.tar.gz \
+	&& tar xvfz helm-${version}-${TARGETPLATFORM/\//-}.tar.gz \
+	&& mv ${TARGETPLATFORM/\//-}/helm /usr/bin/helm \
 	&& chmod +x /usr/bin/helm \
 	&& /usr/bin/helm version | grep -E "${HELM}" | grep -E "${version}"
 
