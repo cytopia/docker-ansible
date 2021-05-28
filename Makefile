@@ -26,6 +26,7 @@ PLATFORM ?= amd64
 PLATFORM_SHORT = $(shell echo $(PLATFORM) | cut -c-5)
 TAG = latest
 NO_CACHE =
+export DOCKER_BUILDKIT = 1
 
 # Version & Flavour
 ANSIBLE = latest
