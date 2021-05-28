@@ -174,6 +174,7 @@ build:
 			--cache-from $(IMAGE):$(ANSIBLE)-$(PLATFORM) \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR); \
+			docker push $(IMAGE):$(ANSIBLE)-$(PLATFORM); \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		if [ -z "$(HELM)" ]; then \
 			echo "Error, HELM variable required."; \
@@ -191,6 +192,7 @@ build:
 			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+			docker push $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM)-$(PLATFORM); \
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
 		if [ -z "$(KOPS)" ]; then \
 			echo "Error, KOPS variable required."; \
@@ -208,6 +210,7 @@ build:
 			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+			docker push $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM); \
 	else \
 		docker build \
 			$(NO_CACHE) \
@@ -220,6 +223,7 @@ build:
 			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+			docker push $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM); \
 	fi
 
 rebuild: NO_CACHE=--no-cache
