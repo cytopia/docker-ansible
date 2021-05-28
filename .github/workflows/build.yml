@@ -25,7 +25,7 @@ on:
 # -------------------------------------------------------------------------------------------------
 jobs:
   build:
-    name: "[ Ansible-${{ matrix.version }} ]"
+    name: "[ Ansible-${{ matrix.version }} ${{ matrix.platform }} ]"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: False
@@ -39,6 +39,9 @@ jobs:
           - '2.10'
           - '2.11'
           - 'latest'
+        platform:
+          - amd64
+          - arm64v8
     steps:
 
       # ------------------------------------------------------------
@@ -126,6 +129,7 @@ jobs:
           scripts/retry make _build_builder
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -136,12 +140,14 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=base
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible Base
         run: |
           scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=base
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -152,12 +158,14 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=tools
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible Tools
         run: |
           scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=tools
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -168,12 +176,14 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=infra
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible Infra
         run: |
           scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=infra
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -184,12 +194,14 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=azure
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible Azure
         run: |
           scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=azure
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -200,12 +212,14 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=aws
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible AWS
         run: |
           scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=aws
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -216,12 +230,14 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=awsk8s
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible AWS K8s
         run: |
           scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=awsk8s
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -261,6 +277,7 @@ jobs:
           scripts/retry make push TAG=${DOCKER_TAG_AWSK8S}
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (

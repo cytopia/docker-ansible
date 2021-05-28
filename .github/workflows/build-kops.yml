@@ -25,7 +25,7 @@ on:
 # -------------------------------------------------------------------------------------------------
 jobs:
   build_kops:
-    name: "[ Ansible-${{ matrix.version }} (kops-${{ matrix.kops }}) ]"
+    name: "[ Ansible-${{ matrix.version }} (kops-${{ matrix.kops }}) ${{ matrix.platform }} ]"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: False
@@ -55,6 +55,9 @@ jobs:
           - "1.20"
           - "1.21"
           - "1.22"
+        platform:
+          - amd64
+          - arm64v8
     steps:
 
       # ------------------------------------------------------------
@@ -123,6 +126,7 @@ jobs:
           scripts/retry make _build_builder
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -133,6 +137,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=base
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -143,6 +148,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=tools
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -153,6 +159,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=aws
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -163,6 +170,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=awsk8s
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -174,6 +182,7 @@ jobs:
         env:
           KOPS: ${{ matrix.kops }}
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible AWS Kops
         run: |
@@ -181,6 +190,7 @@ jobs:
         env:
           KOPS: ${{ matrix.kops }}
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -206,6 +216,7 @@ jobs:
         env:
           KOPS: ${{ matrix.kops }}
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (
