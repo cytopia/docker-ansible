@@ -153,6 +153,8 @@ _build_builder:
 	docker build \
 		$(NO_CACHE) \
 		--build-arg PLATFORM=$(PLATFORM) \
+		--build-arg BUILDKIT_INLINE_CACHE=1 \
+		--cache-from $(IMAGE_BUILDER)-$(PLATFORM) \
 		-t $(IMAGE_BUILDER)-$(PLATFORM) -f ${DIR}/builder ${DIR}
 
 build: _build_builder
@@ -166,6 +168,8 @@ build:
 			--label "org.opencontainers.image.version"="${VERSION}" \
 			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
+			--build-arg BUILDKIT_INLINE_CACHE=1 \
+			--cache-from $(IMAGE):$(ANSIBLE)-$(PLATFORM) \
 			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR); \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		if [ -z "$(HELM)" ]; then \
@@ -180,6 +184,8 @@ build:
 			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg HELM=$(HELM) \
+			--build-arg BUILDKIT_INLINE_CACHE=1 \
+			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
 		if [ -z "$(KOPS)" ]; then \
@@ -194,6 +200,8 @@ build:
 			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg KOPS=$(KOPS) \
+			--build-arg BUILDKIT_INLINE_CACHE=1 \
+			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	else \
 		docker build \
@@ -203,6 +211,8 @@ build:
 			--label "org.opencontainers.image.version"="${VERSION}" \
 			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
+			--build-arg BUILDKIT_INLINE_CACHE=1 \
+			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	fi
 
