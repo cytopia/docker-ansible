@@ -21,7 +21,8 @@ FL_IGNORES = .git/,.github/,tests/
 DIR = Dockerfiles
 FILE = Dockerfile
 IMAGE = morganchristiansson/ansible
-IMAGE_BUILDER = $(IMAGE):builder
+# IMAGE_CACHE = $(IMAGE)-builder
+IMAGE_CACHE = ghcr.io/$(GITHUB_ACTOR)/docker-ansible
 PLATFORM ?= amd64
 PLATFORM_SHORT = $(shell echo $(PLATFORM) | cut -c-5)
 TAG = latest
@@ -151,79 +152,84 @@ lint-workflow:
 # -------------------------------------------------------------------------------------------------
 
 _build_builder:
-	docker build \
+	docker buildx build \
 		$(NO_CACHE) \
 		--build-arg PLATFORM=$(PLATFORM) \
-		--build-arg BUILDKIT_INLINE_CACHE=1 \
-		--cache-from $(IMAGE_BUILDER)-$(PLATFORM) \
+		--cache-from type=registry,ref=$(IMAGE):builder-$(PLATFORM) \
+		--cache-from type=registry,ref=$(IMAGE_CACHE):cache-builder-$(PLATFORM) \
+		--cache-to type=registry,ref=$(IMAGE_CACHE):cache-builder-$(PLATFORM),mode=max \
 		--platform $(PLATFORM_SHORT) \
-		-t $(IMAGE_BUILDER)-$(PLATFORM) -f ${DIR}/builder ${DIR}
-	docker push $(IMAGE_BUILDER)-$(PLATFORM)
+		-t $(IMAGE_CACHE):builder-$(PLATFORM) -f ${DIR}/builder ${DIR} \
+		-o type=registry
 
 build:
 	@ \
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		docker build \
+		docker buildx build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
-			--build-arg BUILDKIT_INLINE_CACHE=1 \
-			--cache-from $(IMAGE):$(ANSIBLE)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(PLATFORM) \
+			--cache-to type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
-			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR); \
-			docker push $(IMAGE):$(ANSIBLE)-$(PLATFORM); \
+			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR) \
+			-o type=registry; \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		if [ -z "$(HELM)" ]; then \
 			echo "Error, HELM variable required."; \
 			exit 1; \
 		fi; \
-		docker build \
+		docker buildx build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg HELM=$(HELM) \
-			--build-arg BUILDKIT_INLINE_CACHE=1 \
-			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
+			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-			docker push $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM)-$(PLATFORM); \
+			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
+			-o type=registry; \
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
 		if [ -z "$(KOPS)" ]; then \
 			echo "Error, KOPS variable required."; \
 			exit 1; \
 		fi; \
-		docker build \
+		docker buildx build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg KOPS=$(KOPS) \
-			--build-arg BUILDKIT_INLINE_CACHE=1 \
-			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
+			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-			docker push $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM); \
+			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
+			-o type=registry; \
 	else \
-		docker build \
+		docker buildx build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
-			--build-arg BUILDKIT_INLINE_CACHE=1 \
-			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
+			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-			docker push $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM); \
+			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
+			-o type=registry; \
 	fi
 
 rebuild: NO_CACHE=--no-cache
