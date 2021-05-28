@@ -23,6 +23,7 @@ FILE = Dockerfile
 IMAGE = morganchristiansson/ansible
 IMAGE_BUILDER = $(IMAGE):builder
 PLATFORM ?= amd64
+PLATFORM_SHORT = $(shell echo $(PLATFORM) | cut -c-5)
 TAG = latest
 NO_CACHE =
 
@@ -155,6 +156,7 @@ _build_builder:
 		--build-arg PLATFORM=$(PLATFORM) \
 		--build-arg BUILDKIT_INLINE_CACHE=1 \
 		--cache-from $(IMAGE_BUILDER)-$(PLATFORM) \
+		--platform $(PLATFORM_SHORT) \
 		-t $(IMAGE_BUILDER)-$(PLATFORM) -f ${DIR}/builder ${DIR}
 
 build: _build_builder
@@ -170,6 +172,7 @@ build:
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg BUILDKIT_INLINE_CACHE=1 \
 			--cache-from $(IMAGE):$(ANSIBLE)-$(PLATFORM) \
+			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR); \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		if [ -z "$(HELM)" ]; then \
@@ -186,6 +189,7 @@ build:
 			--build-arg HELM=$(HELM) \
 			--build-arg BUILDKIT_INLINE_CACHE=1 \
 			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
+			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
 		if [ -z "$(KOPS)" ]; then \
@@ -202,6 +206,7 @@ build:
 			--build-arg KOPS=$(KOPS) \
 			--build-arg BUILDKIT_INLINE_CACHE=1 \
 			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
+			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	else \
 		docker build \
@@ -213,6 +218,7 @@ build:
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg BUILDKIT_INLINE_CACHE=1 \
 			--cache-from $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
+			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	fi
 
