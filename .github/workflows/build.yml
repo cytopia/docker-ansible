@@ -126,6 +126,7 @@ jobs:
 
       - name: Build Builder Image
         run: |
+          make login USERNAME=${{ secrets.DOCKERHUB_USERNAME }} PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
           scripts/retry make _build_builder
         env:
           VERSION: ${{ matrix.version }}
