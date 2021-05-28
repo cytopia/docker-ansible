@@ -109,10 +109,6 @@ jobs:
       # ------------------------------------------------------------
       # Builder
       # ------------------------------------------------------------
-      - name: Pull Base Image
-        run: |
-          scripts/retry make pull-base-image
-
       - name: Build Builder Image
         run: |
           scripts/retry make _build_builder
