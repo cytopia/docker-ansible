@@ -18,10 +18,11 @@ FL_IGNORES = .git/,.github/,tests/
 # -------------------------------------------------------------------------------------------------
 # Docker configuration
 # -------------------------------------------------------------------------------------------------
-DIR = Dockerfiles/
+DIR = Dockerfiles
 FILE = Dockerfile
 IMAGE = morganchristiansson/ansible
 IMAGE_BUILDER = $(IMAGE):builder
+PLATFORM ?= amd64
 TAG = latest
 NO_CACHE =
 
@@ -149,7 +150,10 @@ lint-workflow:
 # -------------------------------------------------------------------------------------------------
 
 _build_builder:
-	docker build $(NO_CACHE) -t $(IMAGE_BUILDER) -f ${DIR}/builder ${DIR}
+	docker build \
+		$(NO_CACHE) \
+		--build-arg PLATFORM=$(PLATFORM) \
+		-t $(IMAGE_BUILDER)-$(PLATFORM) -f ${DIR}/builder ${DIR}
 
 build: _build_builder
 build:
@@ -160,9 +164,9 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
-			-t $(IMAGE):$(ANSIBLE) -f $(DIR)/$(FILE) $(DIR); \
+			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR); \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		if [ -z "$(HELM)" ]; then \
 			echo "Error, HELM variable required."; \
@@ -173,10 +177,10 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg HELM=$(HELM) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
 		if [ -z "$(KOPS)" ]; then \
 			echo "Error, KOPS variable required."; \
@@ -187,19 +191,19 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg KOPS=$(KOPS) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	else \
 		docker build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER) \
+			--build-arg IMAGE_BUILDER=$(IMAGE_BUILDER)-$(PLATFORM) \
 			--build-arg VERSION=$(ANSIBLE) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
 	fi
 
 rebuild: NO_CACHE=--no-cache
@@ -244,15 +248,15 @@ test-ansible-version:
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		if ! docker run --rm $(IMAGE):$(ANSIBLE) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
+		if ! docker run --rm $(IMAGE):$(ANSIBLE)-$(PLATFORM) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
 			echo "[FAILED]"; \
-			docker run --rm $(IMAGE):$(ANSIBLE) ansible --version; \
+			docker run --rm $(IMAGE):$(ANSIBLE)-$(PLATFORM) ansible --version; \
 			exit 1; \
 		fi; \
 	else \
-		if ! docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
+		if ! docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
 			echo "[FAILED]"; \
-			docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible --version; \
+			docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) ansible --version; \
 			exit 1; \
 		fi; \
 	fi; \
@@ -268,9 +272,9 @@ test-python-libs:
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		LIBS="$$( docker run --rm $(IMAGE):$(ANSIBLE) pip3 freeze )"; \
+		LIBS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(PLATFORM) pip3 freeze )"; \
 	else \
-		LIBS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) pip3 freeze )"; \
+		LIBS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) pip3 freeze )"; \
 	fi; \
 	\
 	\
@@ -425,9 +429,9 @@ test-binaries:
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		BINS="$$( docker run --rm $(IMAGE):$(ANSIBLE) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
+		BINS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(PLATFORM) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
 	else \
-		BINS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
+		BINS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
 	fi; \
 	\
 	\
@@ -591,17 +595,17 @@ test-helm-version:
 					| sed 's/\"//g' \
 			)"; \
 			echo "Testing for latest: $${LATEST}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short | grep -E "^(Client: )?v$${LATEST}"; then \
+			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM)-$(PLATFORM) helm version --client --short | grep -E "^(Client: )?v$${LATEST}"; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short; \
+				docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM)-$(PLATFORM) helm version --client --short; \
 				exit 1; \
 			fi; \
 		else \
 			VERSION="$$( echo '$(HELM)' | grep -Eo '^[.0-9]+?' )"; \
 			echo "Testing for version: $${VERSION}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short | grep -E "^(Client: )?v$${VERSION}\."; then \
+			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM)-$(PLATFORM) helm version --client --short | grep -E "^(Client: )?v$${VERSION}\."; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short; \
+				docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM)-$(PLATFORM) helm version --client --short; \
 				exit 1; \
 			fi; \
 		fi; \
@@ -629,17 +633,17 @@ test-kops-version:
 					| sed 's/\"//g' \
 			)"; \
 			echo "Testing for latest: $${LATEST}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version | grep -E "^Version $${LATEST}"; then \
+			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS)-$(PLATFORM) kops version | grep -E "^Version $${LATEST}"; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version; \
+				docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS)-$(PLATFORM) kops version; \
 				exit 1; \
 			fi; \
 		else \
 			VERSION="$$( echo '$(KOPS)' | grep -Eo '^[.0-9]+?' )"; \
 			echo "Testing for version: $${VERSION}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version | grep -E "^Version $${VERSION}\."; then \
+			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS)-$(PLATFORM) kops version | grep -E "^Version $${VERSION}\."; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version; \
+				docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS)-$(PLATFORM) kops version; \
 				exit 1; \
 			fi; \
 		fi; \
@@ -656,12 +660,12 @@ test-run-user-root:
 	@echo "################################################################################"
 	@\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(ANSIBLE) ansible-playbook -i inventory playbook.yml; then \
+		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(ANSIBLE)-$(PLATFORM) ansible-playbook -i inventory playbook.yml; then \
 			echo "[FAILED]"; \
 			exit 1; \
 		fi; \
 	else \
-		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible-playbook -i inventory playbook.yml ; then \
+		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) ansible-playbook -i inventory playbook.yml ; then \
 			echo "[FAILED]"; \
 			exit 1; \
 		fi; \
@@ -678,7 +682,7 @@ test-run-user-ansible:
 	if [ "$(FLAVOUR)" = "base" ]; then \
 		echo "[SKIPPING] Does not have user setup"; \
 	else \
-		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data -e USER=ansible -e MY_UID=$$(id -u) -e MY_GID=$$(id -g) $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible-playbook -i inventory playbook.yml ; then \
+		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data -e USER=ansible -e MY_UID=$$(id -u) -e MY_GID=$$(id -g) $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) ansible-playbook -i inventory playbook.yml ; then \
 			echo "[FAILED]"; \
 			exit 1; \
 		fi; \
@@ -693,9 +697,9 @@ test-run-user-ansible:
 tag:
 	@\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		docker tag $(IMAGE):$(ANSIBLE) $(IMAGE):$(TAG); \
+		docker tag $(IMAGE):$(ANSIBLE)-$(PLATFORM) $(IMAGE):$(TAG)-$(PLATFORM); \
 	else \
-		docker tag $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) $(IMAGE):$(TAG); \
+		docker tag $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) $(IMAGE):$(TAG)-$(PLATFORM); \
 	fi
 
 login:
@@ -720,18 +724,18 @@ ifeq ($(strip $(TAG)),)
 	@$(info )
 	@$(error Exiting)
 endif
-	docker push $(IMAGE):$(TAG)
+	docker push $(IMAGE):$(TAG)-$(PLATFORM)
 
 
 # --------------------------------------------------------------------------------------------------
 # Helper Targets
 # --------------------------------------------------------------------------------------------------
 pull-base-image:
-	docker pull $(IMAGE_BUILDER)
+	docker pull $(IMAGE_BUILDER)-$(PLATFORM)
 
 enter:
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		docker run --rm -it $(IMAGE):$(ANSIBLE); \
+		docker run --rm -it $(IMAGE):$(ANSIBLE)-$(PLATFORM); \
 	else \
-		docker run --rm -it $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS); \
+		docker run --rm -it $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM); \
 	fi

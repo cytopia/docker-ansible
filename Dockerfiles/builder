@@ -6,8 +6,8 @@
 # Image name: cytopia/ansible-builder
 # How to build: docker build -t cytopia/ansible-builder -f builder .
 #
-
-FROM alpine:3.13 as builder
+ARG PLATFORM=amd64
+FROM ${PLATFORM}/alpine:3.13 as builder
 
 # Package required tools for all flavour's "builder" stage
 RUN set -eux \
