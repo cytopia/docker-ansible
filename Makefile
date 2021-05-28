@@ -5,7 +5,7 @@ endif
 # -------------------------------------------------------------------------------------------------
 # Default configuration
 # -------------------------------------------------------------------------------------------------
-.PHONY: lint build rebuild test tag pull-base-image login push enter
+.PHONY: lint build rebuild test tag login push enter
 
 CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -91,7 +91,6 @@ help:
 	@echo "--------------------------------------------------------------------------------"
 	@echo
 	@echo "lint                                      Lint repository"
-	@echo "pull-base-image                           Pull the base Docker image"
 	@echo "login [USERNAME=] [PASSWORD=]             Login to Dockerhub"
 	@echo "push  [TAG=]                              Push Docker image to Dockerhub"
 	@echo "enter [TAG=]                              Run and enter Docker built image"
@@ -223,7 +222,6 @@ build:
 	fi
 
 rebuild: NO_CACHE=--no-cache
-rebuild: pull-base-image
 rebuild: build
 
 
@@ -746,9 +744,6 @@ endif
 # --------------------------------------------------------------------------------------------------
 # Helper Targets
 # --------------------------------------------------------------------------------------------------
-pull-base-image:
-	docker pull $(IMAGE_BUILDER)-$(PLATFORM)
-
 enter:
 	if [ "$(FLAVOUR)" = "base" ]; then \
 		docker run --rm -it $(IMAGE):$(ANSIBLE)-$(PLATFORM); \
