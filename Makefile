@@ -158,8 +158,8 @@ _build_builder:
 		--cache-from $(IMAGE_BUILDER)-$(PLATFORM) \
 		--platform $(PLATFORM_SHORT) \
 		-t $(IMAGE_BUILDER)-$(PLATFORM) -f ${DIR}/builder ${DIR}
+	docker push $(IMAGE_BUILDER)-$(PLATFORM)
 
-build: _build_builder
 build:
 	@ \
 	if [ "$(FLAVOUR)" = "base" ]; then \
