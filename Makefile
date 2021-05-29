@@ -21,7 +21,6 @@ FL_IGNORES = .git/,.github/,tests/
 DIR = Dockerfiles
 FILE = Dockerfile
 IMAGE = morganchristiansson/ansible
-# IMAGE_CACHE = $(IMAGE)-builder
 IMAGE_CACHE = ghcr.io/$(GITHUB_ACTOR)/docker-ansible
 PLATFORM ?= amd64
 PLATFORM_SHORT = $(shell echo $(PLATFORM) | cut -c-5)
@@ -160,24 +159,30 @@ _build_builder:
 		--cache-to type=registry,ref=$(IMAGE_CACHE):cache-builder-$(PLATFORM),mode=max \
 		--platform $(PLATFORM_SHORT) \
 		-t $(IMAGE_CACHE):builder-$(PLATFORM) -f ${DIR}/builder ${DIR} \
-		-o type=registry
+		-o type=registry \
+		--push
 
 build:
 	@ \
+	set -x; \
 	if [ "$(FLAVOUR)" = "base" ]; then \
 		docker buildx build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE=$(IMAGE) \
 			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
+			--build-arg PLATFORM=$(PLATFORM) \
+			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(PLATFORM) \
 			--cache-from type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(PLATFORM) \
 			--cache-to type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR) \
-			-o type=registry; \
+			-o type=registry \
+			--push; \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		if [ -z "$(HELM)" ]; then \
 			echo "Error, HELM variable required."; \
@@ -188,7 +193,10 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE=$(IMAGE) \
 			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
+			--build-arg PLATFORM=$(PLATFORM) \
+			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg HELM=$(HELM) \
 			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
@@ -196,7 +204,8 @@ build:
 			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
-			-o type=registry; \
+			-o type=registry \
+			--push; \
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
 		if [ -z "$(KOPS)" ]; then \
 			echo "Error, KOPS variable required."; \
@@ -207,7 +216,10 @@ build:
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE=$(IMAGE) \
 			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
+			--build-arg PLATFORM=$(PLATFORM) \
+			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg KOPS=$(KOPS) \
 			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
@@ -215,21 +227,27 @@ build:
 			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
-			-o type=registry; \
+			-o type=registry \
+			--push; \
 	else \
 		docker buildx build \
 			$(NO_CACHE) \
 			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
 			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
 			--label "org.opencontainers.image.version"="${VERSION}" \
+			--build-arg IMAGE=$(IMAGE) \
 			--build-arg IMAGE_BUILDER=$(IMAGE_CACHE):builder-$(PLATFORM) \
+			--build-arg PLATFORM=$(PLATFORM) \
+			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
 			--cache-from type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
 			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
-			-o type=registry; \
+			--progress plain \
+			-o type=registry \
+			--push; \
 	fi
 
 rebuild: NO_CACHE=--no-cache
@@ -465,7 +483,7 @@ test-binaries:
 	REQUIRED_INFRA="rsync"; \
 	REQUIRED_AZURE=""; \
 	REQUIRED_AWS="aws aws-iam-authenticator"; \
-	REQUIRED_AWSK8S="kubectl oc"; \
+	REQUIRED_AWSK8S="kubectl"; \
 	REQUIRED_AWSKOPS="kops"; \
 	REQUIRED_AWSHELM="helm"; \
 	\

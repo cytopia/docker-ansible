@@ -1,10 +1,12 @@
 ARG VERSION
+ARG PLATFORM
+ARG IMAGE_BUILDER
+ARG IMAGE
 
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-ARG IMAGE_BUILDER=cytopia/ansible
 FROM ${IMAGE_BUILDER} as builder
 
 # Python packages (copied to final image)
@@ -19,20 +21,14 @@ RUN set -eux \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
 # aws-iam-authemticator (copied to final image)
+ARG PLATFORM_SHORT
+ARG IAM_AUTH_VERSION=1.19.6
 RUN set -eux \
-	&& git clone https://github.com/kubernetes-sigs/aws-iam-authenticator /tmp/aws-iam-authenticator \
-	&& cd /tmp/aws-iam-authenticator \
-	&& IAM_AUTH_VERSION="$( git tag --sort=-creatordate \
-		| grep -E 'v[0-9]+\.[0-9]+\.[0-9]+$' \
-		| head -1 \
-		| sed 's/^v//g' \
-	)" \
-	&& curl -sS -L -b cookies.txt -c cookies.txt \
+	&& curl -sS -L \
 		-o /usr/bin/aws-iam-authenticator \
-		-H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36" \
-		"https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v${IAM_AUTH_VERSION}/aws-iam-authenticator_${IAM_AUTH_VERSION}_${TARGETPLATFORM/\//_}" \
+		"https://amazon-eks.s3.us-west-2.amazonaws.com/${IAM_AUTH_VERSION}/2021-01-05/bin/linux/${PLATFORM_SHORT}/aws-iam-authenticator" \
 	&& chmod +x /usr/bin/aws-iam-authenticator \
-	&& aws-iam-authenticator version | grep -E "\"(${IAM_AUTH_VERSION}|unversioned)\"" \
+	&& aws-iam-authenticator version | grep '"Version":' \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
@@ -40,8 +36,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-tools as production
-ARG VERSION
+FROM ${IMAGE}:${VERSION}-tools-${PLATFORM} as production
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
 #LABEL "org.opencontainers.image.version"=""

@@ -1,11 +1,14 @@
 ARG VERSION
+ARG PLATFORM
+ARG IMAGE_BUILDER
+ARG IMAGE
 
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-ARG IMAGE_BUILDER=cytopia/ansible-builder
 FROM ${IMAGE_BUILDER} as builder
+ARG PLATFORM_SHORT
 
 # Python packages (copied to final image)
 RUN set -eux \
@@ -18,7 +21,7 @@ RUN set -eux \
 # Binaries (copied to final image)
 RUN set -eux \
 	&& YQ="$( curl -L -sS -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest | sed 's/^.*\///g' )" \
-	&& curl -L -sS "https://github.com/mikefarah/yq/releases/download/${YQ}/yq_${TARGETPLATFORM/\//_}" > /usr/bin/yq \
+	&& curl -L -sS "https://github.com/mikefarah/yq/releases/download/${YQ}/yq_linux_${PLATFORM_SHORT}" > /usr/bin/yq \
 	&& chmod +x /usr/bin/yq \
 	&& yq --version
 
@@ -26,8 +29,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION} as production
-ARG VERSION
+FROM ${IMAGE}:${VERSION}-${PLATFORM} as production
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
 #LABEL "org.opencontainers.image.version"=""
