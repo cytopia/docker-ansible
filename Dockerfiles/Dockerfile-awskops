@@ -1,26 +1,29 @@
 ARG VERSION
+ARG PLATFORM
+ARG IMAGE_BUILDER
+ARG IMAGE
 
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-ARG IMAGE_BUILDER=cytopia/ansible
 FROM ${IMAGE_BUILDER} as builder
 
 # Install Kops by major and minor version
 ARG KOPS
 
 # Kops (copied to final image)
+ARG PLATFORM_SHORT
 RUN set -eux \
 	&& git clone https://github.com/kubernetes/kops \
 	&& cd kops \
 	# Get latest feature version
 	&& version="$( git tag | grep -E "^v?${KOPS}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1 | sed 's/^v//g' )" \
 	&& echo "${version}" \
-	&& if [ "$(curl -sS -L -I -o /dev/null -w "%{http_code}" "https://github.com/kubernetes/kops/releases/download/v${version}/kops-${TARGETPLATFORM/\//-}")" != "404" ]; then \
-		KOPS_URL="https://github.com/kubernetes/kops/releases/download/v${version}/kops-${TARGETPLATFORM/\//-}"; \
+	&& if [ "$(curl -sS -L -I -o /dev/null -w "%{http_code}" "https://github.com/kubernetes/kops/releases/download/v${version}/kops-linux-${PLATFORM_SHORT}")" != "404" ]; then \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/v${version}/kops-linux-${PLATFORM_SHORT}"; \
 	else \
-		KOPS_URL="https://github.com/kubernetes/kops/releases/download/${version}/kops-${TARGETPLATFORM/\//-}"; \
+		KOPS_URL="https://github.com/kubernetes/kops/releases/download/${version}/kops-linux-${PLATFORM_SHORT}"; \
 	fi \
 	&& echo "${KOPS_URL}" \
 	&& curl -sS -L -o /usr/bin/kops "${KOPS_URL}" \
@@ -31,8 +34,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-awsk8s as production
-ARG VERSION
+FROM ${IMAGE}:${VERSION}-awsk8s-${PLATFORM} as production
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
 #LABEL "org.opencontainers.image.version"=""

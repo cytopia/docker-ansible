@@ -1,10 +1,12 @@
 ARG VERSION
+ARG PLATFORM
+ARG IMAGE_BUILDER
+ARG IMAGE
 
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-ARG IMAGE_BUILDER=cytopia/ansible
 FROM ${IMAGE_BUILDER} as builder
 
 # Python packages (copied to final image)
@@ -57,8 +59,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-tools as production
-ARG VERSION
+FROM ${IMAGE}:${VERSION}-tools-${PLATFORM} as production
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
 #LABEL "org.opencontainers.image.version"=""
