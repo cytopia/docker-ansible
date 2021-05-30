@@ -114,42 +114,13 @@ jobs:
       # ------------------------------------------------------------
       - name: Pull Base Image
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make pull-base-image
-        env:
-          RETRIES: 20
-          PAUSE: 10
+          scripts/retry make pull-base-image
 
       - name: Build Builder Image
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make _build_builder
+          scripts/retry make _build_builder
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
 
       # ------------------------------------------------------------
@@ -157,43 +128,15 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Ansible Base
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make build ANSIBLE=${VERSION} FLAVOUR=base
+          scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=base
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
       - name: Test Ansible Base
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make test ANSIBLE=${VERSION} FLAVOUR=base
+          scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=base
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
 
       # ------------------------------------------------------------
@@ -201,43 +144,15 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Ansible Tools
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make build ANSIBLE=${VERSION} FLAVOUR=tools
+          scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=tools
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
       - name: Test Ansible Tools
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make test ANSIBLE=${VERSION} FLAVOUR=tools
+          scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=tools
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
 
       # ------------------------------------------------------------
@@ -245,43 +160,15 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Ansible Infra
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make build ANSIBLE=${VERSION} FLAVOUR=infra
+          scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=infra
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
       - name: Test Ansible Infra
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make test ANSIBLE=${VERSION} FLAVOUR=infra
+          scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=infra
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
 
       # ------------------------------------------------------------
@@ -289,43 +176,15 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Ansible Azure
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make build ANSIBLE=${VERSION} FLAVOUR=azure
+          scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=azure
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
       - name: Test Ansible Azure
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make test ANSIBLE=${VERSION} FLAVOUR=azure
+          scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=azure
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
 
       # ------------------------------------------------------------
@@ -333,43 +192,15 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Ansible AWS
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make build ANSIBLE=${VERSION} FLAVOUR=aws
+          scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=aws
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
       - name: Test Ansible AWS
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make test ANSIBLE=${VERSION} FLAVOUR=aws
+          scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=aws
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
 
       # ------------------------------------------------------------
@@ -377,43 +208,15 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Ansible AWS K8s
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make build ANSIBLE=${VERSION} FLAVOUR=awsk8s
+          scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=awsk8s
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
       - name: Test Ansible AWS K8s
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make test ANSIBLE=${VERSION} FLAVOUR=awsk8s
+          scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=awsk8s
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
 
 
       # ------------------------------------------------------------
@@ -421,18 +224,6 @@ jobs:
       # ------------------------------------------------------------
       - name: Publish images (only repo owner)
         run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
 
           # Output
           echo "GIT_TYPE=${GIT_TYPE}"
@@ -445,28 +236,26 @@ jobs:
           echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}"
 
           # Tag image
-          retry make tag ANSIBLE=${VERSION} FLAVOUR=base   TAG=${DOCKER_TAG_BASE}
-          retry make tag ANSIBLE=${VERSION} FLAVOUR=tools  TAG=${DOCKER_TAG_TOOLS}
-          retry make tag ANSIBLE=${VERSION} FLAVOUR=infra  TAG=${DOCKER_TAG_INFRA}
-          retry make tag ANSIBLE=${VERSION} FLAVOUR=azure  TAG=${DOCKER_TAG_AZURE}
-          retry make tag ANSIBLE=${VERSION} FLAVOUR=aws    TAG=${DOCKER_TAG_AWS}
-          retry make tag ANSIBLE=${VERSION} FLAVOUR=awsk8s TAG=${DOCKER_TAG_AWSK8S}
+          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=base   TAG=${DOCKER_TAG_BASE}
+          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=tools  TAG=${DOCKER_TAG_TOOLS}
+          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=infra  TAG=${DOCKER_TAG_INFRA}
+          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=azure  TAG=${DOCKER_TAG_AZURE}
+          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=aws    TAG=${DOCKER_TAG_AWS}
+          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=awsk8s TAG=${DOCKER_TAG_AWSK8S}
           docker images | grep cytopia/ansible
 
           # Login
-          retry make login USERNAME=${{ secrets.DOCKERHUB_USERNAME }} PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
+          scripts/retry make login USERNAME=${{ secrets.DOCKERHUB_USERNAME }} PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
 
           # Push
-          retry make push TAG=${DOCKER_TAG_BASE}
-          retry make push TAG=${DOCKER_TAG_TOOLS}
-          retry make push TAG=${DOCKER_TAG_INFRA}
-          retry make push TAG=${DOCKER_TAG_AZURE}
-          retry make push TAG=${DOCKER_TAG_AWS}
-          retry make push TAG=${DOCKER_TAG_AWSK8S}
+          scripts/retry make push TAG=${DOCKER_TAG_BASE}
+          scripts/retry make push TAG=${DOCKER_TAG_TOOLS}
+          scripts/retry make push TAG=${DOCKER_TAG_INFRA}
+          scripts/retry make push TAG=${DOCKER_TAG_AZURE}
+          scripts/retry make push TAG=${DOCKER_TAG_AWS}
+          scripts/retry make push TAG=${DOCKER_TAG_AWSK8S}
         env:
           VERSION: ${{ matrix.version }}
-          RETRIES: 20
-          PAUSE: 10
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (
