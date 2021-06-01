@@ -22,6 +22,7 @@ DIR = Dockerfiles
 FILE = Dockerfile
 IMAGE = morganchristiansson/ansible
 IMAGE_CACHE = ghcr.io/$(GITHUB_ACTOR)/docker-ansible
+IMAGE_CACHE_WARMUP = ghcr.io/morganchristiansson/docker-ansible
 PLATFORM ?= amd64
 PLATFORM_SHORT = $(shell echo $(PLATFORM) | cut -c-5)
 TAG = latest
@@ -176,7 +177,7 @@ build:
 			--build-arg PLATFORM=$(PLATFORM) \
 			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
-			--cache-from type=registry,ref=$(IMAGE):$(ANSIBLE)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE_WARMUP):cache-$(ANSIBLE)-$(PLATFORM) \
 			--cache-from type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(PLATFORM) \
 			--cache-to type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
@@ -198,7 +199,7 @@ build:
 			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg HELM=$(HELM) \
-			--cache-from type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE_WARMUP):cache-$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
 			--cache-from type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) \
 			--cache-to type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
@@ -220,7 +221,7 @@ build:
 			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
 			--build-arg KOPS=$(KOPS) \
-			--cache-from type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE_WARMUP):cache-$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
 			--cache-from type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) \
 			--cache-to type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
@@ -237,7 +238,7 @@ build:
 			--build-arg PLATFORM=$(PLATFORM) \
 			--build-arg PLATFORM_SHORT=$(PLATFORM_SHORT) \
 			--build-arg VERSION=$(ANSIBLE) \
-			--cache-from type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
+			--cache-from type=registry,ref=$(IMAGE_CACHE_WARMUP):cache-$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
 			--cache-from type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) \
 			--cache-to type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
