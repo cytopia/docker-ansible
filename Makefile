@@ -181,8 +181,7 @@ build:
 			--cache-to type=registry,ref=$(IMAGE_CACHE):cache-$(ANSIBLE)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(PLATFORM) -f $(DIR)/$(FILE) $(DIR) \
-			-o type=registry \
-			--push; \
+			-o type=registry; \
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		if [ -z "$(HELM)" ]; then \
 			echo "Error, HELM variable required."; \
@@ -204,8 +203,7 @@ build:
 			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
-			-o type=registry \
-			--push; \
+			-o type=registry; \
 	elif [ "$(FLAVOUR)" = "awskops" ]; then \
 		if [ -z "$(KOPS)" ]; then \
 			echo "Error, KOPS variable required."; \
@@ -227,8 +225,7 @@ build:
 			--cache-to type=registry,ref=$(IMAGE_CACHE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM),mode=max \
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
-			-o type=registry \
-			--push; \
+			-o type=registry; \
 	else \
 		docker buildx build \
 			$(NO_CACHE) \
@@ -246,8 +243,7 @@ build:
 			--platform $(PLATFORM_SHORT) \
 			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)-$(PLATFORM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR) \
 			--progress plain \
-			-o type=registry \
-			--push; \
+			-o type=registry; \
 	fi
 
 rebuild: NO_CACHE=--no-cache
