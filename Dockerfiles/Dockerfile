@@ -2,7 +2,9 @@
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-FROM cytopia/ansible-builder as builder
+ARG PLATFORM
+ARG IMAGE_BUILDER
+FROM ${IMAGE_BUILDER} as builder
 
 ARG VERSION
 RUN set -eux \
@@ -38,7 +40,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.13 as production
+FROM ${PLATFORM}/alpine:3.13 as production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""

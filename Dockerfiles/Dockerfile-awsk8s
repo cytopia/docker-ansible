@@ -1,10 +1,13 @@
 ARG VERSION
+ARG PLATFORM
+ARG IMAGE_BUILDER
+ARG IMAGE
 
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM ${IMAGE_BUILDER} as builder
 
 # Python packages (copied to final image)
 RUN set -eux \
@@ -14,28 +17,18 @@ RUN set -eux \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
 # kubectl (copied to final image)
+ARG PLATFORM_SHORT
 RUN set -eux \
 	&& curl -sS -L -o /usr/bin/kubectl \
-		https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+		https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${PLATFORM_SHORT}/kubectl \
 	&& chmod +x /usr/bin/kubectl \
 	&& kubectl version --client --short=true 2>&1 | grep -E 'v[.0-9]+'
-
-# openshift client (copied to final image)
-RUN set -eux \
-	&& curl -sS -L -o /tmp/openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
-	&& mkdir /tmp/openshift-client-linux/ \
-	&& tar -xzf /tmp/openshift-client-linux.tar.gz -C /tmp/openshift-client-linux/ \
-	&& mv /tmp/openshift-client-linux/oc /usr/bin/oc-dynamically-linked \
-	&& echo -e '#!/bin/sh\n/lib/ld-musl-x86_64.so.1 --library-path /lib /usr/bin/oc-dynamically-linked "$@"' > /usr/bin/oc \
-	&& chmod +x /usr/bin/oc \
-	&& oc version --client
 
 
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-aws as production
-ARG VERSION
+FROM ${IMAGE}:${VERSION}-aws-${PLATFORM} as production
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
 #LABEL "org.opencontainers.image.version"=""
@@ -53,8 +46,6 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} awsk8s"
 
 COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
-COPY --from=builder /usr/bin/oc-dynamically-linked /usr/bin/oc-dynamically-linked
-COPY --from=builder /usr/bin/oc /usr/bin/oc
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
