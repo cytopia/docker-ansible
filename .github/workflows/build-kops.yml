@@ -58,6 +58,29 @@ jobs:
         platform:
           - amd64
           - arm64v8
+        exclude:
+          - platform: arm64v8
+            kops: "1.8"
+          - platform: arm64v8
+            kops: "1.9"
+          - platform: arm64v8
+            kops: "1.10"
+          - platform: arm64v8
+            kops: "1.11"
+          - platform: arm64v8
+            kops: "1.12"
+          - platform: arm64v8
+            kops: "1.13"
+          - platform: arm64v8
+            kops: "1.14"
+          - platform: arm64v8
+            kops: "1.15"
+          - platform: arm64v8
+            kops: "1.16"
+          - platform: arm64v8
+            kops: "1.17"
+          - platform: arm64v8
+            kops: "1.18"
     steps:
 
       # ------------------------------------------------------------
