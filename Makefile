@@ -155,7 +155,7 @@ _build_builder:
 	docker buildx build \
 		$(NO_CACHE) \
 		--build-arg PLATFORM=$(PLATFORM) \
-		--cache-from type=registry,ref=$(IMAGE):builder-$(PLATFORM) \
+		--cache-from type=registry,ref=$(IMAGE_CACHE_WARMUP):cache-builder-$(PLATFORM) \
 		--cache-from type=registry,ref=$(IMAGE_CACHE):cache-builder-$(PLATFORM) \
 		--cache-to type=registry,ref=$(IMAGE_CACHE):cache-builder-$(PLATFORM),mode=max \
 		--platform $(PLATFORM_SHORT) \
