@@ -20,7 +20,7 @@ on:
 # -------------------------------------------------------------------------------------------------
 jobs:
   nightly_kops:
-    name: "[ Ansible-${{ matrix.version }} (kops-${{ matrix.kops }}) ] (ref: ${{ matrix.refs }})"
+    name: "[ Ansible-${{ matrix.version }} (kops-${{ matrix.kops }}) ${{ matrix.platform }} ] (ref: ${{ matrix.refs }})"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: False
@@ -35,17 +35,6 @@ jobs:
           - '2.11'
           - 'latest'
         kops:
-          - "1.8"
-          - "1.9"
-          - "1.10"
-          - "1.11"
-          - "1.12"
-          - "1.13"
-          - "1.14"
-          - "1.15"
-          - "1.16"
-          - "1.17"
-          - "1.18"
           - "1.19"
           - "1.20"
           - "1.21"
@@ -66,6 +55,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ matrix.refs }}
 
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
       - name: Set variables
         id: vars
         run: |
@@ -114,9 +106,13 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Builder Image
         run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          docker buildx create --use
           scripts/retry make _build_builder
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
+
 
       # ------------------------------------------------------------
       # Base
@@ -126,6 +122,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=base
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -136,6 +133,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=tools
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -146,6 +144,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=aws
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -156,6 +155,7 @@ jobs:
           scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=awsk8s
         env:
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -167,6 +167,7 @@ jobs:
         env:
           KOPS: ${{ matrix.kops }}
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Test Ansible AWS Kops
         run: |
@@ -174,6 +175,7 @@ jobs:
         env:
           KOPS: ${{ matrix.kops }}
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
 
 
       # ------------------------------------------------------------
@@ -199,6 +201,7 @@ jobs:
         env:
           KOPS: ${{ matrix.kops }}
           VERSION: ${{ matrix.version }}
+          PLATFORM: ${{ matrix.platform }}
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (
