@@ -1,21 +1,4 @@
-# Docker image for `ansible`
-
-[![Tag](https://img.shields.io/github/tag/cytopia/docker-ansible.svg)](https://github.com/cytopia/docker-ansible/releases)
-[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
-[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest "ansible")
-[![](https://img.shields.io/docker/pulls/cytopia/ansible.svg)](https://hub.docker.com/r/cytopia/ansible)
-[![](https://img.shields.io/badge/github-cytopia%2Fdocker--ansible-red.svg)](https://github.com/cytopia/docker-ansible "github.com/cytopia/docker-ansible")
-[![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
-
-[![Build Status](https://github.com/cytopia/docker-ansible/workflows/lint/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=lint)
-[![Build Status](https://github.com/cytopia/docker-ansible/workflows/build/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=build)
-[![Build Status](https://github.com/cytopia/docker-ansible/workflows/build-kops/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=build-kops)
-[![Build Status](https://github.com/cytopia/docker-ansible/workflows/build-helm/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=build-helm)
-
-[![Build Status](https://github.com/cytopia/docker-ansible/workflows/nightly/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=nightly)
-[![Build Status](https://github.com/cytopia/docker-ansible/workflows/nightly-kops/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=nightly-kops)
-[![Build Status](https://github.com/cytopia/docker-ansible/workflows/nightly-helm/badge.svg)](https://github.com/cytopia/docker-ansible/actions?workflow=nightly-helm)
-
+# arm64 multi-arch fork of cytopia/ansible
 
 > #### All [#awesome-ci](https://github.com/topics/awesome-ci) Docker images
 >
@@ -53,7 +36,7 @@
 
 View **[Dockerfile](https://github.com/cytopia/docker-ansible/blob/master/Dockerfile)** on GitHub.
 
-[![Docker hub](http://dockeri.co/image/cytopia/ansible?&kill_cache=1)](https://hub.docker.com/r/cytopia/ansible)
+[![Docker hub](http://dockeri.co/image/morganchristiansson/ansible?&kill_cache=1)](https://hub.docker.com/r/cytopia/ansible)
 
 Tiny Alpine-based multistage-build dockerized version of [Ansible](https://github.com/ansible/ansible)<sup>[1]</sup> in many different flavours.
 It comes with **[Mitogen](https://github.com/dw/mitogen)**<sup>[2]</sup> to speed up your runs by up to **600%**<sup>[3][4]</sup> (see [Examples](#run-ansible-playbook-with-mitogen)).
