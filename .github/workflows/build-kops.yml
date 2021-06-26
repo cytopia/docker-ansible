@@ -196,15 +196,11 @@ jobs:
           echo "GIT_SLUG=${GIT_SLUG}"
           echo "DOCKER_TAG_AWSKOPS=${DOCKER_TAG_AWSKOPS}"
 
-          # Tag image
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=awskops KOPS=${KOPS} TAG=${DOCKER_TAG_AWSKOPS}
-          docker images | grep cytopia/ansible
-
           # Login
           scripts/retry make login USERNAME=${{ secrets.DOCKERHUB_USERNAME }} PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
 
-          # Push
-          scripts/retry make push TAG=${DOCKER_TAG_AWSKOPS}
+          # Create multi-arch manifest
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=awskops KOPS=${KOPS} TAG=${DOCKER_TAG_AWSKOPS}
         env:
           KOPS: ${{ matrix.kops }}
           VERSION: ${{ matrix.version }}

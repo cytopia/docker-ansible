@@ -257,25 +257,16 @@ jobs:
           echo "DOCKER_TAG_AWS=${DOCKER_TAG_AWS}"
           echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}"
 
-          # Tag image
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=base   TAG=${DOCKER_TAG_BASE}
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=tools  TAG=${DOCKER_TAG_TOOLS}
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=infra  TAG=${DOCKER_TAG_INFRA}
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=azure  TAG=${DOCKER_TAG_AZURE}
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=aws    TAG=${DOCKER_TAG_AWS}
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=awsk8s TAG=${DOCKER_TAG_AWSK8S}
-          docker images | grep cytopia/ansible
-
           # Login
           scripts/retry make login USERNAME=${{ secrets.DOCKERHUB_USERNAME }} PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
 
-          # Push
-          scripts/retry make push TAG=${DOCKER_TAG_BASE}
-          scripts/retry make push TAG=${DOCKER_TAG_TOOLS}
-          scripts/retry make push TAG=${DOCKER_TAG_INFRA}
-          scripts/retry make push TAG=${DOCKER_TAG_AZURE}
-          scripts/retry make push TAG=${DOCKER_TAG_AWS}
-          scripts/retry make push TAG=${DOCKER_TAG_AWSK8S}
+          # Create multi-arch manifest
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=base   TAG=${DOCKER_TAG_BASE}
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=tools  TAG=${DOCKER_TAG_TOOLS}
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=infra  TAG=${DOCKER_TAG_INFRA}
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=azure  TAG=${DOCKER_TAG_AZURE}
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=aws    TAG=${DOCKER_TAG_AWS}
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=awsk8s TAG=${DOCKER_TAG_AWSK8S}
         env:
           VERSION: ${{ matrix.version }}
           PLATFORM: ${{ matrix.platform }}

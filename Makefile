@@ -734,13 +734,26 @@ test-run-user-ansible:
 # -------------------------------------------------------------------------------------------------
 #  Deploy Targets
 # -------------------------------------------------------------------------------------------------
-tag:
+manifest:
 	@\
 	if [ "$(FLAVOUR)" = "base" ]; then \
-		docker tag $(IMAGE):$(ANSIBLE)-$(PLATFORM) $(IMAGE):$(TAG)-$(PLATFORM); \
+		docker push $(IMAGE):$(ANSIBLE)-$(PLATFORM); \
 	else \
-		docker tag $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM) $(IMAGE):$(TAG)-$(PLATFORM); \
+		docker push $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM); \
 	fi
+	@\
+	if [ "$(FLAVOUR)" = "base" ]; then \
+		docker manifest create \
+			$(IMAGE):$(TAG) \
+			--amend cytopia/ansible:$(TAG) \
+			--amend $(IMAGE):$(ANSIBLE)-$(PLATFORM); \
+	else \
+		docker manifest create \
+			$(IMAGE):$(TAG) \
+			--amend cytopia/ansible:$(TAG) \
+			--amend $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS)-$(PLATFORM); \
+	fi
+	docker manifest push $(IMAGE):$(TAG)
 
 login:
 ifeq ($(strip $(USERNAME)),)
@@ -756,15 +769,6 @@ ifeq ($(strip $(PASSWORD)),)
 	@$(error Exiting)
 endif
 	@yes | docker login --username $(USERNAME) --password $(PASSWORD)
-
-push:
-ifeq ($(strip $(TAG)),)
-	@$(info This make target requires the TAG variable to be set.)
-	@$(info make push TAG=)
-	@$(info )
-	@$(error Exiting)
-endif
-	docker push $(IMAGE):$(TAG)-$(PLATFORM)
 
 
 # --------------------------------------------------------------------------------------------------

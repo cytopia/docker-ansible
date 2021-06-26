@@ -204,15 +204,11 @@ jobs:
           echo "GIT_SLUG=${GIT_SLUG}"
           echo "DOCKER_TAG_AWSHELM=${DOCKER_TAG_AWSHELM}"
 
-          # Tag image
-          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=awshelm HELM=${HELM} TAG=${DOCKER_TAG_AWSHELM}
-          docker images | grep cytopia/ansible
-
           # Login
           scripts/retry make login USERNAME=${{ secrets.DOCKERHUB_USERNAME }} PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
 
-          # Push
-          scripts/retry make push TAG=${DOCKER_TAG_AWSHELM}
+          # Create multi-arch manifest
+          scripts/retry make manifest ANSIBLE=${VERSION} FLAVOUR=awshelm HELM=${HELM} TAG=${DOCKER_TAG_AWSHELM}
         env:
           HELM: ${{ matrix.helm }}
           VERSION: ${{ matrix.version }}
