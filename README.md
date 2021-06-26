@@ -99,7 +99,7 @@ The following table shows a quick overview of provided libraries and tools for e
 | infra   | tools    | `docker`, `docker-compose`, `jsondiff`, `netaddr`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
 | azure   | tools    | `azure-*`              | - |
 | aws     | tools    | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
-| awsk8s  | aws      | `openshift`            | `kubectl`, `oc` |
+| awsk8s  | aws      |                        | `kubectl` |
 | awskops | awsk8s   | -                      | `kops` |
 | awshelm | awsk8s   | -                      | `helm` |
 
@@ -203,7 +203,7 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 [![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-awsk8s.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awsk8s "ansible")
 [![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-awsk8s.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-awsk8s "ansible")
 
-The following Ansible Docker images contain everything from `Ansible aws` and additionally: `openshift` and `kubectl`.
+The following Ansible Docker images contain everything from `Ansible aws` and additionally: `kubectl`.
 
 | Docker tag      | Build from                           |
 |-----------------|--------------------------------------|
