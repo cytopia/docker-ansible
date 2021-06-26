@@ -40,7 +40,7 @@ jobs:
           - '2.11'
           - 'latest'
         platform:
-          - amd64
+          # - amd64
           - arm64v8
     steps:
 

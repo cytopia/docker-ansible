@@ -55,7 +55,7 @@ jobs:
           - "3.6"
           - "3.7"
         platform:
-          - amd64
+          # - amd64
           - arm64v8
     steps:
 

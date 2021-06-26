@@ -40,47 +40,13 @@ jobs:
           - '2.11'
           - 'latest'
         kops:
-          - "1.8"
-          - "1.9"
-          - "1.10"
-          - "1.11"
-          - "1.12"
-          - "1.13"
-          - "1.14"
-          - "1.15"
-          - "1.16"
-          - "1.17"
-          - "1.18"
           - "1.19"
           - "1.20"
           - "1.21"
           - "1.22"
         platform:
-          - amd64
+          # - amd64
           - arm64v8
-        exclude:
-          - platform: arm64v8
-            kops: "1.8"
-          - platform: arm64v8
-            kops: "1.9"
-          - platform: arm64v8
-            kops: "1.10"
-          - platform: arm64v8
-            kops: "1.11"
-          - platform: arm64v8
-            kops: "1.12"
-          - platform: arm64v8
-            kops: "1.13"
-          - platform: arm64v8
-            kops: "1.14"
-          - platform: arm64v8
-            kops: "1.15"
-          - platform: arm64v8
-            kops: "1.16"
-          - platform: arm64v8
-            kops: "1.17"
-          - platform: arm64v8
-            kops: "1.18"
     steps:
 
       # ------------------------------------------------------------
