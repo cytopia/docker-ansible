@@ -42,7 +42,6 @@ RUN set -eux \
 		azure-mgmt-relay \
 		azure-mgmt-reservations \
 		azure-mgmt-serialconsole \
-		azure-monitor \
 		azure-search \
 		azure-servicebus \
 		azure-servicefabric \
