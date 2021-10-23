@@ -30,6 +30,13 @@ RUN set -eux \
 		python3-dev \
 		rust
 
+# Fix: ansible --version: libyaml = True
+# https://www.jeffgeerling.com/blog/2021/ansible-might-be-running-slow-if-libyaml-not-available
+RUN set -eux \
+	&& apk add --update --no-cache \
+		py3-yaml \
+	&& python3 -c 'import _yaml'
+
 
 # Pip required tools for all flavour's "builder" stage
 RUN set -eux \
@@ -39,7 +46,6 @@ RUN set -eux \
 		Jinja2 \
 		MarkupSafe \
 		PyNaCl \
-		PyYaml \
 		bcrypt \
 		cffi \
 		cryptography \
