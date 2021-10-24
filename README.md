@@ -31,6 +31,7 @@
 > [goimports][gimp-git-lnk] **•**
 > [golint][glint-git-lnk] **•**
 > [jsonlint][jlint-git-lnk] **•**
+> [kubeval][kubeval-git-lnk] **•**
 > [linkcheck][linkcheck-git-lnk] **•**
 > [mypy][mypy-git-lnk] **•**
 > [php-cs-fixer][pcsf-git-lnk] **•**
@@ -1141,6 +1142,7 @@ linter below for reproducible local or remote CI tests:
 | [golint][glint-git-lnk]          | [![glint-hub-img]][glint-hub-lnk]     | Go         | Lint Go code |
 | [eslint][elint-git-lnk]          | [![elint-hub-img]][elint-hub-lnk]     | Javascript | Lint Javascript code |
 | [jsonlint][jlint-git-lnk]        | [![jlint-hub-img]][jlint-hub-lnk]     | JSON       | Lint JSON files **<sup>[1]</sup>** |
+| [kubeval][kubeval-git-lnk]       | [![kubeval-hub-img]][kubeval-hub-lnk] | K8s        | Lint Kubernetes files |
 | [checkmake][cm-git-lnk]          | [![cm-hub-img]][cm-hub-lnk]           | Make       | Lint Makefiles |
 | [phpcbf][pcbf-git-lnk]           | [![pcbf-hub-img]][pcbf-hub-lnk]       | PHP        | PHP Code Beautifier and Fixer |
 | [phpcs][pcs-git-lnk]             | [![pcs-hub-img]][pcs-hub-lnk]         | PHP        | PHP Code Sniffer |
@@ -1183,6 +1185,10 @@ linter below for reproducible local or remote CI tests:
 [alint-git-lnk]: https://github.com/cytopia/docker-ansible-lint
 [alint-hub-img]: https://img.shields.io/docker/pulls/cytopia/ansible-lint.svg
 [alint-hub-lnk]: https://hub.docker.com/r/cytopia/ansible-lint
+
+[kubeval-git-lnk]: https://github.com/cytopia/docker-kubeval
+[kubeval-hub-img]: https://img.shields.io/docker/pulls/cytopia/kubeval.svg
+[kubeval-hub-lnk]: https://hub.docker.com/r/cytopia/kubeval
 
 [gfmt-git-lnk]: https://github.com/cytopia/docker-gofmt
 [gfmt-hub-img]: https://img.shields.io/docker/pulls/cytopia/gofmt.svg
