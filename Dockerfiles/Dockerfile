@@ -9,11 +9,11 @@ RUN set -eux \
 	&& if [ "${VERSION}" = "latest" ]; then \
 		pip3 install --no-cache-dir --no-compile ansible; \
 	elif [ "${VERSION}" = "2.9" ]; then \
-		pip3 install --no-cache-dir --no-compile "ansible>=${VERSION},<2.10"; \
+		pip3 install --no-cache-dir --no-binary pyyaml "ansible>=${VERSION},<2.10"; \
 	elif [ "${VERSION}" = "2.10" ]; then \
-		pip3 install --no-cache-dir --no-compile "ansible>=${VERSION},<2.11"; \
+		pip3 install --no-cache-dir --no-binary pyyaml "ansible>=${VERSION},<2.11"; \
 	else \
-		pip3 install --no-cache-dir --no-compile "ansible>=${VERSION},<$(echo "${VERSION}+0.1" | bc)"; \
+		pip3 install --no-cache-dir --no-binary pyyaml "ansible>=${VERSION},<$(echo "${VERSION}+0.1" | bc)"; \
 	fi \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
@@ -59,6 +59,7 @@ RUN set -eux \
 	&& apk add --no-cache \
 		py3-pip \
 		python3 \
+		yaml \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf ansible /usr/bin/ansible-config \
 	&& ln -sf ansible /usr/bin/ansible-console \
@@ -75,6 +76,10 @@ RUN set -eux \
 COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
 COPY --from=builder /usr/bin/ansible /usr/bin/ansible
 COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
+
+# Pre-compile Python for better performance
+RUN set -eux \
+	&& python3 -m compileall /usr/lib/python3.8
 
 WORKDIR /data
 CMD ["/bin/sh"]
