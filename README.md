@@ -68,7 +68,29 @@ The image is built nightly against multiple stable versions and pushed to Docker
 ## Available Docker image versions
 
 This repository provides many different Ansible flavours (each flavour also divided into different Ansible versions).
-The following table shows a quick overview. For more details see further down below.
+
+The following tree shows how the different flavours derive from each other (each child has all the tools and features of its parent plus its own additions).
+```css
+          base                           #docker-tag:  :latest
+            |                                          :<version>
+            |
+          tools                          #docker-tag:  :latest-tools
+         /  |  \                                       :<version>-tools
+        /   |   \
+   infra  azure  aws                     #docker-tag:  :latest-infra     :latest-azure     :latest-aws
+                  |                                    :<version>-infra  :<version>-azure  :<version>-aws
+                  |
+                awsk8s                   #docker-tag:  :latest-awsk8s
+                 /  \                                  :<version>-awsk8s
+                /    \
+           awskops  awshelm              #docker-tag   :latest-awskops     :latest-awshelm
+                                                       :<version>-awskops  :<version>-awshelm
+```
+> <sub>`<version>` refers to the latest<sup>\[1\],</sup> patch-level version of Ansible. E.g.: `2.9`, `2.10`, `2.11`, ...</sub><br/>
+> <sub>\[1\]: latest as docker images are (re)built every night via CI against the latest available patch level version of Ansible</sub>
+
+
+The following table shows a quick overview of provided libraries and tools for each flavour. For more details see further down below.
 
 | Flavour | Based on | Additional Python libs | Additional binaries |
 |---------|---------------|------------------------|---------------------|
