@@ -66,8 +66,11 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} base"
 
 RUN set -eux \
 	&& apk add --no-cache \
+# Issue: #85 libgcc required for ansible-vault
+		libgcc \
 		py3-pip \
 		python3 \
+# Issue: #76 yaml required for 'libyaml = True' (faster startup time)
 		yaml \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf ansible /usr/bin/ansible-config \
