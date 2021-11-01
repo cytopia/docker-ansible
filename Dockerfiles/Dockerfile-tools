@@ -9,8 +9,14 @@ ARG VERSION
 
 # Python packages (copied to final image)
 RUN set -eux \
-	&& if [ "${VERSION}" = "latest" ]; then \
-		pip3 install --no-cache-dir --no-compile dnspython mitogen; \
+	&& if [ "${VERSION}" = "2.5" ]; then \
+		pip3 install --no-cache-dir --no-compile dnspython mitogen==0.2.10; \
+	elif [ "${VERSION}" = "2.6" ]; then \
+		pip3 install --no-cache-dir --no-compile dnspython mitogen==0.2.10; \
+	elif [ "${VERSION}" = "2.7" ]; then \
+		pip3 install --no-cache-dir --no-compile dnspython mitogen==0.2.10; \
+	elif [ "${VERSION}" = "2.8" ]; then \
+		pip3 install --no-cache-dir --no-compile dnspython mitogen==0.2.10; \
 	elif [ "${VERSION}" = "2.9" ]; then \
 		pip3 install --no-cache-dir --no-compile dnspython mitogen==0.2.10; \
 	else \
