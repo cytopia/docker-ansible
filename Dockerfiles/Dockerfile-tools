@@ -5,6 +5,7 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # See ./builder for this image
 FROM cytopia/ansible-builder as builder
+ARG VERSION
 
 # Python packages (copied to final image)
 RUN set -eux \
