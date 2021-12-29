@@ -21,6 +21,7 @@ FL_IGNORES = .git/,.github/,tests/
 DIR = Dockerfiles/
 FILE = Dockerfile
 IMAGE = cytopia/ansible
+IMAGE_CACHE = ghcr.io/morganchristiansson/docker-ansible
 TAG = latest
 NO_CACHE =
 
@@ -147,8 +148,12 @@ lint-workflow:
 # -------------------------------------------------------------------------------------------------
 
 _build_builder:
-	docker build $(NO_CACHE) \
-		-t cytopia/ansible-builder -f ${DIR}/builder ${DIR}
+	docker buildx build $(NO_CACHE) \
+		--cache-from type=registry,ref=$(IMAGE_CACHE):cache-builder \
+		--cache-from=type=gha \
+		--cache-to=type=gha \
+		-t cytopia/ansible-builder -f ${DIR}/builder ${DIR} \
+		-o type=docker,name=cytopia/ansible-builder
 
 build: _build_builder
 build:
