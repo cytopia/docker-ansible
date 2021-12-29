@@ -148,7 +148,7 @@ lint-workflow:
 # -------------------------------------------------------------------------------------------------
 
 _build_builder:
-	docker build $(NO_CACHE) --build-arg VERSION=$(ANSIBLE) \
+	docker build $(NO_CACHE) \
 		-t cytopia/ansible-builder -f ${DIR}/builder ${DIR}
 
 build: _build_builder
