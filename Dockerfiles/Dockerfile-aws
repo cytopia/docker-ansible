@@ -19,12 +19,12 @@ RUN set -eux \
 
 # aws-iam-authemticator (copied to final image)
 RUN set -eux \
-	&& git clone https://github.com/kubernetes-sigs/aws-iam-authenticator /tmp/aws-iam-authenticator \
-	&& cd /tmp/aws-iam-authenticator \
-	&& IAM_AUTH_VERSION="$( git tag --sort=-creatordate \
-		| grep -E 'v[0-9]+\.[0-9]+\.[0-9]+$' \
+	&& IAM_AUTH_VERSION="$( curl -sS \
+		https://github.com/kubernetes-sigs/aws-iam-authenticator/releases \
+		| grep -E '/aws-iam-authenticator_[.0-9]+_linux_amd64' \
 		| head -1 \
-		| sed 's/^v//g' \
+		| grep -Eo '[.0-9]+_linux' \
+		| sed 's/_linux//g' \
 	)" \
 	&& curl -sS -L -b cookies.txt -c cookies.txt \
 		-o /usr/bin/aws-iam-authenticator \
