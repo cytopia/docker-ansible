@@ -72,6 +72,8 @@ RUN set -eux \
 		python3 \
 # Issue: #76 yaml required for 'libyaml = True' (faster startup time)
 		yaml \
+# Issue: #101 sshpass required for password-based logins
+		sshpass \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf ansible /usr/bin/ansible-config \
 	&& ln -sf ansible /usr/bin/ansible-console \
