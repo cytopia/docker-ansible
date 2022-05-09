@@ -30,7 +30,7 @@ RUN set -eux \
 		python3-dev \
 		rust \
 # Issue: #101 sshpass required for password-based logins
-    sshpass
+		sshpass
 
 # Fix: ansible --version: libyaml = True
 # https://www.jeffgeerling.com/blog/2021/ansible-might-be-running-slow-if-libyaml-not-available
