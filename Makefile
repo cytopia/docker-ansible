@@ -52,6 +52,7 @@ help:
 	@echo "    make build ANSIBLE=2.3 FLAVOUR=awsk8s"
 	@echo "    make build ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
 	@echo "    make build ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
+	@echo "    make build ANSIBLE=2.3 FLAVOUR=k8s"
 	@echo
 	@echo "--------------------------------------------------------------------------------"
 	@echo " Test Targets"
@@ -67,6 +68,7 @@ help:
 	@echo "    make test ANSIBLE=2.3 FLAVOUR=awsk8s"
 	@echo "    make test ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
 	@echo "    make test ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
+	@echo "    make test ANSIBLE=2.3 FLAVOUR=k8s"
 	@echo
 	@echo "--------------------------------------------------------------------------------"
 	@echo " Tagging Target"
@@ -82,6 +84,7 @@ help:
 	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awsk8s TAG=2.3-awsk8s-mysuffix"
 	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
 	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
+	@echo "    make tag ANSIBLE=2.3 FLAVOUR=k8s TAG=2.3-k8s-mysuffix"
 	@echo
 	@echo "--------------------------------------------------------------------------------"
 	@echo " MISC Targets"
@@ -278,6 +281,7 @@ test-python-libs:
 	REQUIRED_AWSK8S="openshift"; \
 	REQUIRED_AWSKOPS=""; \
 	REQUIRED_AWSHELM=""; \
+	REQUIRED_K8S="docker kubernetes"; \
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
@@ -397,9 +401,35 @@ test-python-libs:
 				exit 1; \
 			fi; \
 		done; \
+		for lib in $${REQUIRED_K8S}; do \
+			if ! echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
+				echo "[OK] unwanted lib not available: $${lib}"; \
+			else \
+				echo "[FAILED] unwanted lib available: $${lib}"; \
+				exit 1; \
+			fi; \
+		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSHELM} ); do \
+			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
+				echo "[OK] required lib available: $${lib}"; \
+			else \
+				echo "[FAILED] required lib not available: $${lib}"; \
+				exit 1; \
+			fi; \
+		done; \
+		for lib in $${REQUIRED_K8S}; do \
+			if ! echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
+				echo "[OK] unwanted lib not available: $${lib}"; \
+			else \
+				echo "[FAILED] unwanted lib available: $${lib}"; \
+				exit 1; \
+			fi; \
+		done; \
+	\
+	elif [ "$(FLAVOUR)" = "k8s" ]; then \
+		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_K8S} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
 			else \
@@ -435,6 +465,7 @@ test-binaries:
 	REQUIRED_AWSK8S="kubectl oc"; \
 	REQUIRED_AWSKOPS="kops"; \
 	REQUIRED_AWSHELM="helm"; \
+	REQUIRED_K8S=""; \
 	\
 	\
 	if [ "$(FLAVOUR)" = "base" ]; then \
@@ -554,9 +585,35 @@ test-binaries:
 				exit 1; \
 			fi; \
 		done; \
+		for bin in $${REQUIRED_K8S}; do \
+			if ! echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
+				echo "[OK] unwanted bin not available: $${bin}"; \
+			else \
+				echo "[FAILED] unwanted bin available: $${bin}"; \
+				exit 1; \
+			fi; \
+		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSHELM} ); do \
+			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
+				echo "[OK] required bin available: $${bin}"; \
+			else \
+				echo "[FAILED] required bin not available: $${bin}"; \
+				exit 1; \
+			fi; \
+		done; \
+		for bin in $${REQUIRED_K8S}; do \
+			if ! echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
+				echo "[OK] unwanted bin not available: $${bin}"; \
+			else \
+				echo "[FAILED] unwanted bin available: $${bin}"; \
+				exit 1; \
+			fi; \
+		done; \
+	\
+	elif [ "$(FLAVOUR)" = "k8s" ]; then \
+		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_K8S} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
 			else \

@@ -71,20 +71,20 @@ This repository provides many different Ansible flavours (each flavour also divi
 
 The following tree shows how the different flavours derive from each other (each child has all the tools and features of its parent plus its own additions).
 ```css
-       base                    #docker-tag:  :latest
-         |                                   :<version>
-         |
-       tools                   #docker-tag:  :latest-tools
-      /  |  \                                :<version>-tools
-     /   |   \
-infra  azure  aws              #docker-tag:  :latest-infra     :latest-azure     :latest-aws
-               |                             :<version>-infra  :<version>-azure  :<version>-aws
+          base                    #docker-tag:  :latest
+            |                                   :<version>
+            |
+          tools                   #docker-tag:  :latest-tools
+       /  /  \  \                               :<version>-tools
+      /  /    \  \
+infra  azure  aws  k8s            #docker-tag:  :latest-infra     :latest-azure     :latest-aws     :latest-k8s
+               |                                :<version>-infra  :<version>-azure  :<version>-aws  :<version>-k8s
                |
-             awsk8s            #docker-tag:  :latest-awsk8s
-              /  \                           :<version>-awsk8s
+             awsk8s               #docker-tag:  :latest-awsk8s
+              /  \                              :<version>-awsk8s
              /    \
-        awskops  awshelm       #docker-tag   :latest-awskops     :latest-awshelm
-                                             :<version>-awskops  :<version>-awshelm
+        awskops  awshelm          #docker-tag   :latest-awskops     :latest-awshelm
+                                                :<version>-awskops  :<version>-awshelm
 ```
 > <sub>`<version>` refers to the latest<sup>\[1\],</sup> patch-level version of Ansible. E.g.: `2.9`, `2.10`, `2.11`, ...</sub><br/>
 > <sub>\[1\]: latest as docker images are (re)built every night via CI against the latest available patch level version of Ansible</sub>
@@ -102,6 +102,7 @@ The following table shows a quick overview of provided libraries and tools for e
 | awsk8s  | aws      | `openshift`            | `kubectl`, `oc` |
 | awskops | awsk8s   | -                      | `kops` |
 | awshelm | awsk8s   | -                      | `helm` |
+| k8s     | tools    | `docker`, `kubernetes` | - |
 
 
 ### Ansible base
@@ -719,6 +720,25 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.4-awshelm2.11`    | Latest stable Ansible 2.4.x version  |
 | `2.3-awshelm2.11`    | Latest stable Ansible 2.3.x version  |
 
+### Ansible k8s
+[![](https://images.microbadger.com/badges/version/cytopia/ansible:latest-k8s.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-k8s "ansible")
+[![](https://images.microbadger.com/badges/image/cytopia/ansible:latest-k8s.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/ansible:latest-k8s "ansible")
+
+The following Ansible Docker images contain everything from `Ansible tools` and additionally: `docker` and `kubernetes` Python libraries.
+
+| Docker tag   | Build from                           |
+|--------------|--------------------------------------|
+| `latest-k8s` | Latest stable Ansible version        |
+| `2.11-k8s`   | Latest stable Ansible 2.11.x version |
+| `2.10-k8s`   | Latest stable Ansible 2.10.x version |
+| `2.9-k8s`    | Latest stable Ansible 2.9.x version  |
+| `2.8-k8s`    | Latest stable Ansible 2.8.x version  |
+| `2.7-k8s`    | Latest stable Ansible 2.7.x version  |
+| `2.6-k8s`    | Latest stable Ansible 2.6.x version  |
+| `2.5-k8s`    | Latest stable Ansible 2.5.x version  |
+| `2.4-k8s`    | Latest stable Ansible 2.4.x version  |
+| `2.3-k8s`    | Latest stable Ansible 2.3.x version  |
+
 
 ## Docker environment variables
 
@@ -1142,6 +1162,17 @@ make build ANSIBLE=latest FLAVOUR=awshelm HELM=2.14
 # Build Ansible 2.6 with Kops 1.8
 # image: cytopia/ansible:2.6-awshelm1.8
 make build ANSIBLE=2.6 FLAVOUR=awshelm HELM=2.14
+```
+
+### Ansible k8s
+```bash
+# Build latest Ansible k8s
+# image: cytopia/ansible:latest-k8s
+make build ANSIBLE=latest FLAVOUR=k8s
+
+# Build Ansible 2.6 k8s
+# image: cytopia/ansible:2.6-k8s
+make build ANSIBLE=2.6 FLAVOUR=k8s
 ```
 
 
