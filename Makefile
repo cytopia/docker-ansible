@@ -401,14 +401,6 @@ test-python-libs:
 				exit 1; \
 			fi; \
 		done; \
-		for lib in $${REQUIRED_AWSK8S}; do \
-			if ! echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
-				echo "[OK] unwanted lib not available: $${lib}"; \
-			else \
-				echo "[FAILED] unwanted lib available: $${lib}"; \
-				exit 1; \
-			fi; \
-		done; \
 	\
 	elif [ "$(FLAVOUR)" = "awsk8s" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} ); do \
@@ -574,14 +566,6 @@ test-binaries:
 				echo "[OK] required bin available: $${bin}"; \
 			else \
 				echo "[FAILED] required bin not available: $${bin}"; \
-				exit 1; \
-			fi; \
-		done; \
-		for bin in $${REQUIRED_AWSK8S}; do \
-			if ! echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
-				echo "[OK] unwanted bin not available: $${bin}"; \
-			else \
-				echo "[FAILED] unwanted bin available: $${bin}"; \
 				exit 1; \
 			fi; \
 		done; \
