@@ -1,0 +1,57 @@
+ARG VERSION
+
+# --------------------------------------------------------------------------------------------------
+# Builder Image
+# --------------------------------------------------------------------------------------------------
+# See ./builder for this image
+FROM cytopia/ansible-builder as builder
+
+# Python packages (copied to final image)
+RUN set -eux \
+	&& pip3 install --no-cache-dir --no-compile \
+		credstash \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+
+# Install specified version of Packer
+ARG PACKER
+RUN set -eux \
+	&& curl -sS -L -o /tmp/packer-release.zip \
+		https://releases.hashicorp.com/packer/${PACKER}/packer_${PACKER}_linux_amd64.zip \
+	&& mkdir /tmp/packer-release/ \
+	&& unzip -d /tmp/packer-release/ /tmp/packer-release.zip \
+	&& mv /tmp/packer-release/packer /usr/bin/packer \
+	&& packer version
+
+# --------------------------------------------------------------------------------------------------
+# Final Image
+# --------------------------------------------------------------------------------------------------
+FROM cytopia/ansible:${VERSION}-aws as production
+ARG VERSION
+# https://github.com/opencontainers/image-spec/blob/master/annotations.md
+#LABEL "org.opencontainers.image.created"=""
+#LABEL "org.opencontainers.image.version"=""
+#LABEL "org.opencontainers.image.revision"=""
+LABEL "maintainer"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.authors"="cytopia <cytopia@everythingcli.org>"
+LABEL "org.opencontainers.image.vendor"="cytopia"
+LABEL "org.opencontainers.image.licenses"="MIT"
+LABEL "org.opencontainers.image.url"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.documentation"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.source"="https://github.com/cytopia/docker-ansible"
+LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} Packer ${PACKER} awsruby"
+LABEL "org.opencontainers.image.title"="Ansible ${VERSION} Packer ${PACKER} awsruby"
+LABEL "org.opencontainers.image.description"="Ansible ${VERSION} Packer ${PACKER} awsruby"
+
+COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
+
+RUN set -eux \
+        && apk add --no-cache \
+                ruby \
+                ruby-bundler \
+		sudo \
+        && rm -rf /var/cache/apk/*
+
+WORKDIR /data
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/bash"]
