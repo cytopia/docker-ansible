@@ -1,10 +1,3 @@
-TL;DR 
-For Transport:
-
-make build ANSIBLE=2.4 FLAVOUR=awsruby PACKER=1.8.2
-make test ANSIBLE=2.4 FLAVOUR=awsruby PACKER=1.8.2
-make tag ANSIBLE=2.4 FLAVOUR=awsruby PACKER=1.8.2 TAG=ruby_funzies_0.1
-
 # Docker image for `ansible`
 
 [![Tag](https://img.shields.io/github/tag/cytopia/docker-ansible.svg)](https://github.com/cytopia/docker-ansible/releases)
