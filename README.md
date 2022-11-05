@@ -959,7 +959,7 @@ GID = 1000
 # Ansible check mode uses mitogen_linear strategy for much faster roll-outs
 dry:
 ifndef GPG_PASS
-	docker run --rm it \
+	docker run --rm -it \
 		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.8/site-packages/ansible_mitogen/plugins/strategy \
 		-e ANSIBLE_STRATEGY=mitogen_linear \
 		-e USER=ansible \
@@ -969,9 +969,10 @@ ifndef GPG_PASS
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
 		-v $(CURRENT_DIR):/data \
-		cytopia/ansible:$(ANSIBLE)-aws ansible-playbook playbook.yml --check
+		cytopia/ansible:$(ANSIBLE)-aws \
+		ansible-playbook playbook.yml --check
 else
-	docker run --rm it \
+	docker run --rm -it \
 		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.8/site-packages/ansible_mitogen/plugins/strategy \
 		-e ANSIBLE_STRATEGY=mitogen_linear \
 		-e USER=ansible \
@@ -983,14 +984,14 @@ else
 		-v $${HOME}/.aws/credentials:/home/ansible/.aws/credentials:ro \
 		-v $${HOME}/.gnupg/:/home/ansible/.gnupg/ \
 		-v $(CURRENT_DIR):/data \
-		cytopia/ansible:$(ANSIBLE)INIT_GPG_KEY` -aws \
+		cytopia/ansible:$(ANSIBLE)-aws \
 		ansible-playbook playbook.yml --check
 endif
 
 # Ansible real run uses default strategy
 run:
 ifndef GPG_PASS
-	docker run --rm it \
+	docker run --rm -it \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
@@ -1000,7 +1001,7 @@ ifndef GPG_PASS
 		-v $(CURRENT_DIR):/data \
 		cytopia/ansible:$(ANSIBLE)-aws ansible-playbook playbook.yml
 else
-	docker run --rm it \
+	docker run --rm -it \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
 		-e MY_GID=$(GID) \
