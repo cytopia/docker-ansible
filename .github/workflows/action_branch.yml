@@ -44,7 +44,7 @@ jobs:
 
 
   # -----------------------------------------------------------------------------------------------
-  # (3/8) Build & Test base
+  # (3/8) Build & Test builder
   # -----------------------------------------------------------------------------------------------
   build-builder:
     needs:
@@ -57,27 +57,29 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.params.outputs.matrix_arch }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      artifact_curr_name_add_version: false
       pull_base_image: true
       stage: builder
       stage_prev: ''
 
-  build:
+  # -----------------------------------------------------------------------------------------------
+  # (4/8) Build & Test base
+  # -----------------------------------------------------------------------------------------------
+  build-base:
     needs:
-      - params
       - configure
-    name: name
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{ fromJson(needs.params.outputs.matrix_arch) }}
-    steps:
-      - name: "[DEBUG] Show setup"
-        shell: bash
-        run: |
-          echo 'version: ${{ matrix.version }}'
-          echo 'flavour: ${{ matrix.flavour }}'
-          echo 'arch:    ${{ matrix.arch }}'
+      - build-builder
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: false
+      upload_artifact: true
+      matrix: ${{ needs.configure.outputs.matrix_build }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      artifact_prev_name_add_version: false
+      pull_base_image: false
+      stage: base
+      stage_prev: builder
 
 
 
