@@ -1,0 +1,160 @@
+---
+
+# -------------------------------------------------------------------------------------------------
+# Job Name
+# -------------------------------------------------------------------------------------------------
+name: params
+
+
+# -------------------------------------------------------------------------------------------------
+# Custom Variables
+# -------------------------------------------------------------------------------------------------
+env:
+  ANSIBLE: >-
+    [
+      {
+        "NAME": "ansible",
+        "VERSION": [
+          "latest",
+          "2.11",
+          "2.10",
+          "2.9",
+          "2.8",
+          "2.7",
+          "2.6",
+          "2.5",
+          "2.4",
+          "2.3"
+        ],
+        "FLAVOUR": ["default"],
+        "ARCH":    ["linux/amd64", "linux/arm64"]
+      }
+    ]
+  KOPS: >-
+    [
+      "1.25",
+      "1.24",
+      "1.23",
+      "1.22",
+      "1.21",
+      "1.20",
+      "1.19",
+      "1.18",
+      "1.17",
+      "1.16",
+      "1.15",
+      "1.14"
+    ]
+  HELM: >-
+    [
+      "3.10",
+      "3.9",
+      "3.8",
+      "3.7",
+      "3.6",
+      "3.5",
+      "3.4",
+      "3.3",
+      "3.2",
+      "3.1",
+      "3.0",
+      "2.16"
+    ]
+
+
+# -------------------------------------------------------------------------------------------------
+# When to run
+# -------------------------------------------------------------------------------------------------
+on:
+  workflow_call:
+    outputs:
+      matrix_arch:
+        description: "The determined Arch version matrix (all possible architectures)"
+        value: ${{ jobs.params.outputs.matrix_arch }}
+      matrix_base:
+        description: "The determined Ansible version matrix"
+        value: ${{ jobs.params.outputs.matrix_base }}
+      matrix_kops:
+        description: "The determined Ansible with Kops version matrix"
+        value: ${{ jobs.params.outputs.matrix_kops }}
+      matrix_helm:
+        description: "The determined Ansible with Helm version matrix"
+        value: ${{ jobs.params.outputs.matrix_helm }}
+      refs:
+        description: "The determined git ref matrix (only during scheduled run)"
+        value: ${{ jobs.params.outputs.refs }}
+
+jobs:
+  params:
+    runs-on: ubuntu-latest
+
+    outputs:
+      matrix_arch: ${{ steps.set-matrix.outputs.matrix_arch }}
+      matrix_base: ${{ steps.set-matrix.outputs.matrix_base }}
+      matrix_kops: ${{ steps.set-matrix.outputs.matrix_kops }}
+      matrix_helm: ${{ steps.set-matrix.outputs.matrix_helm }}
+      refs: ${{ steps.set-refs.outputs.matrix }}
+
+    steps:
+      - name: "[Set-Output] Matrix"
+        id: set-matrix
+        run: |
+
+          MATRIX_BASE="$( \
+            jq -M -c \
+              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ env.ANSIBLE }}' \
+          )"
+          MATRIX_KOPS="$( \
+            jq -M -c \
+              --argjson kops '${{ env.KOPS }}' \
+              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], kops:$kops[]})' <<<'${{ env.ANSIBLE }}' \
+          )"
+          MATRIX_HELM="$( \
+            jq -M -c \
+              --argjson helm '${{ env.HELM }}' \
+              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], helm:$helm[]})' <<<'${{ env.ANSIBLE }}' \
+          )"
+          MATRIX_ARCH="$( \
+            jq -M -c \
+              'map({name:.NAME, version:"builder", flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ env.ANSIBLE }}' \
+          )"
+          echo "matrix_arch=${MATRIX_ARCH}" >> $GITHUB_OUTPUT
+          echo "matrix_base=${MATRIX_BASE}" >> $GITHUB_OUTPUT
+          echo "matrix_kops=${MATRIX_KOPS}" >> $GITHUB_OUTPUT
+          echo "matrix_helm=${MATRIX_HELM}" >> $GITHUB_OUTPUT
+
+      - name: "[Set-Output] Matrix 'Refs' (master branch and latest tag)"
+        id: set-refs
+        uses: cytopia/git-ref-matrix-action@v0.1.12
+        with:
+          repository_default_branch: master
+          branches: master
+          num_latest_tags: 0
+        if: github.event_name == 'schedule'
+
+      - name: "[DEBUG] Show settings'"
+        run: |
+          echo 'Matrix Arch'
+          echo '--------------------'
+          echo '${{ steps.set-matrix.outputs.matrix_arch }}'
+          echo
+
+          echo 'Matrix Base'
+          echo '--------------------'
+          echo '${{ steps.set-matrix.outputs.matrix_base }}'
+          echo
+
+          echo 'Matrix Kops'
+          echo '--------------------'
+          echo '${{ steps.set-matrix.outputs.matrix_kops }}'
+          echo
+
+          echo 'Matrix Helm'
+          echo '--------------------'
+          echo '${{ steps.set-matrix.outputs.matrix_helm }}'
+          echo
+
+          echo 'Matrix: Refs'
+          echo '--------------------'
+          echo '${{ steps.set-matrix-refs.outputs.matrix }}'
+          echo
