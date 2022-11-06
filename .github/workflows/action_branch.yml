@@ -11,12 +11,12 @@ name: build
 # -------------------------------------------------------------------------------------------------
 on:
   push:
-    paths:
-      - 'Makefile'
-      - 'Dockerfiles/**'
-      - 'tests/**'
-      - '.github/workflows/action*.yml'
-      - '.github/workflows/params.yml'
+#    paths:
+#      - 'Makefile'
+#      - 'Dockerfiles/**'
+#      - 'tests/**'
+#      - '.github/workflows/action*.yml'
+#      - '.github/workflows/params.yml'
 
 jobs:
 
@@ -48,6 +48,7 @@ jobs:
   # -----------------------------------------------------------------------------------------------
   build-builder:
     needs:
+      - params
       - configure
     uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
     with:
@@ -56,8 +57,27 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.params.outputs.matrix_arch }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      pull_base_image: true
       stage: builder
       stage_prev: ''
+
+  build:
+    needs:
+      - params
+      - configure
+    name: name
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.params.outputs.matrix_arch) }}
+    steps:
+      - name: "[DEBUG] Show setup"
+        shell: bash
+        run: |
+          echo 'version: ${{ matrix.version }}'
+          echo 'flavour: ${{ matrix.flavour }}'
+          echo 'arch:    ${{ matrix.arch }}'
 
 
 
