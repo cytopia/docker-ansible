@@ -72,7 +72,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} azure"
 
-COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
+COPY --from=builder /usr/lib/python3.9/site-packages/ /usr/lib/python3.9/site-packages/
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]

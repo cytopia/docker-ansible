@@ -47,7 +47,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.16 as production
+FROM alpine:3.15 as production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
@@ -75,12 +75,12 @@ RUN set -eux \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
-COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
+COPY --from=builder /usr/lib/python3.9/site-packages/ /usr/lib/python3.9/site-packages/
 COPY --from=builder /usr/bin/ansible* /usr/bin/
 
 # Pre-compile Python for better performance
 RUN set -eux \
-	&& python3 -m compileall /usr/lib/python3.10
+	&& python3 -m compileall /usr/lib/python3.9
 
 WORKDIR /data
 CMD ["/bin/sh"]
