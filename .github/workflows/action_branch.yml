@@ -77,7 +77,7 @@ jobs:
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       artifact_prev_name_add_version: false
-      pull_base_image: false
+      pull_base_image: true
       stage: base
       stage_prev: builder
 

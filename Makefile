@@ -32,6 +32,9 @@ STAGE      = builder
 DIR        = Dockerfiles
 DOCKER_TAG = $(VERSION)
 
+# Never pull this image if mentioned in FROM tag
+DOCKER_PULL_BASE_IMAGES_IGNORE = cytopia/ansible-builder
+
 # Determine Dockerfile to use
 ifeq ($(strip $(STAGE)),builder)
 	FILE = builder
@@ -180,6 +183,10 @@ load: docker-load
 save-verify: save
 save-verify: load
 
+
+# -------------------------------------------------------------------------------------------------
+#  Target Overrides
+# -------------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------------------
 #  Test Targets
