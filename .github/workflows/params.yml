@@ -10,7 +10,7 @@ name: params
 # Custom Variables
 # -------------------------------------------------------------------------------------------------
 env:
-  ANSIBLE: >-
+  VERSIONS: >-
     [
       {
         "NAME": "ansible",
@@ -68,58 +68,56 @@ env:
 on:
   workflow_call:
     outputs:
+      versions:
+        description: "The determined Ansible version matrix"
+        value: ${{ jobs.params.outputs.versions }}
+      refs:
+        description: "The determined git ref matrix (only during scheduled run)"
+        value: ${{ jobs.params.outputs.refs }}
       matrix_arch:
         description: "The determined Arch version matrix (all possible architectures)"
         value: ${{ jobs.params.outputs.matrix_arch }}
-      matrix_base:
-        description: "The determined Ansible version matrix"
-        value: ${{ jobs.params.outputs.matrix_base }}
       matrix_kops:
         description: "The determined Ansible with Kops version matrix"
         value: ${{ jobs.params.outputs.matrix_kops }}
       matrix_helm:
         description: "The determined Ansible with Helm version matrix"
         value: ${{ jobs.params.outputs.matrix_helm }}
-      refs:
-        description: "The determined git ref matrix (only during scheduled run)"
-        value: ${{ jobs.params.outputs.refs }}
 
 jobs:
   params:
     runs-on: ubuntu-latest
 
     outputs:
+      versions: ${{ steps.set-matrix.outputs.versions }}
+      refs: ${{ steps.set-refs.outputs.refs }}
       matrix_arch: ${{ steps.set-matrix.outputs.matrix_arch }}
-      matrix_base: ${{ steps.set-matrix.outputs.matrix_base }}
       matrix_kops: ${{ steps.set-matrix.outputs.matrix_kops }}
       matrix_helm: ${{ steps.set-matrix.outputs.matrix_helm }}
-      refs: ${{ steps.set-refs.outputs.matrix }}
 
     steps:
       - name: "[Set-Output] Matrix"
         id: set-matrix
         run: |
 
-          MATRIX_BASE="$( \
+          MATRIX_BASE="$( echo '${{ env.VERSIONS }}' | jq -M -c )"
+
+          MATRIX_ARCH="$( \
             jq -M -c \
-              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ env.ANSIBLE }}' \
+              'map({name:.NAME, version:"builder", flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ env.VERSIONS }}' \
           )"
           MATRIX_KOPS="$( \
             jq -M -c \
               --argjson kops '${{ env.KOPS }}' \
-              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], kops:$kops[]})' <<<'${{ env.ANSIBLE }}' \
+              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], kops:$kops[]})' <<<'${{ env.VERSIONS }}' \
           )"
           MATRIX_HELM="$( \
             jq -M -c \
               --argjson helm '${{ env.HELM }}' \
-              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], helm:$helm[]})' <<<'${{ env.ANSIBLE }}' \
+              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], helm:$helm[]})' <<<'${{ env.VERSIONS }}' \
           )"
-          MATRIX_ARCH="$( \
-            jq -M -c \
-              'map({name:.NAME, version:"builder", flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ env.ANSIBLE }}' \
-          )"
+          echo "versions=${MATRIX_BASE}" >> $GITHUB_OUTPUT
           echo "matrix_arch=${MATRIX_ARCH}" >> $GITHUB_OUTPUT
-          echo "matrix_base=${MATRIX_BASE}" >> $GITHUB_OUTPUT
           echo "matrix_kops=${MATRIX_KOPS}" >> $GITHUB_OUTPUT
           echo "matrix_helm=${MATRIX_HELM}" >> $GITHUB_OUTPUT
 
@@ -134,14 +132,18 @@ jobs:
 
       - name: "[DEBUG] Show settings'"
         run: |
+          echo 'Versions'
+          echo '--------------------'
+          echo '${{ steps.set-matrix.outputs.versions }}'
+          echo
+
+          echo 'Refs'
+          echo '--------------------'
+          echo '${{ steps.set-matrix-refs.outputs.refs }}'
+          echo
           echo 'Matrix Arch'
           echo '--------------------'
           echo '${{ steps.set-matrix.outputs.matrix_arch }}'
-          echo
-
-          echo 'Matrix Base'
-          echo '--------------------'
-          echo '${{ steps.set-matrix.outputs.matrix_base }}'
           echo
 
           echo 'Matrix Kops'
@@ -154,7 +156,4 @@ jobs:
           echo '${{ steps.set-matrix.outputs.matrix_helm }}'
           echo
 
-          echo 'Matrix: Refs'
-          echo '--------------------'
-          echo '${{ steps.set-matrix-refs.outputs.matrix }}'
-          echo
+

@@ -22,14 +22,20 @@ RUN set -eux \
 	&& git clone https://github.com/kubernetes-sigs/aws-iam-authenticator /tmp/aws-iam-authenticator \
 	&& cd /tmp/aws-iam-authenticator \
 	&& IAM_AUTH_VERSION="$( git tag --sort=-creatordate \
+		| sort -V \
 		| grep -E 'v[0-9]+\.[0-9]+\.[0-9]+$' \
-		| head -1 \
-		| sed 's/^v//g' \
+		| tail -1 \
 	)" \
-	&& curl -sS -L -b cookies.txt -c cookies.txt \
-		-o /usr/bin/aws-iam-authenticator \
-		-H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36" \
-		"https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v${IAM_AUTH_VERSION}/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_amd64" \
+	&& git checkout "${IAM_AUTH_VERSION}" \
+	&& make build-all-bins \
+	\
+	&& if [ "$(uname -m)" = "x86_64" ]; then \
+		mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_amd64 /usr/bin/aws-iam-authenticator; \
+	elif [ "$(uname -m)" = "aarch64" ]; then \
+		mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_arm64 /usr/bin/aws-iam-authenticator; \
+	else \
+		fail; \
+	fi \
 	&& chmod +x /usr/bin/aws-iam-authenticator \
 	&& aws-iam-authenticator version | grep -E "\"(${IAM_AUTH_VERSION}|unversioned)\"" \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
@@ -56,7 +62,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} aws"
 
-COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
+COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 COPY --from=builder /usr/bin/aws /usr/bin/aws
 COPY --from=builder /usr/bin/aws-iam-authenticator /usr/bin/aws-iam-authenticator
 

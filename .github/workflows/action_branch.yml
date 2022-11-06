@@ -20,9 +20,46 @@ on:
 
 jobs:
 
-  # (1/2) Determine repository params
+  # -----------------------------------------------------------------------------------------------
+  # (1/8) Determine parameter settings
+  # -----------------------------------------------------------------------------------------------
   params:
     uses: ./.github/workflows/params.yml
+
+  # -----------------------------------------------------------------------------------------------
+  # (2/8) Configure Build and Deploy Matrices
+  # -----------------------------------------------------------------------------------------------
+  configure:
+    needs: [params]
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-configure.yml@master
+    with:
+      enabled: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && (github.event.pull_request.user.login != 'cytopia')) }}
+      can_deploy: ${{ (github.repository == 'cytopia/docker-ansible') && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/heads/release-')) }}
+      is_scheduled: false
+      versions: ${{ needs.params.outputs.versions }}
+      refs: ${{ needs.params.outputs.refs }}
+    secrets:
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+
+  # -----------------------------------------------------------------------------------------------
+  # (3/8) Build & Test base
+  # -----------------------------------------------------------------------------------------------
+  build-builder:
+    needs:
+      - configure
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: false
+      upload_artifact: true
+      matrix: ${{ needs.params.outputs.matrix_arch }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      stage: builder
+      stage_prev: ''
+
+
 
   # (2/2) Build
   #  docker:

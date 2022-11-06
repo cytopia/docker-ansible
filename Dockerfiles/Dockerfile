@@ -47,7 +47,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.13 as production
+FROM alpine:3.16 as production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
@@ -72,26 +72,15 @@ RUN set -eux \
 		python3 \
 # Issue: #76 yaml required for 'libyaml = True' (faster startup time)
 		yaml \
-	&& ln -sf /usr/bin/python3 /usr/bin/python \
-	&& ln -sf ansible /usr/bin/ansible-config \
-	&& ln -sf ansible /usr/bin/ansible-console \
-	&& ln -sf ansible /usr/bin/ansible-doc \
-	&& ln -sf ansible /usr/bin/ansible-galaxy \
-	&& ln -sf ansible /usr/bin/ansible-inventory \
-	&& ln -sf ansible /usr/bin/ansible-playbook \
-	&& ln -sf ansible /usr/bin/ansible-pull \
-	&& ln -sf ansible /usr/bin/ansible-test \
-	&& ln -sf ansible /usr/bin/ansible-vault \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
-COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
-COPY --from=builder /usr/bin/ansible /usr/bin/ansible
-COPY --from=builder /usr/bin/ansible-connection /usr/bin/ansible-connection
+COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
+COPY --from=builder /usr/bin/ansible* /usr/bin/
 
 # Pre-compile Python for better performance
 RUN set -eux \
-	&& python3 -m compileall /usr/lib/python3.8
+	&& python3 -m compileall /usr/lib/python3.10
 
 WORKDIR /data
 CMD ["/bin/sh"]

@@ -51,7 +51,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} awsk8s"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} awsk8s"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} awsk8s"
 
-COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
+COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
 COPY --from=builder /usr/bin/oc-dynamically-linked /usr/bin/oc-dynamically-linked
 COPY --from=builder /usr/bin/oc /usr/bin/oc

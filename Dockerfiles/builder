@@ -7,7 +7,7 @@
 # How to build: docker build -t cytopia/ansible-builder -f builder .
 #
 
-FROM alpine:3.13 as builder
+FROM alpine:3.16 as builder
 
 # Package required tools for all flavour's "builder" stage
 RUN set -eux \
@@ -15,10 +15,12 @@ RUN set -eux \
 		bc \
 		cargo \
 		cmake \
+		coreutils \
 		curl \
 		g++ \
 		gcc \
 		git \
+		go \
 		libffi-dev \
 		libxml2-dev \
 		libxslt-dev \

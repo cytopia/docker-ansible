@@ -2,205 +2,341 @@ ifneq (,)
 .error This Makefile requires GNU Make.
 endif
 
+# Ensure additional Makefiles are present
+MAKEFILES = Makefile.docker Makefile.lint
+$(MAKEFILES): URL=https://raw.githubusercontent.com/devilbox/makefiles/master/$(@)
+$(MAKEFILES):
+	@if ! (curl --fail -sS -o $(@) $(URL) || wget -O $(@) $(URL)); then \
+		echo "Error, curl or wget required."; \
+		echo "Exiting."; \
+		false; \
+	fi
+include $(MAKEFILES)
+
+# Set default Target
+.DEFAULT_GOAL := help
+
+
 # -------------------------------------------------------------------------------------------------
 # Default configuration
 # -------------------------------------------------------------------------------------------------
-.PHONY: lint build rebuild test tag pull-base-image login push enter
+# Own vars
+TAG        = latest
 
-CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+# Makefile.docker overwrites
+NAME       = ansible
+VERSION    = latest
+IMAGE      = cytopia/ansible
+FLAVOUR    = default
+STAGE      = builder
+DIR        = Dockerfiles
+DOCKER_TAG = $(VERSION)
+
+# Determine Dockerfile to use
+ifeq ($(strip $(STAGE)),builder)
+	FILE = builder
+	IMAGE = cytopia/ansible-builder
+	DOCKER_TAG = latest
+endif
+ifeq ($(strip $(STAGE)),base)
+	FILE = Dockerfile
+endif
+ifeq ($(strip $(STAGE)),tools)
+	FILE = Dockerfile-tools
+	DOCKER_TAG = $(VERSION)-tools
+endif
+ifeq ($(strip $(STAGE)),infra)
+	FILE = Dockerfile-infra
+	DOCKER_TAG = $(VERSION)-infra
+endif
+ifeq ($(strip $(STAGE)),azure)
+	FILE = Dockerfile-azure
+	DOCKER_TAG = $(VERSION)-azure
+endif
+ifeq ($(strip $(STAGE)),aws)
+	FILE = Dockerfile-aws
+	DOCKER_TAG = $(VERSION)-aws
+endif
+ifeq ($(strip $(STAGE)),awsk8s)
+	FILE = Dockerfile-awsk8s
+	DOCKER_TAG = $(VERSION)-awsk8s
+endif
+ifeq ($(strip $(STAGE)),awskops)
+	FILE = Dockerfile-awskops
+	DOCKER_TAG = $(VERSION)-awskops
+endif
+ifeq ($(strip $(STAGE)),awshelm)
+	FILE = Dockerfile-awshelm
+	DOCKER_TAG = $(VERSION)-awshelm
+endif
+
+## Building from master branch: Tag == 'latest'
+#ifeq ($(strip $(TAG)),latest)
+#	ifeq ($(strip $(VERSION)),latest)
+#		DOCKER_TAG = $(FLAVOUR)
+#	else
+#		ifeq ($(strip $(FLAVOUR)),latest)
+#			ifeq ($(strip $(PHP_VERSION)),latest)
+#				DOCKER_TAG = $(PCS_VERSION)
+#			else
+#				DOCKER_TAG = $(PCS_VERSION)-php$(PHP_VERSION)
+#			endif
+#		else
+#			ifeq ($(strip $(PHP_VERSION)),latest)
+#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)
+#			else
+#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)-php$(PHP_VERSION)
+#			endif
+#		endif
+#	endif
+## Building from any other branch or tag: Tag == '<REF>'
+#else
+#	ifeq ($(strip $(VERSION)),latest)
+#		ifeq ($(strip $(FLAVOUR)),latest)
+#			DOCKER_TAG = latest-$(TAG)
+#		else
+#			DOCKER_TAG = $(FLAVOUR)-latest-$(TAG)
+#		endif
+#	else
+#		ifeq ($(strip $(FLAVOUR)),latest)
+#			ifeq ($(strip $(PHP_VERSION)),latest)
+#				DOCKER_TAG = $(PCS_VERSION)-$(TAG)
+#			else
+#				DOCKER_TAG = $(PCS_VERSION)-php$(PHP_VERSION)-$(TAG)
+#			endif
+#		else
+#			ifeq ($(strip $(PHP_VERSION)),latest)
+#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)-$(TAG)
+#			else
+#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)-php$(PHP_VERSION)-$(TAG)
+#			endif
+#		endif
+#	endif
+#endif
+
+# Makefile.lint overwrites
+FL_IGNORES  = .git/,.github/,tests/
+SC_IGNORES  = .git/,.github/,tests/
+JL_IGNORES  = .git/,.github/,./tests/
+
 
 # -------------------------------------------------------------------------------------------------
-# File-lint configuration
+#  Default Target
 # -------------------------------------------------------------------------------------------------
-FL_VERSION = 0.4
-FL_IGNORES = .git/,.github/,tests/
+.PHONY: help
+help:
+	@echo "lint                                     Lint project files and repository"
+	@echo
+	@echo "build [ARCH=...] [TAG=...]               Build Docker image"
+	@echo "rebuild [ARCH=...] [TAG=...]             Build Docker image without cache"
+	@echo "push [ARCH=...] [TAG=...]                Push Docker image to Docker hub"
+	@echo
+	@echo "manifest-create [ARCHES=...] [TAG=...]   Create multi-arch manifest"
+	@echo "manifest-push [TAG=...]                  Push multi-arch manifest"
+	@echo
+	@echo "test [ARCH=...]                          Test built Docker image"
+	@echo
+
 
 # -------------------------------------------------------------------------------------------------
-# Docker configuration
+#  Docker Targets
 # -------------------------------------------------------------------------------------------------
-DIR = Dockerfiles/
-FILE = Dockerfile
-IMAGE = cytopia/ansible
-TAG = latest
-NO_CACHE =
+.PHONY: build
+build: ARGS+=--build-arg VERSION=$(VERSION)
+build: ARGS+=--build-arg KOPS=$(KOPS)
+build: ARGS+=--build-arg HELM=$(HELM)
+build: docker-arch-build
 
-# Version & Flavour
-ANSIBLE = latest
-FLAVOUR = base
-KOPS =
-HELM =
+.PHONY: rebuild
+rebuild: ARGS+=--build-arg VERSION=$(VERSION)
+rebuild: ARGS+=--build-arg KOPS=$(KOPS)
+rebuild: ARGS+=--build-arg HELM=$(HELM)
+rebuild: docker-arch-rebuild
+
+.PHONY: push
+push: docker-arch-push
+
+
+# -------------------------------------------------------------------------------------------------
+#  Manifest Targets
+# -------------------------------------------------------------------------------------------------
+.PHONY: manifest-create
+manifest-create: docker-manifest-create
+
+.PHONY: manifest-push
+manifest-push: docker-manifest-push
+
+
+# -------------------------------------------------------------------------------------------------
+#  Test Targets
+# -------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+#ifneq (,)
+#.error This Makefile requires GNU Make.
+#endif
+#
+## -------------------------------------------------------------------------------------------------
+## Default configuration
+## -------------------------------------------------------------------------------------------------
+#.PHONY: lint build rebuild test tag pull-base-image login push enter
+#
+#CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+#
+## -------------------------------------------------------------------------------------------------
+## File-lint configuration
+## -------------------------------------------------------------------------------------------------
+#FL_VERSION = 0.4
+#FL_IGNORES = .git/,.github/,tests/
+#
+## -------------------------------------------------------------------------------------------------
+## Docker configuration
+## -------------------------------------------------------------------------------------------------
+#DIR = Dockerfiles/
+#FILE = Dockerfile
+#IMAGE = cytopia/ansible
+#TAG = latest
+#NO_CACHE =
+#
+## Version & Flavour
+#ANSIBLE = latest
+#FLAVOUR = base
+#KOPS =
+#HELM =
 
 
 # -------------------------------------------------------------------------------------------------
 # Default Target
 # -------------------------------------------------------------------------------------------------
-help:
-	@echo "--------------------------------------------------------------------------------"
-	@echo " Build Targets"
-	@echo "--------------------------------------------------------------------------------"
-	@echo
-	@echo "All Docker images are build as follows: $(IMAGE):\$$ANSIBLE[-\$$FLAVOUR[\$$KOPS|\$$HELM]]"
-	@echo
-	@echo "build   [ANSIBLE=] [KOPS=] [HELM=]        Build Docker image"
-	@echo "rebuild [ANSIBLE=] [KOPS=] [HELM=]        Build Docker image without cache"
-	@echo
-	@echo "    make build ANSIBLE=2.3"
-	@echo "    make build ANSIBLE=2.3 FLAVOUR=tools"
-	@echo "    make build ANSIBLE=2.3 FLAVOUR=infra"
-	@echo "    make build ANSIBLE=2.3 FLAVOUR=azure"
-	@echo "    make build ANSIBLE=2.3 FLAVOUR=aws"
-	@echo "    make build ANSIBLE=2.3 FLAVOUR=awsk8s"
-	@echo "    make build ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
-	@echo "    make build ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
-	@echo
-	@echo "--------------------------------------------------------------------------------"
-	@echo " Test Targets"
-	@echo "--------------------------------------------------------------------------------"
-	@echo
-	@echo "test [ANSIBLE=] [KOPS=] [HELM=]           Test built Docker image"
-	@echo
-	@echo "    make test ANSIBLE=2.3"
-	@echo "    make test ANSIBLE=2.3 FLAVOUR=tools"
-	@echo "    make test ANSIBLE=2.3 FLAVOUR=infra"
-	@echo "    make test ANSIBLE=2.3 FLAVOUR=azure"
-	@echo "    make test ANSIBLE=2.3 FLAVOUR=aws"
-	@echo "    make test ANSIBLE=2.3 FLAVOUR=awsk8s"
-	@echo "    make test ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
-	@echo "    make test ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
-	@echo
-	@echo "--------------------------------------------------------------------------------"
-	@echo " Tagging Target"
-	@echo "--------------------------------------------------------------------------------"
-	@echo
-	@echo "tag [ANSIBLE=] [KOPS=] [HELM=] [TAG=]     Tag built Docker image"
-	@echo
-	@echo "    make tag ANSIBLE=2.3 TAG=2.3-mysuffix"
-	@echo "    make tag ANSIBLE=2.3 FLAVOUR=tools TAG=2.3-tools-mysuffix"
-	@echo "    make tag ANSIBLE=2.3 FLAVOUR=infra TAG=2.3-infra-mysuffix"
-	@echo "    make tag ANSIBLE=2.3 FLAVOUR=azure TAG=2.3-azure-mysuffix"
-	@echo "    make tag ANSIBLE=2.3 FLAVOUR=aws TAG=2.3-aws-mysuffix"
-	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awsk8s TAG=2.3-awsk8s-mysuffix"
-	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
-	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
-	@echo
-	@echo "--------------------------------------------------------------------------------"
-	@echo " MISC Targets"
-	@echo "--------------------------------------------------------------------------------"
-	@echo
-	@echo "lint                                      Lint repository"
-	@echo "pull-base-image                           Pull the base Docker image"
-	@echo "login [USERNAME=] [PASSWORD=]             Login to Dockerhub"
-	@echo "push  [TAG=]                              Push Docker image to Dockerhub"
-	@echo "enter [TAG=]                              Run and enter Docker built image"
+#help:
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo " Build Targets"
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo
+#	@echo "All Docker images are build as follows: $(IMAGE):\$$ANSIBLE[-\$$FLAVOUR[\$$KOPS|\$$HELM]]"
+#	@echo
+#	@echo "build   [ANSIBLE=] [KOPS=] [HELM=]        Build Docker image"
+#	@echo "rebuild [ANSIBLE=] [KOPS=] [HELM=]        Build Docker image without cache"
+#	@echo
+#	@echo "    make build ANSIBLE=2.3"
+#	@echo "    make build ANSIBLE=2.3 FLAVOUR=tools"
+#	@echo "    make build ANSIBLE=2.3 FLAVOUR=infra"
+#	@echo "    make build ANSIBLE=2.3 FLAVOUR=azure"
+#	@echo "    make build ANSIBLE=2.3 FLAVOUR=aws"
+#	@echo "    make build ANSIBLE=2.3 FLAVOUR=awsk8s"
+#	@echo "    make build ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
+#	@echo "    make build ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
+#	@echo
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo " Test Targets"
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo
+#	@echo "test [ANSIBLE=] [KOPS=] [HELM=]           Test built Docker image"
+#	@echo
+#	@echo "    make test ANSIBLE=2.3"
+#	@echo "    make test ANSIBLE=2.3 FLAVOUR=tools"
+#	@echo "    make test ANSIBLE=2.3 FLAVOUR=infra"
+#	@echo "    make test ANSIBLE=2.3 FLAVOUR=azure"
+#	@echo "    make test ANSIBLE=2.3 FLAVOUR=aws"
+#	@echo "    make test ANSIBLE=2.3 FLAVOUR=awsk8s"
+#	@echo "    make test ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
+#	@echo "    make test ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
+#	@echo
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo " Tagging Target"
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo
+#	@echo "tag [ANSIBLE=] [KOPS=] [HELM=] [TAG=]     Tag built Docker image"
+#	@echo
+#	@echo "    make tag ANSIBLE=2.3 TAG=2.3-mysuffix"
+#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=tools TAG=2.3-tools-mysuffix"
+#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=infra TAG=2.3-infra-mysuffix"
+#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=azure TAG=2.3-azure-mysuffix"
+#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=aws TAG=2.3-aws-mysuffix"
+#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awsk8s TAG=2.3-awsk8s-mysuffix"
+#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
+#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
+#	@echo
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo " MISC Targets"
+#	@echo "--------------------------------------------------------------------------------"
+#	@echo
+#	@echo "lint                                      Lint repository"
+#	@echo "pull-base-image                           Pull the base Docker image"
+#	@echo "login [USERNAME=] [PASSWORD=]             Login to Dockerhub"
+#	@echo "push  [TAG=]                              Push Docker image to Dockerhub"
+#	@echo "enter [TAG=]                              Run and enter Docker built image"
 
-
-# -------------------------------------------------------------------------------------------------
-# Lint Targets
-# -------------------------------------------------------------------------------------------------
-lint: lint-files
-lint: lint-workflow
-
-lint-files:
-	@echo "################################################################################"
-	@echo "# Lint Files"
-	@echo "################################################################################"
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '$(FL_IGNORES)' --path .
-
-lint-workflow:
-	@echo "################################################################################"
-	@echo "# Lint Workflow"
-	@echo "################################################################################"
-	@\
-	GIT_CURR_MAJOR="$$( git tag | sort -V | tail -1 | sed 's|\.[0-9]*$$||g' )"; \
-	GIT_CURR_MINOR="$$( git tag | sort -V | tail -1 | sed 's|^[0-9]*\.||g' )"; \
-	GIT_NEXT_TAG="$${GIT_CURR_MAJOR}.$$(( GIT_CURR_MINOR + 1 ))"; \
-	if ! grep 'refs:' -A 100 .github/workflows/nightly.yml \
-		| grep  "          - '$${GIT_NEXT_TAG}'" >/dev/null; then \
-		echo "[ERR] New Tag required in .github/workflows/nightly.yml: $${GIT_NEXT_TAG}"; \
-			exit 1; \
-		else \
-		echo "[OK] Git Tag present in .github/workflows/nightly.yml: $${GIT_NEXT_TAG}"; \
-	fi; \
-	if ! grep 'refs:' -A 100 .github/workflows/nightly-kops.yml \
-		| grep  "          - '$${GIT_NEXT_TAG}'" >/dev/null; then \
-		echo "[ERR] New Tag required in .github/workflows/nightly-kops.yml: $${GIT_NEXT_TAG}"; \
-			exit 1; \
-		else \
-		echo "[OK] Git Tag present in .github/workflows/nightly-kops.yml: $${GIT_NEXT_TAG}"; \
-	fi; \
-	if ! grep 'refs:' -A 100 .github/workflows/nightly-helm.yml \
-		| grep  "          - '$${GIT_NEXT_TAG}'" >/dev/null; then \
-		echo "[ERR] New Tag required in .github/workflows/nightly-helm.yml: $${GIT_NEXT_TAG}"; \
-			exit 1; \
-		else \
-		echo "[OK] Git Tag present in .github/workflows/nightly-helm.yml: $${GIT_NEXT_TAG}"; \
-	fi
-	@echo
 
 
 # -------------------------------------------------------------------------------------------------
 # Build Targets
 # -------------------------------------------------------------------------------------------------
 
-_build_builder:
-	docker build $(NO_CACHE) --build-arg VERSION=$(ANSIBLE) \
-		-t cytopia/ansible-builder -f ${DIR}/builder ${DIR}
-
-build: _build_builder
-build:
-	@ \
-	if [ "$(FLAVOUR)" = "base" ]; then \
-		docker build \
-			$(NO_CACHE) \
-			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg VERSION=$(ANSIBLE) \
-			-t $(IMAGE):$(ANSIBLE) -f $(DIR)/$(FILE) $(DIR); \
-	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
-		if [ -z "$(HELM)" ]; then \
-			echo "Error, HELM variable required."; \
-			exit 1; \
-		fi; \
-		docker build \
-			$(NO_CACHE) \
-			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg VERSION=$(ANSIBLE) \
-			--build-arg HELM=$(HELM) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-	elif [ "$(FLAVOUR)" = "awskops" ]; then \
-		if [ -z "$(KOPS)" ]; then \
-			echo "Error, KOPS variable required."; \
-			exit 1; \
-		fi; \
-		docker build \
-			$(NO_CACHE) \
-			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg VERSION=$(ANSIBLE) \
-			--build-arg KOPS=$(KOPS) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-	else \
-		docker build \
-			$(NO_CACHE) \
-			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-			--label "org.opencontainers.image.version"="${VERSION}" \
-			--build-arg VERSION=$(ANSIBLE) \
-			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-	fi
-
-rebuild: NO_CACHE=--no-cache
-rebuild: pull-base-image
-rebuild: build
+#_build_builder:
+#	docker build $(NO_CACHE) --build-arg VERSION=$(ANSIBLE) \
+#		-t cytopia/ansible-builder -f ${DIR}/builder ${DIR}
+#
+#build: _build_builder
+#build:
+#	@ \
+#	if [ "$(FLAVOUR)" = "base" ]; then \
+#		docker build \
+#			$(NO_CACHE) \
+#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
+#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
+#			--label "org.opencontainers.image.version"="${VERSION}" \
+#			--build-arg VERSION=$(ANSIBLE) \
+#			-t $(IMAGE):$(ANSIBLE) -f $(DIR)/$(FILE) $(DIR); \
+#	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
+#		if [ -z "$(HELM)" ]; then \
+#			echo "Error, HELM variable required."; \
+#			exit 1; \
+#		fi; \
+#		docker build \
+#			$(NO_CACHE) \
+#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
+#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
+#			--label "org.opencontainers.image.version"="${VERSION}" \
+#			--build-arg VERSION=$(ANSIBLE) \
+#			--build-arg HELM=$(HELM) \
+#			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+#	elif [ "$(FLAVOUR)" = "awskops" ]; then \
+#		if [ -z "$(KOPS)" ]; then \
+#			echo "Error, KOPS variable required."; \
+#			exit 1; \
+#		fi; \
+#		docker build \
+#			$(NO_CACHE) \
+#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
+#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
+#			--label "org.opencontainers.image.version"="${VERSION}" \
+#			--build-arg VERSION=$(ANSIBLE) \
+#			--build-arg KOPS=$(KOPS) \
+#			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+#	else \
+#		docker build \
+#			$(NO_CACHE) \
+#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
+#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
+#			--label "org.opencontainers.image.version"="${VERSION}" \
+#			--build-arg VERSION=$(ANSIBLE) \
+#			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
+#	fi
+#
+#rebuild: NO_CACHE=--no-cache
+#rebuild: pull-base-image
+#rebuild: build
 
 
 # -------------------------------------------------------------------------------------------------
@@ -681,57 +817,3 @@ test-run-user-ansible:
 	fi; \
 	echo "[SUCCESS]"; \
 	echo
-
-
-# -------------------------------------------------------------------------------------------------
-#  Deploy Targets
-# -------------------------------------------------------------------------------------------------
-tag:
-	@\
-	if [ "$(FLAVOUR)" = "base" ]; then \
-		docker tag $(IMAGE):$(ANSIBLE) $(IMAGE):$(TAG); \
-	else \
-		docker tag $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) $(IMAGE):$(TAG); \
-	fi
-
-login:
-ifeq ($(strip $(USERNAME)),)
-	@$(info This make target requires the USERNAME variable to be set.)
-	@$(info make login USERNAME= PASSWORD=)
-	@$(info )
-	@$(error Exiting)
-endif
-ifeq ($(strip $(PASSWORD)),)
-	@$(info This make target requires the PASSWORD variable to be set.)
-	@$(info make login USERNAME= PASSWORD=)
-	@$(info )
-	@$(error Exiting)
-endif
-	@yes | docker login --username $(USERNAME) --password $(PASSWORD)
-
-push:
-ifeq ($(strip $(TAG)),)
-	@$(info This make target requires the TAG variable to be set.)
-	@$(info make push TAG=)
-	@$(info )
-	@$(error Exiting)
-endif
-	docker push $(IMAGE):$(TAG)
-
-
-# --------------------------------------------------------------------------------------------------
-# Helper Targets
-# --------------------------------------------------------------------------------------------------
-pull-base-image:
-	@grep -E '^\s*FROM' $(DIR)/Dockerfile \
-		| sed -e 's/^FROM//g' -e 's/[[:space:]]*as[[:space:]]*.*$$//g' \
-		| sort -u \
-		| grep -v 'cytopia/' \
-		| xargs -n1 docker pull;
-
-enter:
-	if [ "$(FLAVOUR)" = "base" ]; then \
-		docker run --rm -it $(IMAGE):$(ANSIBLE); \
-	else \
-		docker run --rm -it $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS); \
-	fi
