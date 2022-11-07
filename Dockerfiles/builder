@@ -7,7 +7,7 @@
 # How to build: docker build -t cytopia/ansible-builder -f builder .
 #
 
-FROM alpine:3.15 as builder
+FROM alpine:3.16 as builder
 
 # Package required tools for all flavour's "builder" stage
 RUN set -eux \
@@ -43,12 +43,15 @@ RUN set -eux \
 # Pip required tools for all flavour's "builder" stage
 RUN set -eux \
 	&& pip3 install --no-cache-dir --no-compile \
-		wheel \
+		wheel
+RUN set -eux \
 	&& pip3 install --no-cache-dir --no-compile \
 		Jinja2 \
 		MarkupSafe \
 		PyNaCl \
-		bcrypt \
 		cffi \
-		cryptography \
 		pycparser
+
+#		cryptography \
+#		bcrypt \
+
