@@ -110,7 +110,9 @@ RUN set -eux \
 # Issue: #76 yaml required for 'libyaml = True' (faster startup time)
 		yaml \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
-	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf \
+	\
+	&& ln -s /usr/bin/python3 /usr/bin/python
 
 COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 COPY --from=builder /usr/bin/ansible* /usr/bin/
