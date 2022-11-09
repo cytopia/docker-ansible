@@ -135,7 +135,8 @@ save-verify: load
 # Test Targets
 # -------------------------------------------------------------------------------------------------
 .PHONY: test
-test: test-architecture
+test: test-architecture-uname
+test: test-architecture-inspect
 test: test-ansible-version
 test: test-python-libs
 test: test-binaries
@@ -144,10 +145,10 @@ test: test-kops-version
 test: test-run-user-root
 test: test-run-user-ansible
 
-.PHONY: test-architecture
-test-architecture:
+.PHONY: test-architecture-uname
+test-architecture-uname:
 	@echo "################################################################################"
-	@echo "# Testing correct Architecture ($(ARCH))"
+	@echo "# Testing correct Architecture - uname ($(ARCH))"
 	@echo "################################################################################"
 	@echo "docker run --rm --platform $(ARCH) --entrypoint=sh $(IMAGE):$(DOCKER_TAG) -c 'uname -m'"
 	@\
@@ -170,6 +171,35 @@ test-architecture:
 	fi; \
 	echo "[SUCCESS]"; \
 	echo
+
+.PHONY: test-architecture-inspect
+test-architecture-inspect:
+	@echo "################################################################################"
+	@echo "# Testing correct Architecture - inspect ($(ARCH))"
+	@echo "################################################################################"
+	@echo "docker image inspect $(IMAGE):$(DOCKER_TAG) -f '{{ .Architecture }}'"
+	@\
+	if [ "$(ARCH)" = "linux/amd64" ]; then \
+		if ! docker image inspect $(IMAGE):$(DOCKER_TAG) -f '{{ .Architecture }}' | grep -E '^amd64$$'; then \
+			echo "[FAILED]"; \
+			docker image inspect $(IMAGE):$(DOCKER_TAG) -f '{{ .Architecture }}'; \
+			exit 1; \
+		fi; \
+	elif [ "$(ARCH)" = "linux/arm64" ]; then \
+		if ! docker image inspect $(IMAGE):$(DOCKER_TAG) -f '{{ .Architecture }}' | grep -E '^arm64$$'; then \
+			echo "[FAILED]"; \
+			docker image inspect $(IMAGE):$(DOCKER_TAG) -f '{{ .Architecture }}'; \
+			exit 1; \
+		fi; \
+	else \
+		echo "[FAILED]"; \
+		echo "Wrong ARCH variable specified: $(ARCH)"; \
+		exit 1; \
+	fi; \
+	echo "[SUCCESS]"; \
+	echo
+
+
 
 .PHONY: test-ansible-version
 test-ansible-version:
