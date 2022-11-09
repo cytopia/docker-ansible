@@ -3,8 +3,14 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM cytopia/ansible:${VERSION} as builder
+
+# Required tools for building Python packages
+RUN set -eux \
+	&& apk add --no-cache \
+		# misc tools
+		curl \
+		git
 
 # Install Helm by major and minor version
 ARG HELM
