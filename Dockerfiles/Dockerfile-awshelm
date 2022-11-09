@@ -9,6 +9,7 @@ FROM cytopia/ansible:${VERSION} as builder
 RUN set -eux \
 	&& apk add --no-cache \
 		# misc tools
+		coreutils \
 		curl \
 		git
 
@@ -26,7 +27,7 @@ RUN set -eux \
 	&& git clone https://github.com/helm/helm \
 	&& cd helm \
 	# Sort by unique minor versions (without patch) \
-	&& version="$(git tag | grep -E "^v${HELM}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1)" \
+	&& version="$(git tag | grep -E "^v${HELM}\.[0-9]{1,2}$" | sort -V | tail -1)" \
 	&& echo "${version}" \
 	&& curl -sS -L --fail -O https://get.helm.sh/helm-${version}-linux-${ARCH}.tar.gz \
 	&& tar xvfz helm-${version}-linux-${ARCH}.tar.gz \

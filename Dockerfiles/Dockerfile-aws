@@ -52,8 +52,7 @@ RUN set -eux \
 	)" \
 	&& git checkout "${IAM_AUTH_VERSION}" \
 	&& make build-all-bins \
-	\
-	mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_${ARCH} /usr/bin/aws-iam-authenticator; \
+	&& mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_${ARCH} /usr/bin/aws-iam-authenticator \
 	&& chmod +x /usr/bin/aws-iam-authenticator \
 	&& aws-iam-authenticator version | grep -E "\"(${IAM_AUTH_VERSION}|unversioned)\"" \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
