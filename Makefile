@@ -135,6 +135,7 @@ save-verify: load
 # Test Targets
 # -------------------------------------------------------------------------------------------------
 .PHONY: test
+test: test-architecture
 test: test-ansible-version
 test: test-python-libs
 test: test-binaries
@@ -142,6 +143,33 @@ test: test-helm-version
 test: test-kops-version
 test: test-run-user-root
 test: test-run-user-ansible
+
+.PHONY: test-architecture
+test-architecture:
+	@echo "################################################################################"
+	@echo "# Testing correct Architecture ($(ARCH))"
+	@echo "################################################################################"
+	@echo "docker run --rm --platform $(ARCH) --entrypoint=sh $(IMAGE):$(DOCKER_TAG) -c 'uname -m'"
+	@\
+	if [ "$(ARCH)" = "linux/amd64" ]; then \
+		if ! docker run --rm --platform $(ARCH) --entrypoint=sh $(IMAGE):$(DOCKER_TAG) -c 'uname -m' | grep -E '^x86_64$$'; then \
+			echo "[FAILED]"; \
+			docker run --rm --platform $(ARCH) --entrypoint=sh $(IMAGE):$(DOCKER_TAG) -c 'uname -m'; \
+			exit 1; \
+		fi; \
+	elif [ "$(ARCH)" = "linux/arm64" ]; then \
+		if ! docker run --rm --platform $(ARCH) --entrypoint=sh $(IMAGE):$(DOCKER_TAG) -c 'uname -m' | grep -E '^aarch64$$'; then \
+			echo "[FAILED]"; \
+			docker run --rm --platform $(ARCH) --entrypoint=sh $(IMAGE):$(DOCKER_TAG) -c 'uname -m'; \
+			exit 1; \
+		fi; \
+	else \
+		echo "[FAILED]"; \
+		echo "Wrong ARCH variable specified: $(ARCH)"; \
+		exit 1; \
+	fi; \
+	echo "[SUCCESS]"; \
+	echo
 
 .PHONY: test-ansible-version
 test-ansible-version:
