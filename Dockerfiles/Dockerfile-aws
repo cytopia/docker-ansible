@@ -35,6 +35,14 @@ RUN set -eux \
 
 # aws-iam-authemticator (copied to final image)
 RUN set -eux \
+	&& if [ "$(uname -m)" = "aarch64" ]; then \
+		ARCH="arm64"; \
+	elif [ "$(uname -m)" = "x86_64" ]; then \
+		ARCH="amd64"; \
+	else \
+		fail; \
+	fi \
+	\
 	&& git clone https://github.com/kubernetes-sigs/aws-iam-authenticator /tmp/aws-iam-authenticator \
 	&& cd /tmp/aws-iam-authenticator \
 	&& IAM_AUTH_VERSION="$( git tag --sort=-creatordate \
@@ -45,13 +53,7 @@ RUN set -eux \
 	&& git checkout "${IAM_AUTH_VERSION}" \
 	&& make build-all-bins \
 	\
-	&& if [ "$(uname -m)" = "x86_64" ]; then \
-		mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_amd64 /usr/bin/aws-iam-authenticator; \
-	elif [ "$(uname -m)" = "aarch64" ]; then \
-		mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_arm64 /usr/bin/aws-iam-authenticator; \
-	else \
-		fail; \
-	fi \
+	mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_${ARCH} /usr/bin/aws-iam-authenticator; \
 	&& chmod +x /usr/bin/aws-iam-authenticator \
 	&& aws-iam-authenticator version | grep -E "\"(${IAM_AUTH_VERSION}|unversioned)\"" \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
