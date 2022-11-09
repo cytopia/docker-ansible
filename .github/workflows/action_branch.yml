@@ -81,7 +81,7 @@ jobs:
       stage_prev: ''
 
   # -----------------------------------------------------------------------------------------------
-  # (4/8) Build & Test base
+  # (4/8) Build & Test tools
   # -----------------------------------------------------------------------------------------------
   build-tools:
     needs:
@@ -98,6 +98,62 @@ jobs:
       pull_base_image: true
       stage: tools
       stage_prev: base
+
+  # -----------------------------------------------------------------------------------------------
+  # (4/8) Build & Test infra|azure|aws
+  # -----------------------------------------------------------------------------------------------
+  build-infra:
+    needs:
+      - configure
+      - build-tools
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: false
+      upload_artifact: true
+      matrix: ${{ needs.configure.outputs.matrix_build }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      artifact_prev_name_add_version: true
+      pull_base_image: true
+      stage: infra
+      stage_prev: tools
+
+  build-azure:
+    needs:
+      - configure
+      - build-tools
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: false
+      upload_artifact: true
+      matrix: ${{ needs.configure.outputs.matrix_build }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      artifact_prev_name_add_version: true
+      pull_base_image: true
+      stage: azure
+      stage_prev: tools
+
+  build-aws:
+    needs:
+      - configure
+      - build-tools
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: false
+      upload_artifact: true
+      matrix: ${{ needs.configure.outputs.matrix_build }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      artifact_prev_name_add_version: true
+      pull_base_image: true
+      stage: aws
+      stage_prev: tools
+
+
+
+
+
 
 
 

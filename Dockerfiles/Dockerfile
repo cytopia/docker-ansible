@@ -5,18 +5,21 @@ FROM alpine:3.16 as builder
 
 RUN set -eux \
 	&& apk add --update --no-cache \
-		bc \
+		# build tools
+		coreutils \
 		g++ \
 		gcc \
-		libffi-dev \
-		libxml2-dev \
-		libxslt-dev \
 		make \
 		musl-dev \
 		openssl-dev \
+		python3-dev \
+		# misc tools
+		bc \
+		libffi-dev \
+		libxml2-dev \
+		libxslt-dev \
 		py3-pip \
 		python3 \
-		python3-dev \
 # Fix: ansible --version: libyaml = True
 # https://www.jeffgeerling.com/blog/2021/ansible-might-be-running-slow-if-libyaml-not-available
 	&& apk add --update --no-cache \
