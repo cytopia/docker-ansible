@@ -43,11 +43,17 @@ RUN set -eux \
 
 # openshift client (copied to final image)
 RUN set -eux \
+	&& if [ "$(uname -m)" != "x86_64" ]; then \
+		echo -e '#!/bin/sh\necho "Not available for this platform"' > /usr/bin/oc \
+		&& chmod +x /usr/bin/oc \
+		&& exit 0; \
+	fi \
+	\
 	&& curl -sS -L --fail -o /tmp/openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
 	&& mkdir /tmp/openshift-client-linux/ \
 	&& tar -xzf /tmp/openshift-client-linux.tar.gz -C /tmp/openshift-client-linux/ \
 	&& mv /tmp/openshift-client-linux/oc /usr/bin/oc-dynamically-linked \
-	&& echo -e '#!/bin/sh\n/lib/ld-musl-x86_64.so.1 --library-path /lib /usr/bin/oc-dynamically-linked "$@"' > /usr/bin/oc \
+	&& echo -e '#!/bin/sh\n/lib/ld-musl-$(uname -m).so.1 --library-path /lib /usr/bin/oc-dynamically-linked "$@"' > /usr/bin/oc \
 	&& chmod +x /usr/bin/oc \
 	&& oc version --client
 
@@ -74,8 +80,7 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} awsk8s"
 
 COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 COPY --from=builder /usr/bin/kubectl /usr/bin/kubectl
-COPY --from=builder /usr/bin/oc-dynamically-linked /usr/bin/oc-dynamically-linked
-COPY --from=builder /usr/bin/oc /usr/bin/oc
+COPY --from=builder /usr/bin/oc* /usr/bin/
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
