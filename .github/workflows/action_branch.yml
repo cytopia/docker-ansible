@@ -43,7 +43,7 @@ jobs:
       dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   # -----------------------------------------------------------------------------------------------
-  # (4/8) Build & Test base
+  # (3/8) Build & Test base
   # -----------------------------------------------------------------------------------------------
   build-base:
     needs:
@@ -78,8 +78,23 @@ jobs:
       stage_prev: base
 
   # -----------------------------------------------------------------------------------------------
-  # (4/8) Build & Test infra|azure|aws
+  # (5/8) Build & Test aws, infra and azure
   # -----------------------------------------------------------------------------------------------
+  build-aws:
+    needs:
+      - configure
+      - build-tools
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: true
+      upload_artifact: true
+      matrix: ${{ needs.configure.outputs.matrix_build }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      pull_base_image: false
+      stage: aws
+      stage_prev: tools
+
   build-infra:
     needs:
       - configure
@@ -110,23 +125,8 @@ jobs:
       stage: azure
       stage_prev: tools
 
-  build-aws:
-    needs:
-      - configure
-      - build-tools
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
-    with:
-      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      run_tests: true
-      upload_artifact: true
-      matrix: ${{ needs.configure.outputs.matrix_build }}
-      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      pull_base_image: false
-      stage: aws
-      stage_prev: tools
-
   # -----------------------------------------------------------------------------------------------
-  # (4/8) Build & Test awsk8s
+  # (6/8) Build & Test awsk8s
   # -----------------------------------------------------------------------------------------------
   build-awsk8s:
     needs:
@@ -144,7 +144,7 @@ jobs:
       stage_prev: aws
 
   # -----------------------------------------------------------------------------------------------
-  # (4/8) Build & Test awskops|awshelm
+  # (7/8) Build & Test awskops and awshelm
   # -----------------------------------------------------------------------------------------------
   build-awskops:
     needs:
