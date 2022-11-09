@@ -28,19 +28,13 @@ NAME       = ansible
 VERSION    = latest
 IMAGE      = cytopia/ansible
 FLAVOUR    = default
-STAGE      = builder
+STAGE      = base
 DIR        = Dockerfiles
 DOCKER_TAG = $(VERSION)
 
 # Never pull this image if mentioned in FROM tag
 DOCKER_PULL_BASE_IMAGES_IGNORE = cytopia/ansible-builder
 
-# Determine Dockerfile to use
-ifeq ($(strip $(STAGE)),builder)
-	FILE = builder
-	IMAGE = cytopia/ansible-builder
-	DOCKER_TAG = latest
-endif
 ifeq ($(strip $(STAGE)),base)
 	FILE = Dockerfile
 endif
@@ -66,56 +60,12 @@ ifeq ($(strip $(STAGE)),awsk8s)
 endif
 ifeq ($(strip $(STAGE)),awskops)
 	FILE = Dockerfile-awskops
-	DOCKER_TAG = $(VERSION)-awskops
+	DOCKER_TAG = $(VERSION)-awskops$(KOPS)
 endif
 ifeq ($(strip $(STAGE)),awshelm)
 	FILE = Dockerfile-awshelm
-	DOCKER_TAG = $(VERSION)-awshelm
+	DOCKER_TAG = $(VERSION)-awshelm$(HELM)
 endif
-
-## Building from master branch: Tag == 'latest'
-#ifeq ($(strip $(TAG)),latest)
-#	ifeq ($(strip $(VERSION)),latest)
-#		DOCKER_TAG = $(FLAVOUR)
-#	else
-#		ifeq ($(strip $(FLAVOUR)),latest)
-#			ifeq ($(strip $(PHP_VERSION)),latest)
-#				DOCKER_TAG = $(PCS_VERSION)
-#			else
-#				DOCKER_TAG = $(PCS_VERSION)-php$(PHP_VERSION)
-#			endif
-#		else
-#			ifeq ($(strip $(PHP_VERSION)),latest)
-#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)
-#			else
-#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)-php$(PHP_VERSION)
-#			endif
-#		endif
-#	endif
-## Building from any other branch or tag: Tag == '<REF>'
-#else
-#	ifeq ($(strip $(VERSION)),latest)
-#		ifeq ($(strip $(FLAVOUR)),latest)
-#			DOCKER_TAG = latest-$(TAG)
-#		else
-#			DOCKER_TAG = $(FLAVOUR)-latest-$(TAG)
-#		endif
-#	else
-#		ifeq ($(strip $(FLAVOUR)),latest)
-#			ifeq ($(strip $(PHP_VERSION)),latest)
-#				DOCKER_TAG = $(PCS_VERSION)-$(TAG)
-#			else
-#				DOCKER_TAG = $(PCS_VERSION)-php$(PHP_VERSION)-$(TAG)
-#			endif
-#		else
-#			ifeq ($(strip $(PHP_VERSION)),latest)
-#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)-$(TAG)
-#			else
-#				DOCKER_TAG = $(FLAVOUR)-$(PCS_VERSION)-php$(PHP_VERSION)-$(TAG)
-#			endif
-#		endif
-#	endif
-#endif
 
 # Makefile.lint overwrites
 FL_IGNORES  = .git/,.github/,tests/
@@ -185,184 +135,9 @@ save-verify: load
 
 
 # -------------------------------------------------------------------------------------------------
-#  Target Overrides
-# -------------------------------------------------------------------------------------------------
-
-# -------------------------------------------------------------------------------------------------
-#  Test Targets
-# -------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-#ifneq (,)
-#.error This Makefile requires GNU Make.
-#endif
-#
-## -------------------------------------------------------------------------------------------------
-## Default configuration
-## -------------------------------------------------------------------------------------------------
-#.PHONY: lint build rebuild test tag pull-base-image login push enter
-#
-#CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-#
-## -------------------------------------------------------------------------------------------------
-## File-lint configuration
-## -------------------------------------------------------------------------------------------------
-#FL_VERSION = 0.4
-#FL_IGNORES = .git/,.github/,tests/
-#
-## -------------------------------------------------------------------------------------------------
-## Docker configuration
-## -------------------------------------------------------------------------------------------------
-#DIR = Dockerfiles/
-#FILE = Dockerfile
-#IMAGE = cytopia/ansible
-#TAG = latest
-#NO_CACHE =
-#
-## Version & Flavour
-#ANSIBLE = latest
-#FLAVOUR = base
-#KOPS =
-#HELM =
-
-
-# -------------------------------------------------------------------------------------------------
-# Default Target
-# -------------------------------------------------------------------------------------------------
-#help:
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo " Build Targets"
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo
-#	@echo "All Docker images are build as follows: $(IMAGE):\$$ANSIBLE[-\$$FLAVOUR[\$$KOPS|\$$HELM]]"
-#	@echo
-#	@echo "build   [ANSIBLE=] [KOPS=] [HELM=]        Build Docker image"
-#	@echo "rebuild [ANSIBLE=] [KOPS=] [HELM=]        Build Docker image without cache"
-#	@echo
-#	@echo "    make build ANSIBLE=2.3"
-#	@echo "    make build ANSIBLE=2.3 FLAVOUR=tools"
-#	@echo "    make build ANSIBLE=2.3 FLAVOUR=infra"
-#	@echo "    make build ANSIBLE=2.3 FLAVOUR=azure"
-#	@echo "    make build ANSIBLE=2.3 FLAVOUR=aws"
-#	@echo "    make build ANSIBLE=2.3 FLAVOUR=awsk8s"
-#	@echo "    make build ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
-#	@echo "    make build ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
-#	@echo
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo " Test Targets"
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo
-#	@echo "test [ANSIBLE=] [KOPS=] [HELM=]           Test built Docker image"
-#	@echo
-#	@echo "    make test ANSIBLE=2.3"
-#	@echo "    make test ANSIBLE=2.3 FLAVOUR=tools"
-#	@echo "    make test ANSIBLE=2.3 FLAVOUR=infra"
-#	@echo "    make test ANSIBLE=2.3 FLAVOUR=azure"
-#	@echo "    make test ANSIBLE=2.3 FLAVOUR=aws"
-#	@echo "    make test ANSIBLE=2.3 FLAVOUR=awsk8s"
-#	@echo "    make test ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11"
-#	@echo "    make test ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15"
-#	@echo
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo " Tagging Target"
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo
-#	@echo "tag [ANSIBLE=] [KOPS=] [HELM=] [TAG=]     Tag built Docker image"
-#	@echo
-#	@echo "    make tag ANSIBLE=2.3 TAG=2.3-mysuffix"
-#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=tools TAG=2.3-tools-mysuffix"
-#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=infra TAG=2.3-infra-mysuffix"
-#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=azure TAG=2.3-azure-mysuffix"
-#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=aws TAG=2.3-aws-mysuffix"
-#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awsk8s TAG=2.3-awsk8s-mysuffix"
-#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
-#	@echo "    make tag ANSIBLE=2.3 FLAVOUR=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
-#	@echo
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo " MISC Targets"
-#	@echo "--------------------------------------------------------------------------------"
-#	@echo
-#	@echo "lint                                      Lint repository"
-#	@echo "pull-base-image                           Pull the base Docker image"
-#	@echo "login [USERNAME=] [PASSWORD=]             Login to Dockerhub"
-#	@echo "push  [TAG=]                              Push Docker image to Dockerhub"
-#	@echo "enter [TAG=]                              Run and enter Docker built image"
-
-
-
-# -------------------------------------------------------------------------------------------------
-# Build Targets
-# -------------------------------------------------------------------------------------------------
-
-#_build_builder:
-#	docker build $(NO_CACHE) --build-arg VERSION=$(ANSIBLE) \
-#		-t cytopia/ansible-builder -f ${DIR}/builder ${DIR}
-#
-#build: _build_builder
-#build:
-#	@ \
-#	if [ "$(FLAVOUR)" = "base" ]; then \
-#		docker build \
-#			$(NO_CACHE) \
-#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-#			--label "org.opencontainers.image.version"="${VERSION}" \
-#			--build-arg VERSION=$(ANSIBLE) \
-#			-t $(IMAGE):$(ANSIBLE) -f $(DIR)/$(FILE) $(DIR); \
-#	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
-#		if [ -z "$(HELM)" ]; then \
-#			echo "Error, HELM variable required."; \
-#			exit 1; \
-#		fi; \
-#		docker build \
-#			$(NO_CACHE) \
-#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-#			--label "org.opencontainers.image.version"="${VERSION}" \
-#			--build-arg VERSION=$(ANSIBLE) \
-#			--build-arg HELM=$(HELM) \
-#			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-#	elif [ "$(FLAVOUR)" = "awskops" ]; then \
-#		if [ -z "$(KOPS)" ]; then \
-#			echo "Error, KOPS variable required."; \
-#			exit 1; \
-#		fi; \
-#		docker build \
-#			$(NO_CACHE) \
-#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-#			--label "org.opencontainers.image.version"="${VERSION}" \
-#			--build-arg VERSION=$(ANSIBLE) \
-#			--build-arg KOPS=$(KOPS) \
-#			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(KOPS) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-#	else \
-#		docker build \
-#			$(NO_CACHE) \
-#			--label "org.opencontainers.image.created"="$$(date --rfc-3339=s)" \
-#			--label "org.opencontainers.image.revision"="$$(git rev-parse HEAD)" \
-#			--label "org.opencontainers.image.version"="${VERSION}" \
-#			--build-arg VERSION=$(ANSIBLE) \
-#			-t $(IMAGE):$(ANSIBLE)-$(FLAVOUR) -f $(DIR)/$(FILE)-$(FLAVOUR) $(DIR); \
-#	fi
-#
-#rebuild: NO_CACHE=--no-cache
-#rebuild: pull-base-image
-#rebuild: build
-
-
-# -------------------------------------------------------------------------------------------------
 # Test Targets
 # -------------------------------------------------------------------------------------------------
+.PHONY: test
 test: test-ansible-version
 test: test-python-libs
 test: test-binaries
@@ -394,20 +169,13 @@ test-ansible-version:
 	\
 	\
 	echo "Testing against Ansible version: $${TEST_VERSION}"; \
+	echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) ansible --version | grep -E \"^[Aa]nsible.+$${TEST_VERSION}\""; \
 	\
 	\
-	if [ "$(FLAVOUR)" = "base" ]; then \
-		if ! docker run --rm $(IMAGE):$(ANSIBLE) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
-			echo "[FAILED]"; \
-			docker run --rm $(IMAGE):$(ANSIBLE) ansible --version; \
-			exit 1; \
-		fi; \
-	else \
-		if ! docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
-			echo "[FAILED]"; \
-			docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible --version; \
-			exit 1; \
-		fi; \
+	if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) ansible --version | grep -E "^[Aa]nsible.+$${TEST_VERSION}"; then \
+		echo "[FAILED]"; \
+		docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) ansible --version; \
+		exit 1; \
 	fi; \
 	echo "[SUCCESS]"; \
 	echo
@@ -417,14 +185,11 @@ test-python-libs:
 	@echo "################################################################################"
 	@echo "# Testing correct Python libraries"
 	@echo "################################################################################"
+	@echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) pip3 freeze"
 	@\
 	\
 	\
-	if [ "$(FLAVOUR)" = "base" ]; then \
-		LIBS="$$( docker run --rm $(IMAGE):$(ANSIBLE) pip3 freeze )"; \
-	else \
-		LIBS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) pip3 freeze )"; \
-	fi; \
+	LIBS="$$( docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) pip3 freeze )"; \
 	\
 	\
 	REQUIRED_BASE="cffi cryptography paramiko Jinja2 PyYAML"; \
@@ -437,7 +202,7 @@ test-python-libs:
 	REQUIRED_AWSHELM=""; \
 	\
 	\
-	if [ "$(FLAVOUR)" = "base" ]; then \
+	if [ "$(STAGE)" = "base" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -455,7 +220,7 @@ test-python-libs:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "tools" ]; then \
+	elif [ "$(STAGE)" = "tools" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -473,7 +238,7 @@ test-python-libs:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "infra" ]; then \
+	elif [ "$(STAGE)" = "infra" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_INFRA} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -491,7 +256,7 @@ test-python-libs:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "azure" ]; then \
+	elif [ "$(STAGE)" = "azure" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AZURE} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -509,7 +274,7 @@ test-python-libs:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "aws" ]; then \
+	elif [ "$(STAGE)" = "aws" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -527,7 +292,7 @@ test-python-libs:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "awsk8s" ]; then \
+	elif [ "$(STAGE)" = "awsk8s" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -545,7 +310,7 @@ test-python-libs:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "awskops" ]; then \
+	elif [ "$(STAGE)" = "awskops" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSKOPS} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -555,7 +320,7 @@ test-python-libs:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
+	elif [ "$(STAGE)" = "awshelm" ]; then \
 		for lib in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSHELM} ); do \
 			if echo "$${LIBS}" | grep -E "^$${lib}" >/dev/null; then \
 				echo "[OK] required lib available: $${lib}"; \
@@ -574,14 +339,11 @@ test-binaries:
 	@echo "################################################################################"
 	@echo "# Testing correct Binaries"
 	@echo "################################################################################"
+	@echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) find /usr/bin/ -type f | sed 's|/usr/bin/||g'"
 	@\
 	\
 	\
-	if [ "$(FLAVOUR)" = "base" ]; then \
-		BINS="$$( docker run --rm $(IMAGE):$(ANSIBLE) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
-	else \
-		BINS="$$( docker run --rm $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
-	fi; \
+	BINS="$$( docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
 	\
 	\
 	REQUIRED_BASE="python"; \
@@ -594,7 +356,7 @@ test-binaries:
 	REQUIRED_AWSHELM="helm"; \
 	\
 	\
-	if [ "$(FLAVOUR)" = "base" ]; then \
+	if [ "$(STAGE)" = "base" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -612,7 +374,7 @@ test-binaries:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "tools" ]; then \
+	elif [ "$(STAGE)" = "tools" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -630,7 +392,7 @@ test-binaries:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "infra" ]; then \
+	elif [ "$(STAGE)" = "infra" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_INFRA} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -648,7 +410,7 @@ test-binaries:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "azure" ]; then \
+	elif [ "$(STAGE)" = "azure" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AZURE} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -666,7 +428,7 @@ test-binaries:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "aws" ]; then \
+	elif [ "$(STAGE)" = "aws" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -684,7 +446,7 @@ test-binaries:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "awsk8s" ]; then \
+	elif [ "$(STAGE)" = "awsk8s" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -702,7 +464,7 @@ test-binaries:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "awskops" ]; then \
+	elif [ "$(STAGE)" = "awskops" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSKOPS} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -712,7 +474,7 @@ test-binaries:
 			fi; \
 		done; \
 	\
-	elif [ "$(FLAVOUR)" = "awshelm" ]; then \
+	elif [ "$(STAGE)" = "awshelm" ]; then \
 		for bin in $$( echo $${REQUIRED_BASE} $${REQUIRED_TOOLS} $${REQUIRED_AWS} $${REQUIRED_AWSK8S} $${REQUIRED_AWSHELM} ); do \
 			if echo "$${BINS}" | grep -E "^$${bin}" >/dev/null; then \
 				echo "[OK] required bin available: $${bin}"; \
@@ -732,7 +494,7 @@ test-helm-version:
 	@echo "# Testing correct Helm version"
 	@echo "################################################################################"
 	@\
-	if [ "$(FLAVOUR)" = "awshelm" ]; then \
+	if [ "$(STAGE)" = "awshelm" ]; then \
 		if echo '$(HELM)' | grep -Eq 'latest\-?'; then \
 			echo "Fetching latest version from GitHub"; \
 			LATEST="$$( \
@@ -744,17 +506,19 @@ test-helm-version:
 					| sed 's/\"//g' \
 			)"; \
 			echo "Testing for latest: $${LATEST}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short | grep -E "^(Client: )?v$${LATEST}"; then \
+			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) helm version --client --short | grep -E \"^(Client: )?v$${LATEST}\""; \
+			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) helm version --client --short | grep -E "^(Client: )?v$${LATEST}"; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short; \
+				docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) helm version --client --short; \
 				exit 1; \
 			fi; \
 		else \
 			VERSION="$$( echo '$(HELM)' | grep -Eo '^[.0-9]+?' )"; \
 			echo "Testing for version: $${VERSION}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short | grep -E "^(Client: )?v$${VERSION}\."; then \
+			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) helm version --client --short | grep -E \"^(Client: )?v$${VERSION}\.\""; \
+			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) helm version --client --short | grep -E "^(Client: )?v$${VERSION}\."; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awshelm$(HELM) helm version --client --short; \
+				docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) helm version --client --short; \
 				exit 1; \
 			fi; \
 		fi; \
@@ -770,7 +534,7 @@ test-kops-version:
 	@echo "# Testing correct Kops version"
 	@echo "################################################################################"
 	@\
-	if [ "$(FLAVOUR)" = "awskops" ]; then \
+	if [ "$(STAGE)" = "awskops" ]; then \
 		if echo '$(KOPS)' | grep -Eq 'latest\-?'; then \
 			echo "Fetching latest version from GitHub"; \
 			LATEST="$$( \
@@ -782,17 +546,19 @@ test-kops-version:
 					| sed 's/\"//g' \
 			)"; \
 			echo "Testing for latest: $${LATEST}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version | grep -E "^Version $${LATEST}"; then \
+			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E \"^Version $${LATEST}\""; \
+			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E "^Version $${LATEST}"; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version; \
+				docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version; \
 				exit 1; \
 			fi; \
 		else \
 			VERSION="$$( echo '$(KOPS)' | grep -Eo '^[.0-9]+?' )"; \
 			echo "Testing for version: $${VERSION}"; \
-			if ! docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version | grep -E "^Version $${VERSION}\."; then \
+			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E \"^Version $${VERSION}\.\""; \
+			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E "^Version $${VERSION}\."; then \
 				echo "[FAILED]"; \
-				docker run --rm $(IMAGE):$(ANSIBLE)-awskops$(KOPS) kops version; \
+				docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version; \
 				exit 1; \
 			fi; \
 		fi; \
@@ -807,17 +573,11 @@ test-run-user-root:
 	@echo "################################################################################"
 	@echo "# Testing playbook (user: root)"
 	@echo "################################################################################"
+	@echo "docker run --rm --platform $(ARCH) $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(DOCKER_TAG) ansible-playbook -i inventory playbook.yml"
 	@\
-	if [ "$(FLAVOUR)" = "base" ]; then \
-		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(ANSIBLE) ansible-playbook -i inventory playbook.yml; then \
-			echo "[FAILED]"; \
-			exit 1; \
-		fi; \
-	else \
-		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible-playbook -i inventory playbook.yml ; then \
-			echo "[FAILED]"; \
-			exit 1; \
-		fi; \
+	if ! docker run --rm --platform $(ARCH) $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data $(IMAGE):$(DOCKER_TAG) ansible-playbook -i inventory playbook.yml; then \
+		echo "[FAILED]"; \
+		exit 1; \
 	fi; \
 	echo "[SUCCESS]"; \
 	echo
@@ -828,10 +588,11 @@ test-run-user-ansible:
 	@echo "# Testing playbook (user: ansible)"
 	@echo "################################################################################"
 	@\
-	if [ "$(FLAVOUR)" = "base" ]; then \
+	if [ "$(STAGE)" = "base" ]; then \
 		echo "[SKIPPING] Does not have user setup"; \
 	else \
-		if ! docker run --rm $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data -e USER=ansible -e MY_UID=$$(id -u) -e MY_GID=$$(id -g) $(IMAGE):$(ANSIBLE)-$(FLAVOUR)$(HELM)$(KOPS) ansible-playbook -i inventory playbook.yml ; then \
+		echo "docker run --rm --platform $(ARCH) $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data -e USER=ansible -e MY_UID=$$(id -u) -e MY_GID=$$(id -g) $(IMAGE):$(DOCKER_TAG) ansible-playbook -i inventory playbook.yml"; \
+		if ! docker run --rm --platform $(ARCH) $$(tty -s && echo "-it" || echo) -v $(CURRENT_DIR)/tests:/data -e USER=ansible -e MY_UID=$$(id -u) -e MY_GID=$$(id -g) $(IMAGE):$(DOCKER_TAG) ansible-playbook -i inventory playbook.yml ; then \
 			echo "[FAILED]"; \
 			exit 1; \
 		fi; \
