@@ -3,7 +3,7 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION} as builder
+FROM cytopia/ansible:${VERSION}-awsk8s as builder
 
 # Required tools for building Python packages
 RUN set -eux \
