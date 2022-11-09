@@ -1,8 +1,41 @@
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM alpine:3.16 as builder
+
+RUN set -eux \
+	&& apk add --update --no-cache \
+		bc \
+		g++ \
+		gcc \
+		libffi-dev \
+		libxml2-dev \
+		libxslt-dev \
+		make \
+		musl-dev \
+		openssl-dev \
+		py3-pip \
+		python3 \
+		python3-dev \
+# Fix: ansible --version: libyaml = True
+# https://www.jeffgeerling.com/blog/2021/ansible-might-be-running-slow-if-libyaml-not-available
+	&& apk add --update --no-cache \
+		py3-yaml \
+	&& python3 -c 'import _yaml'
+
+# Pip required tools
+RUN set -eux \
+	&& pip3 install --no-cache-dir --no-compile \
+		wheel
+RUN set -eux \
+	&& pip3 install --no-cache-dir --no-compile \
+		Jinja2 \
+		MarkupSafe \
+		PyNaCl \
+		bcrypt \
+		cffi \
+		cryptography \
+		pycparser
 
 ARG VERSION
 RUN set -eux \
@@ -29,7 +62,6 @@ RUN set -eux \
 
 # Python packages (copied to final image)
 RUN set -eux \
-	&& apk add --no-cache  \
 	&& pip3 install --no-cache-dir --no-compile \
 		junit-xml \
 		lxml \
@@ -41,7 +73,9 @@ RUN set -eux \
 RUN set -eux \
 	&& pip3 uninstall --yes \
 		setuptools \
-		wheel
+		wheel \
+	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
+	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
 
 # --------------------------------------------------------------------------------------------------

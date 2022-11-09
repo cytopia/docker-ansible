@@ -3,9 +3,12 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM cytopia/ansible:${VERSION} as builder
 ARG VERSION
+
+RUN set -eux \
+	&& apk add --update --no-cache \
+		curl
 
 # Python packages (copied to final image)
 RUN set -eux \

@@ -46,21 +46,21 @@ jobs:
   # -----------------------------------------------------------------------------------------------
   # (3/8) Build & Test builder
   # -----------------------------------------------------------------------------------------------
-  build-builder:
-    needs:
-      - params
-      - configure
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
-    with:
-      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      run_tests: false
-      upload_artifact: true
-      matrix: ${{ needs.params.outputs.matrix_arch }}
-      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_curr_name_add_version: false
-      pull_base_image: true
-      stage: builder
-      stage_prev: ''
+  #  build-builder:
+  #    needs:
+  #      - params
+  #      - configure
+  #    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+  #    with:
+  #      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+  #      run_tests: false
+  #      upload_artifact: true
+  #      matrix: ${{ needs.params.outputs.matrix_arch }}
+  #      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+  #      artifact_curr_name_add_version: false
+  #      pull_base_image: true
+  #      stage: builder
+  #      stage_prev: ''
 
   # -----------------------------------------------------------------------------------------------
   # (4/8) Build & Test base
@@ -68,7 +68,6 @@ jobs:
   build-base:
     needs:
       - configure
-      - build-builder
     uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
     with:
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
@@ -76,10 +75,31 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: false
+      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: base
-      stage_prev: builder
+      stage_prev: ''
+
+  # -----------------------------------------------------------------------------------------------
+  # (4/8) Build & Test base
+  # -----------------------------------------------------------------------------------------------
+  build-tools:
+    needs:
+      - configure
+      - build-base
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: false
+      upload_artifact: true
+      matrix: ${{ needs.configure.outputs.matrix_build }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      artifact_prev_name_add_version: true
+      pull_base_image: true
+      stage: tools
+      stage_prev: base
+
+
 
 
 
