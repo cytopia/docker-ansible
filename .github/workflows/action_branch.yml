@@ -78,7 +78,7 @@ jobs:
       stage_prev: base
 
   # -----------------------------------------------------------------------------------------------
-  # (5/8) Build & Test aws, infra and azure
+  # (5/8) Build & Test aws, azure and infra
   # -----------------------------------------------------------------------------------------------
   build-aws:
     needs:
@@ -95,21 +95,6 @@ jobs:
       stage: aws
       stage_prev: tools
 
-  build-infra:
-    needs:
-      - configure
-      - build-tools
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
-    with:
-      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      run_tests: true
-      upload_artifact: true
-      matrix: ${{ needs.configure.outputs.matrix_build }}
-      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      pull_base_image: false
-      stage: infra
-      stage_prev: tools
-
   build-azure:
     needs:
       - configure
@@ -123,6 +108,21 @@ jobs:
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       pull_base_image: false
       stage: azure
+      stage_prev: tools
+
+  build-infra:
+    needs:
+      - configure
+      - build-tools
+    uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
+    with:
+      has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
+      run_tests: true
+      upload_artifact: true
+      matrix: ${{ needs.configure.outputs.matrix_build }}
+      artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
+      pull_base_image: false
+      stage: infra
       stage_prev: tools
 
   # -----------------------------------------------------------------------------------------------
