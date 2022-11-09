@@ -32,9 +32,6 @@ STAGE      = base
 DIR        = Dockerfiles
 DOCKER_TAG = $(VERSION)
 
-# Never pull this image if mentioned in FROM tag
-DOCKER_PULL_BASE_IMAGES_IGNORE = cytopia/ansible-builder
-
 ifeq ($(strip $(STAGE)),base)
 	FILE = Dockerfile
 endif
