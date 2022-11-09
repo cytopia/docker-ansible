@@ -55,7 +55,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: base
       stage_prev: ''
@@ -74,7 +73,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: tools
       stage_prev: base
@@ -93,7 +91,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: infra
       stage_prev: tools
@@ -109,7 +106,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: azure
       stage_prev: tools
@@ -125,7 +121,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: aws
       stage_prev: tools
@@ -144,7 +139,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: awsk8s
       stage_prev: aws
@@ -163,7 +157,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: awskops
       stage_prev: awsk8s
@@ -179,7 +172,6 @@ jobs:
       upload_artifact: true
       matrix: ${{ needs.configure.outputs.matrix_build }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
-      artifact_prev_name_add_version: true
       pull_base_image: true
       stage: awshelm
       stage_prev: awsk8s
