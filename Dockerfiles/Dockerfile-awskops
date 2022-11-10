@@ -39,7 +39,9 @@ RUN set -eux \
 	&& echo "${KOPS_URL}" \
 	&& curl -sS -L --fail -o /usr/bin/kops "${KOPS_URL}" \
 	&& chmod +x /usr/bin/kops \
-	&& /usr/bin/kops version | grep -E "${KOPS}" | grep -E "^Version\s+v?${version}"
+	\
+	&& /usr/bin/kops version \
+	&& /usr/bin/kops version | grep -E "${KOPS}" | grep -E "^([Cc]lient\s)?[Vv]ersion(:)?\s+v?${version}"
 
 
 # --------------------------------------------------------------------------------------------------
