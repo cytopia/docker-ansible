@@ -161,7 +161,7 @@ jobs:
       pull_base_image: false
       stage: awskops
       stage_prev: awsk8s
-      extra_version: KOPS
+      extra_version_name: KOPS
 
   build-awshelm:
     needs:
@@ -178,7 +178,7 @@ jobs:
       pull_base_image: false
       stage: awshelm
       stage_prev: awsk8s
-      extra_version: HELM
+      extra_version_name: HELM
 
   # -----------------------------------------------------------------------------------------------
   # (8/8) Push images
