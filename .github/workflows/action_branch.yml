@@ -317,6 +317,7 @@ jobs:
 
   push-awskops:
     needs:
+      - params
       - configure
       - build-base
       - build-tools
@@ -326,19 +327,21 @@ jobs:
       - build-awsk8s
       - build-awskops
       - build-awshelm
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-push-image.yml@master
+    uses: ./.github/workflows/docker-multistage-push-image-extra.yml
     with:
       can_deploy: ${{ needs.configure.outputs.can_login == 'true' && needs.configure.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      matrix: ${{ needs.configure.outputs.matrix_build }}
+      matrix: ${{ needs.params.outputs.matrix_kops }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       stage: awskops
+      extra_version_name: KOPS
     secrets:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   push-awshelm:
     needs:
+      - params
       - configure
       - build-base
       - build-tools
@@ -348,13 +351,14 @@ jobs:
       - build-awsk8s
       - build-awskops
       - build-awshelm
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-push-image.yml@master
+    uses: ./.github/workflows/docker-multistage-push-image-extra.yml
     with:
       can_deploy: ${{ needs.configure.outputs.can_login == 'true' && needs.configure.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      matrix: ${{ needs.configure.outputs.matrix_build }}
+      matrix: ${{ needs.params.outputs.matrix_helm }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       stage: awshelm
+      extra_version_name: HELM
     secrets:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}

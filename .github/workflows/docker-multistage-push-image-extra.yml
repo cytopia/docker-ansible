@@ -1,0 +1,149 @@
+---
+name: "Push multistage docker images (multi -flavours, -versions, -architectures -extra)"
+
+on:
+  workflow_call:
+    ###
+    ### Variables
+    ###
+    inputs:
+      matrix:
+        description: 'The build matrix'
+        required: true
+        type: string
+      stage:
+        description: 'The stage to build (Examples: base, mods, prod or work).'
+        required: true
+        type: string
+      artifact_prefix:
+        description: 'Unique artifact name prefix (to avoid overriding existing artifcats during parallel runs).'
+        required: true
+        type: string
+      can_deploy:
+        description: 'Determines whether this workflow will also deploy (login and push).'
+        required: true
+        type: boolean
+      has_refs:
+        description: 'The ref build matrix as JSON string (list of git refs to build/deploy).'
+        required: true
+        type: boolean
+      extra_version_name:
+        description: 'The Makefile variable name (e.g. HELM or KOPS) to append to make commands. The extra version value is taken from the build matrix (extra_version).'
+        required: true
+        type: string
+
+    ###
+    ### Secrets
+    ###
+    secrets:
+      dockerhub_username:
+        description: 'The username for Dockerhub.'
+        required: true
+      dockerhub_password:
+        description: 'The password for Dockerhub.'
+        required: true
+
+jobs:
+  # -----------------------------------------------------------------------------------------------
+  # JOB: DEPLOY
+  # -----------------------------------------------------------------------------------------------
+  test:
+    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.extra_version }} (${{ matrix.arch }}) ${{ matrix.refs }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(inputs.matrix) }}
+    steps:
+
+      # ------------------------------------------------------------
+      # Setup repository
+      # ------------------------------------------------------------
+      - name: "[SETUP] Checkout repository (current)"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+        if: ${{ !inputs.has_refs }}
+
+      - name: "[SETUP] Checkout repository (ref: ${{ matrix.refs }})"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ matrix.refs }}
+        if: ${{ inputs.has_refs }}
+
+      - name: "[SETUP] Setup QEMU environment"
+        uses: docker/setup-qemu-action@v2
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: "[SETUP] Determine Docker tag"
+        id: tag
+        uses: cytopia/docker-tag-action@v0.4.22
+
+      - name: "[SETUP] Set artifact names"
+        id: set-artifact-name
+        run: |
+          PRE_HASH="$( git rev-parse HEAD | head -c 10 )"
+          VERSION="${{ matrix.version }}"
+          ARCH="$( echo "${{ matrix.arch }}" | sed 's|/|-|g' )"
+
+          NAME_CURR="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage }}${{ matrix.extra_version }}"
+
+          echo "curr=${NAME_CURR}" >> $GITHUB_OUTPUT
+
+
+      # ------------------------------------------------------------
+      # Artifact Import
+      # ------------------------------------------------------------
+
+      ###
+      ### Download and import previously built image
+      ###
+      - name: "[Artifact Load] Download previously built image"
+        uses: cytopia/download-artifact-retry-action@v0.1.4
+        with:
+          name: ${{ steps.set-artifact-name.outputs.curr }}
+
+      - name: "[Artifact Load] Import previously built image"
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make load INFILE=${{ steps.set-artifact-name.outputs.curr }}
+
+
+      # ------------------------------------------------------------
+      # Re-tag images
+      # ------------------------------------------------------------
+      - name: "[Docker Tag] Retag"
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make tag VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }}
+
+      - name: "[Docker Tag] Show images"
+        run: |
+          docker images
+
+
+      # ------------------------------------------------------------
+      # Login
+      # ------------------------------------------------------------
+      - name: Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        if: ${{ inputs.can_deploy }}
+
+
+      # ------------------------------------------------------------
+      # Push images
+      # ------------------------------------------------------------
+      - name: Push Image
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make push VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }}
+        if: ${{ inputs.can_deploy }}
