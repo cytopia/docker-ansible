@@ -104,12 +104,12 @@ jobs:
           MATRIX_KOPS="$( \
             jq -M -c \
               --argjson kops '${{ env.KOPS }}' \
-              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], kops:$kops[]})' <<<'${{ env.VERSIONS }}' \
+              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], extra_version:$kops[]})' <<<'${{ env.VERSIONS }}' \
           )"
           MATRIX_HELM="$( \
             jq -M -c \
               --argjson helm '${{ env.HELM }}' \
-              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], helm:$helm[]})' <<<'${{ env.VERSIONS }}' \
+              'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], extra_version:$helm[]})' <<<'${{ env.VERSIONS }}' \
           )"
           echo "versions=${MATRIX_BASE}" >> $GITHUB_OUTPUT
           echo "matrix_arch=${MATRIX_ARCH}" >> $GITHUB_OUTPUT
