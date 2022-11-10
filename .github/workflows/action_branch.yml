@@ -151,7 +151,7 @@ jobs:
       - params
       - configure
       - build-awsk8s
-    uses: ./.github/workflows/docker-multistage-build.yml
+    uses: ./.github/workflows/docker-multistage-build-extra.yml
     with:
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
       run_tests: true
@@ -168,7 +168,7 @@ jobs:
       - params
       - configure
       - build-awsk8s
-    uses: ./.github/workflows/docker-multistage-build.yml
+    uses: ./.github/workflows/docker-multistage-build-extra.yml
     with:
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
       run_tests: true
