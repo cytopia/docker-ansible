@@ -601,8 +601,8 @@ test-kops-version:
 					| sed 's/\"//g' \
 			)"; \
 			echo "Testing for latest: $${LATEST}"; \
-			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E \"^Version $${LATEST}\""; \
-			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E "^Version $${LATEST}"; then \
+			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E \"^([Cc]lient\s)?[Vv]ersion(:)?\s+v?$${LATEST}\""; \
+			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E "^([Cc]lient\s)?[Vv]ersion(:)?\s+v?$${LATEST}"; then \
 				echo "[FAILED]"; \
 				docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version; \
 				exit 1; \
@@ -610,8 +610,8 @@ test-kops-version:
 		else \
 			VERSION="$$( echo '$(KOPS)' | grep -Eo '^[.0-9]+?' )"; \
 			echo "Testing for version: $${VERSION}"; \
-			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E \"^Version $${VERSION}\.\""; \
-			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E "^Version $${VERSION}\."; then \
+			echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E \"^([Cc]lient\s)?[Vv]ersion(:)?\s+v?$${VERSION}\.\""; \
+			if ! docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version | grep -E "^([Cc]lient\s)?[Vv]ersion(:)?\s+v?$${VERSION}\."; then \
 				echo "[FAILED]"; \
 				docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) kops version; \
 				exit 1; \
