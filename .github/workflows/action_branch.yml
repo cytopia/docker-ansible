@@ -148,6 +148,7 @@ jobs:
   # -----------------------------------------------------------------------------------------------
   build-awskops:
     needs:
+      - params
       - configure
       - build-awsk8s
     uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
@@ -155,7 +156,7 @@ jobs:
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
       run_tests: true
       upload_artifact: true
-      matrix: ${{ needs.configure.outputs.matrix_build }}
+      matrix: ${{ needs.params.outputs.matrix_kops }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       pull_base_image: false
       stage: awskops
@@ -163,6 +164,7 @@ jobs:
 
   build-awshelm:
     needs:
+      - params
       - configure
       - build-awsk8s
     uses: devilbox/github-actions/.github/workflows/docker-multistage-build.yml@master
@@ -170,7 +172,7 @@ jobs:
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
       run_tests: true
       upload_artifact: true
-      matrix: ${{ needs.configure.outputs.matrix_build }}
+      matrix: ${{ needs.params.outputs.matrix_helm }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       pull_base_image: false
       stage: awshelm

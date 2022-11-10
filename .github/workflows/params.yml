@@ -22,7 +22,7 @@ env:
           "2.8"
         ],
         "FLAVOUR": ["default"],
-        "ARCH":    ["linux/amd64", "linux/arm64"]
+        "ARCH":    ["linux/amd64"]
       }
     ]
   KOPS: >-
