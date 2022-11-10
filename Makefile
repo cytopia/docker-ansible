@@ -103,6 +103,10 @@ rebuild: ARGS+=--build-arg KOPS=$(KOPS)
 rebuild: ARGS+=--build-arg HELM=$(HELM)
 rebuild: docker-arch-rebuild
 
+.PHONY: tag
+tag:
+	@echo "not required."
+
 .PHONY: push
 push: docker-arch-push
 
