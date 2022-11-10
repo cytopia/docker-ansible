@@ -32,37 +32,55 @@ STAGE      = base
 DIR        = Dockerfiles
 DOCKER_TAG = $(VERSION)
 
+
+FILE = Dockerfile-$(STAGE)$(KOPS)$(HELM)
+
+
+#ifeq ($(strip $(TAG)),latest)
 ifeq ($(strip $(STAGE)),base)
-	FILE = Dockerfile
+	DOCKER_TAG = $(VERSION)
+else
+	DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)
 endif
-ifeq ($(strip $(STAGE)),tools)
-	FILE = Dockerfile-tools
-	DOCKER_TAG = $(VERSION)-tools
-endif
-ifeq ($(strip $(STAGE)),infra)
-	FILE = Dockerfile-infra
-	DOCKER_TAG = $(VERSION)-infra
-endif
-ifeq ($(strip $(STAGE)),azure)
-	FILE = Dockerfile-azure
-	DOCKER_TAG = $(VERSION)-azure
-endif
-ifeq ($(strip $(STAGE)),aws)
-	FILE = Dockerfile-aws
-	DOCKER_TAG = $(VERSION)-aws
-endif
-ifeq ($(strip $(STAGE)),awsk8s)
-	FILE = Dockerfile-awsk8s
-	DOCKER_TAG = $(VERSION)-awsk8s
-endif
-ifeq ($(strip $(STAGE)),awskops)
-	FILE = Dockerfile-awskops
-	DOCKER_TAG = $(VERSION)-awskops$(KOPS)
-endif
-ifeq ($(strip $(STAGE)),awshelm)
-	FILE = Dockerfile-awshelm
-	DOCKER_TAG = $(VERSION)-awshelm$(HELM)
-endif
+#else
+#	ifeq ($(strip $(STAGE)),base)
+#		DOCKER_TAG = $(VERSION)-$(TAG)
+#	else
+#		DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)-$(TAG)
+#	endif
+#endif
+
+#ifeq ($(strip $(STAGE)),base)
+#	FILE = Dockerfile
+#endif
+#ifeq ($(strip $(STAGE)),tools)
+#	FILE = Dockerfile-tools
+#	DOCKER_TAG = $(VERSION)-tools
+#endif
+#ifeq ($(strip $(STAGE)),infra)
+#	FILE = Dockerfile-infra
+#	DOCKER_TAG = $(VERSION)-infra
+#endif
+#ifeq ($(strip $(STAGE)),azure)
+#	FILE = Dockerfile-azure
+#	DOCKER_TAG = $(VERSION)-azure
+#endif
+#ifeq ($(strip $(STAGE)),aws)
+#	FILE = Dockerfile-aws
+#	DOCKER_TAG = $(VERSION)-aws
+#endif
+#ifeq ($(strip $(STAGE)),awsk8s)
+#	FILE = Dockerfile-awsk8s
+#	DOCKER_TAG = $(VERSION)-awsk8s
+#endif
+#ifeq ($(strip $(STAGE)),awskops)
+#	FILE = Dockerfile-awskops
+#	DOCKER_TAG = $(VERSION)-awskops$(KOPS)
+#endif
+#ifeq ($(strip $(STAGE)),awshelm)
+#	FILE = Dockerfile-awshelm
+#	DOCKER_TAG = $(VERSION)-awshelm$(HELM)
+#endif
 
 # Makefile.lint overwrites
 FL_IGNORES  = .git/,.github/,tests/
@@ -105,20 +123,84 @@ rebuild: docker-arch-rebuild
 
 .PHONY: tag
 tag:
-	@echo "not required."
+	@if [ "$(TAG)" = "latest" ]; then \
+		if [ "$(STAGE)" = "base" ]; then \
+			echo "docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION)"; \
+			docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION); \
+		else \
+			echo "docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION)-$(STAGE)$(KOPS)$(HELM)"; \
+			docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION)-$(STAGE)$(KOPS)$(HELM); \
+		fi \
+	else \
+		if [ "$(STAGE)" = "base" ]; then \
+			echo "docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION)-$(TAG)"; \
+			docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION)-$(TAG); \
+		else \
+			echo "docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION)-$(STAGE)$(KOPS)$(HELM)-$(TAG)"; \
+			docker tag $(IMAGE):$(DOCKER_TAG) $(IMAGE):$(VERSION)-$(STAGE)$(KOPS)$(HELM)-$(TAG); \
+		fi \
+	fi
 
 .PHONY: push
+ifeq ($(strip $(TAG)),latest)
+ifeq ($(strip $(STAGE)),base)
+push: DOCKER_TAG = $(VERSION)
 push: docker-arch-push
+else
+push: DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)
+push: docker-arch-push
+endif
+else
+ifeq ($(strip $(STAGE)),base)
+push: DOCKER_TAG = $(VERSION)-$(TAG)
+push: docker-arch-push
+else
+push: DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)-$(TAG)
+push: docker-arch-push
+endif
+endif
 
 
 # -------------------------------------------------------------------------------------------------
 #  Manifest Targets
 # -------------------------------------------------------------------------------------------------
 .PHONY: manifest-create
+ifeq ($(strip $(TAG)),latest)
+ifeq ($(strip $(STAGE)),base)
+manifest-create: DOCKER_TAG = $(VERSION)
 manifest-create: docker-manifest-create
+else
+manifest-create: DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)
+manifest-create: docker-manifest-create
+endif
+else
+ifeq ($(strip $(STAGE)),base)
+manifest-create: DOCKER_TAG = $(VERSION)-$(TAG)
+manifest-create: docker-manifest-create
+else
+manifest-create: DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)-$(TAG)
+manifest-create: docker-manifest-create
+endif
+endif
 
 .PHONY: manifest-push
+ifeq ($(strip $(TAG)),latest)
+ifeq ($(strip $(STAGE)),base)
+manifest-push: DOCKER_TAG = $(VERSION)
 manifest-push: docker-manifest-push
+else
+manifest-push: DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)
+manifest-push: docker-manifest-push
+endif
+else
+ifeq ($(strip $(STAGE)),base)
+manifest-push: DOCKER_TAG = $(VERSION)-$(TAG)
+manifest-push: docker-manifest-push
+else
+manifest-push: DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)-$(TAG)
+manifest-push: docker-manifest-push
+endif
+endif
 
 
 # -------------------------------------------------------------------------------------------------
