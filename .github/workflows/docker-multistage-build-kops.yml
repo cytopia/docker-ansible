@@ -42,21 +42,6 @@ on:
         type: boolean
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "[DEBUG] Inputs"
-        run: |
-          echo 'inputs.matrix'
-          echo '--------------------'
-          echo '${{ inputs.matrix }}'
-          echo
-
-          echo 'fromJson(inputs.matrix)'
-          echo '--------------------'
-          echo 'fromJson(${{ inputs.matrix }})'
-          echo
-
   # -----------------------------------------------------------------------------------------------
   # JOB: BUILD
   # -----------------------------------------------------------------------------------------------
