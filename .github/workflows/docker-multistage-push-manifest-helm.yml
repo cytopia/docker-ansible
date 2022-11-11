@@ -44,7 +44,7 @@ jobs:
   # JOB (3/3): DEPLOY
   # -----------------------------------------------------------------------------------------------
   deploy:
-    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ inputs.helm }} ${{ matrix.refs }}
+    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.helm }} ${{ matrix.refs }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
