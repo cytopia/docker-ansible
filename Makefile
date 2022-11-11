@@ -30,57 +30,14 @@ IMAGE      = cytopia/ansible
 FLAVOUR    = default
 STAGE      = base
 DIR        = Dockerfiles
+FILE       = Dockerfile-$(STAGE)
 DOCKER_TAG = $(VERSION)
 
-
-FILE = Dockerfile-$(STAGE)
-
-
-#ifeq ($(strip $(TAG)),latest)
 ifeq ($(strip $(STAGE)),base)
 	DOCKER_TAG = $(VERSION)
 else
 	DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)
 endif
-#else
-#	ifeq ($(strip $(STAGE)),base)
-#		DOCKER_TAG = $(VERSION)-$(TAG)
-#	else
-#		DOCKER_TAG = $(VERSION)-$(STAGE)$(KOPS)$(HELM)-$(TAG)
-#	endif
-#endif
-
-#ifeq ($(strip $(STAGE)),base)
-#	FILE = Dockerfile
-#endif
-#ifeq ($(strip $(STAGE)),tools)
-#	FILE = Dockerfile-tools
-#	DOCKER_TAG = $(VERSION)-tools
-#endif
-#ifeq ($(strip $(STAGE)),infra)
-#	FILE = Dockerfile-infra
-#	DOCKER_TAG = $(VERSION)-infra
-#endif
-#ifeq ($(strip $(STAGE)),azure)
-#	FILE = Dockerfile-azure
-#	DOCKER_TAG = $(VERSION)-azure
-#endif
-#ifeq ($(strip $(STAGE)),aws)
-#	FILE = Dockerfile-aws
-#	DOCKER_TAG = $(VERSION)-aws
-#endif
-#ifeq ($(strip $(STAGE)),awsk8s)
-#	FILE = Dockerfile-awsk8s
-#	DOCKER_TAG = $(VERSION)-awsk8s
-#endif
-#ifeq ($(strip $(STAGE)),awskops)
-#	FILE = Dockerfile-awskops
-#	DOCKER_TAG = $(VERSION)-awskops$(KOPS)
-#endif
-#ifeq ($(strip $(STAGE)),awshelm)
-#	FILE = Dockerfile-awshelm
-#	DOCKER_TAG = $(VERSION)-awshelm$(HELM)
-#endif
 
 # Makefile.lint overwrites
 FL_IGNORES  = .git/,.github/,tests/
@@ -93,17 +50,53 @@ JL_IGNORES  = .git/,.github/,./tests/
 # -------------------------------------------------------------------------------------------------
 .PHONY: help
 help:
-	@echo "lint                                     Lint project files and repository"
+	@echo "--------------------------------------------------------------------------------"
+	@echo " Build Targets"
+	@echo "--------------------------------------------------------------------------------"
 	@echo
-	@echo "build [ARCH=...] [TAG=...]               Build Docker image"
-	@echo "rebuild [ARCH=...] [TAG=...]             Build Docker image without cache"
-	@echo "push [ARCH=...] [TAG=...]                Push Docker image to Docker hub"
+	@echo "All Docker images are build as follows: $(IMAGE):\$$VERSION[-\$$STAGEg[\$$KOPS|\$$HELM]]"
 	@echo
-	@echo "manifest-create [ARCHES=...] [TAG=...]   Create multi-arch manifest"
-	@echo "manifest-push [TAG=...]                  Push multi-arch manifest"
+	@echo "build   [VERSION=] [ARCH=] [KOPS=] [HELM=]        Build Docker image"
+	@echo "rebuild [VERSION=] [ARCH=] [KOPS=] [HELM=]        Build Docker image without cache"
 	@echo
-	@echo "test [ARCH=...]                          Test built Docker image"
+	@echo "    make build VERSION=2.3"
+	@echo "    make build VERSION=2.3 STAGEg=tools"
+	@echo "    make build VERSION=2.3 STAGEg=infra"
+	@echo "    make build VERSION=2.3 STAGEg=azure"
+	@echo "    make build VERSION=2.3 STAGEg=aws"
+	@echo "    make build VERSION=2.3 STAGEg=awsk8s"
+	@echo "    make build VERSION=2.3 STAGEg=awshelm HELM=2.11"
+	@echo "    make build VERSION=2.3 STAGEg=awskops KOPS=1.15"
 	@echo
+	@echo "--------------------------------------------------------------------------------"
+	@echo " Test Targets"
+	@echo "--------------------------------------------------------------------------------"
+	@echo
+	@echo "test [VERSION=] [ARCH=] [KOPS=] [HELM=]           Test built Docker image"
+	@echo
+	@echo "    make test VERSION=2.3"
+	@echo "    make test VERSION=2.3 STAGEg=tools"
+	@echo "    make test VERSION=2.3 STAGEg=infra"
+	@echo "    make test VERSION=2.3 STAGEg=azure"
+	@echo "    make test VERSION=2.3 STAGEg=aws"
+	@echo "    make test VERSION=2.3 STAGEg=awsk8s"
+	@echo "    make test VERSION=2.3 STAGEg=awshelm HELM=2.11"
+	@echo "    make test VERSION=2.3 STAGEg=awskops KOPS=1.15"
+	@echo
+	@echo "--------------------------------------------------------------------------------"
+	@echo " Tagging Target"
+	@echo "--------------------------------------------------------------------------------"
+	@echo
+	@echo "tag [VERSION=] [ARCH=] [KOPS=] [HELM=] [TAG=]     Tag built Docker image"
+	@echo
+	@echo "    make tag VERSION=2.3 TAG=2.3-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGEg=tools TAG=2.3-tools-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGEg=infra TAG=2.3-infra-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGEg=azure TAG=2.3-azure-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGEg=aws TAG=2.3-aws-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGEg=awsk8s TAG=2.3-awsk8s-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGEg=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGEg=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
 
 
 # -------------------------------------------------------------------------------------------------
