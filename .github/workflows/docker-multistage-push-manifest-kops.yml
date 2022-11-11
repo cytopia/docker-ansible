@@ -1,3 +1,4 @@
+---
 name: Deploy multi-arch image manifests
 
 on:
@@ -118,4 +119,3 @@ jobs:
         with:
           command: |
             make manifest-push VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} TAG=${{ steps.tag.outputs.docker-tag }} KOPS=${{ matrix.kops }}
-
