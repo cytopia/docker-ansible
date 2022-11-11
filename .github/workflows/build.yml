@@ -78,6 +78,7 @@ jobs:
             DOCKER_TAG_AZURE="${VERSION}-azure"
             DOCKER_TAG_AWS="${VERSION}-aws"
             DOCKER_TAG_AWSK8S="${VERSION}-awsk8s"
+            DOCKER_TAG_K8S="${VERSION}-k8s"
           else
             DOCKER_TAG_BASE="${VERSION}-${GIT_SLUG}"
             DOCKER_TAG_TOOLS="${VERSION}-tools-${GIT_SLUG}"
@@ -85,6 +86,7 @@ jobs:
             DOCKER_TAG_AZURE="${VERSION}-azure-${GIT_SLUG}"
             DOCKER_TAG_AWS="${VERSION}-aws-${GIT_SLUG}"
             DOCKER_TAG_AWSK8S="${VERSION}-awsk8s-${GIT_SLUG}"
+            DOCKER_TAG_K8S="${VERSION}-k8s-${GIT_SLUG}"
           fi
 
           # Output
@@ -96,6 +98,7 @@ jobs:
           echo "DOCKER_TAG_AZURE=${DOCKER_TAG_AZURE}"
           echo "DOCKER_TAG_AWS=${DOCKER_TAG_AWS}"
           echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}"
+          echo "DOCKER_TAG_K8S=${DOCKER_TAG_K8S}"
 
           # Export variable
           # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#environment-files
@@ -107,6 +110,7 @@ jobs:
           echo "DOCKER_TAG_AZURE=${DOCKER_TAG_AZURE}"   >> ${GITHUB_ENV}
           echo "DOCKER_TAG_AWS=${DOCKER_TAG_AWS}"       >> ${GITHUB_ENV}
           echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}" >> ${GITHUB_ENV}
+          echo "DOCKER_TAG_K8S=${DOCKER_TAG_K8S}"       >> ${GITHUB_ENV}
         env:
           VERSION: ${{ matrix.version }}
 
@@ -222,6 +226,22 @@ jobs:
 
 
       # ------------------------------------------------------------
+      # K8s
+      # ------------------------------------------------------------
+      - name: Build Ansible K8s
+        run: |
+          scripts/retry make build ANSIBLE=${VERSION} FLAVOUR=k8s
+        env:
+          VERSION: ${{ matrix.version }}
+
+      - name: Test Ansible K8s
+        run: |
+          scripts/retry make test ANSIBLE=${VERSION} FLAVOUR=k8s
+        env:
+          VERSION: ${{ matrix.version }}
+
+
+      # ------------------------------------------------------------
       # Deploy
       # ------------------------------------------------------------
       - name: Publish images (only repo owner)
@@ -236,6 +256,7 @@ jobs:
           echo "DOCKER_TAG_AZURE=${DOCKER_TAG_AZURE}"
           echo "DOCKER_TAG_AWS=${DOCKER_TAG_AWS}"
           echo "DOCKER_TAG_AWSK8S=${DOCKER_TAG_AWSK8S}"
+          echo "DOCKER_TAG_K8S=${DOCKER_TAG_K8S}"
 
           # Tag image
           scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=base   TAG=${DOCKER_TAG_BASE}
@@ -244,6 +265,7 @@ jobs:
           scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=azure  TAG=${DOCKER_TAG_AZURE}
           scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=aws    TAG=${DOCKER_TAG_AWS}
           scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=awsk8s TAG=${DOCKER_TAG_AWSK8S}
+          scripts/retry make tag ANSIBLE=${VERSION} FLAVOUR=k8s TAG=${DOCKER_TAG_K8S}
           docker images | grep cytopia/ansible
 
           # Login
@@ -256,6 +278,7 @@ jobs:
           scripts/retry make push TAG=${DOCKER_TAG_AZURE}
           scripts/retry make push TAG=${DOCKER_TAG_AWS}
           scripts/retry make push TAG=${DOCKER_TAG_AWSK8S}
+          scripts/retry make push TAG=${DOCKER_TAG_K8S}
         env:
           VERSION: ${{ matrix.version }}
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
