@@ -1,5 +1,5 @@
 ---
-name: "Build multistage docker images (multi -flavours, -versions, -architectures -extra)"
+name: "Build multistage docker images (multi -flavours, -versions, -architectures -helm)"
 
 on:
   workflow_call:
@@ -40,17 +40,13 @@ on:
         required: false
         default: false
         type: boolean
-      extra_version_name:
-        description: 'The Makefile variable name (e.g. HELM or KOPS) to append to make commands. The extra version value is taken from the build matrix (extra_version).'
-        required: true
-        type: string
 
 jobs:
   # -----------------------------------------------------------------------------------------------
   # JOB: BUILD
   # -----------------------------------------------------------------------------------------------
   build:
-    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.extra_version }} (${{ matrix.arch }}) ${{ matrix.refs }}
+    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.helm }} (${{ matrix.arch }}) ${{ matrix.refs }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -93,7 +89,7 @@ jobs:
           ARCH="$( echo "${{ matrix.arch }}" | sed 's|/|-|g' )"
 
           NAME_PREV="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage_prev }}"
-          NAME_CURR="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage }}${{ matrix.extra_version }}"
+          NAME_CURR="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage }}${{ matrix.helm }}"
           echo "prev=${NAME_PREV}" >> $GITHUB_OUTPUT
           echo "curr=${NAME_CURR}" >> $GITHUB_OUTPUT
 
@@ -136,14 +132,14 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make docker-pull-base-image VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }}
+            make docker-pull-base-image VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} HELM=${{ matrix.helm }}
         if: ${{ inputs.pull_base_image }}
 
       - name: Build
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make build VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }}
+            make build VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} HELM=${{ matrix.helm }}
 
 
       # ------------------------------------------------------------
@@ -153,7 +149,7 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make test VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }}
+            make test VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} HELM=${{ matrix.helm }}
         if: ${{ inputs.run_tests }}
 
 
@@ -170,7 +166,7 @@ jobs:
           name: ${{ steps.set-artifact-name.outputs.curr }}
           path: ${{ steps.set-artifact-name.outputs.curr }}
           pre_command: |
-            make save-verify VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }} OUTFILE=${{ steps.set-artifact-name.outputs.curr }} INFILE=${{ steps.set-artifact-name.outputs.curr }}
+            make save-verify VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} HELM=${{ matrix.helm }} OUTFILE=${{ steps.set-artifact-name.outputs.curr }} INFILE=${{ steps.set-artifact-name.outputs.curr }}
           post_command: |
             make load INFILE={{download_path}}
         if: ${{ inputs.upload_artifact }}

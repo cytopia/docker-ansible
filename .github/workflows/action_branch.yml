@@ -31,7 +31,7 @@ jobs:
   # -----------------------------------------------------------------------------------------------
   configure:
     needs: [params]
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-configure.yml@master
+    uses: ./.github/workflows/docker-multistage-configure-extra.yml
     with:
       enabled: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && (github.event.pull_request.user.login != 'cytopia')) }}
       can_deploy: ${{ (github.repository == 'cytopia/docker-ansible') && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/heads/release-')) }}
@@ -137,38 +137,34 @@ jobs:
   # Note: awskops is special
   build-awskops:
     needs:
-      - params
       - configure
       - build-awsk8s
-    uses: ./.github/workflows/docker-multistage-build-extra.yml
+    uses: ./.github/workflows/docker-multistage-build-kops.yml
     with:
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
       run_tests: true
       upload_artifact: true
-      matrix: ${{ needs.params.outputs.matrix_kops }}
+      matrix: ${{ needs.configure.outputs.matrix_build_kops }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       pull_base_image: false
       stage: awskops
       stage_prev: awsk8s
-      extra_version_name: KOPS
 
   # Note: awshelm is special
   build-awshelm:
     needs:
-      - params
       - configure
       - build-awsk8s
-    uses: ./.github/workflows/docker-multistage-build-extra.yml
+    uses: ./.github/workflows/docker-multistage-build-helm.yml
     with:
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
       run_tests: true
       upload_artifact: true
-      matrix: ${{ needs.params.outputs.matrix_helm }}
+      matrix: ${{ needs.configure.outputs.matrix_build_helm }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       pull_base_image: false
       stage: awshelm
       stage_prev: awsk8s
-      extra_version_name: HELM
 
   # -----------------------------------------------------------------------------------------------
   # (4/5) Push images
@@ -266,17 +262,15 @@ jobs:
   # Note: awskops is special
   push-awskops:
     needs:
-      - params
       - configure
       - build-awskops
-    uses: ./.github/workflows/docker-multistage-push-image-extra.yml
+    uses: ./.github/workflows/docker-multistage-push-image-kops.yml
     with:
       can_deploy: ${{ needs.configure.outputs.can_login == 'true' && needs.configure.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      matrix: ${{ needs.params.outputs.matrix_kops }}
+      matrix: ${{ needs.configure.outputs.matrix_build_kops }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       stage: awskops
-      extra_version_name: KOPS
     secrets:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -284,17 +278,15 @@ jobs:
   # Note: awshelm is special
   push-awshelm:
     needs:
-      - params
       - configure
       - build-awshelm
-    uses: ./.github/workflows/docker-multistage-push-image-extra.yml
+    uses: ./.github/workflows/docker-multistage-push-image-helm.yml
     with:
       can_deploy: ${{ needs.configure.outputs.can_login == 'true' && needs.configure.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      matrix: ${{ needs.params.outputs.matrix_helm }}
+      matrix: ${{ needs.configure.outputs.matrix_build_helm }}
       artifact_prefix: ${{ needs.configure.outputs.artifact_prefix }}
       stage: awshelm
-      extra_version_name: HELM
     secrets:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -397,11 +389,11 @@ jobs:
     needs:
       - configure
       - push-awskops
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-push-manifest.yml@master
+    uses: ./.github/workflows/docker-multistage-push-manifest-kops.yml
     with:
       can_deploy: ${{ needs.configure.outputs.can_login == 'true' && needs.configure.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      matrix: ${{ needs.configure.outputs.matrix_deploy }}
+      matrix: ${{ needs.configure.outputs.matrix_deploy_kops }}
       versions: ${{ needs.configure.outputs.versions }}
       stage: awskops
     secrets:
@@ -413,11 +405,11 @@ jobs:
     needs:
       - configure
       - push-awshelm
-    uses: devilbox/github-actions/.github/workflows/docker-multistage-push-manifest.yml@master
+    uses: ./.github/workflows/docker-multistage-push-manifest-helm.yml
     with:
       can_deploy: ${{ needs.configure.outputs.can_login == 'true' && needs.configure.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure.outputs.has_refs == 'true' }}
-      matrix: ${{ needs.configure.outputs.matrix_deploy }}
+      matrix: ${{ needs.configure.outputs.matrix_deploy_helm }}
       versions: ${{ needs.configure.outputs.versions }}
       stage: awshelm
     secrets:

@@ -1,5 +1,5 @@
 ---
-name: "Push multistage docker images (multi -flavours, -versions, -architectures -extra)"
+name: "Push multistage docker images (multi -flavours, -versions, -architectures -kops)"
 
 on:
   workflow_call:
@@ -27,10 +27,6 @@ on:
         description: 'The ref build matrix as JSON string (list of git refs to build/deploy).'
         required: true
         type: boolean
-      extra_version_name:
-        description: 'The Makefile variable name (e.g. HELM or KOPS) to append to make commands. The extra version value is taken from the build matrix (extra_version).'
-        required: true
-        type: string
 
     ###
     ### Secrets
@@ -48,7 +44,7 @@ jobs:
   # JOB: DEPLOY
   # -----------------------------------------------------------------------------------------------
   test:
-    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.extra_version }} (${{ matrix.arch }}) ${{ matrix.refs }}
+    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.kops }} (${{ matrix.arch }}) ${{ matrix.refs }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -89,7 +85,7 @@ jobs:
           VERSION="${{ matrix.version }}"
           ARCH="$( echo "${{ matrix.arch }}" | sed 's|/|-|g' )"
 
-          NAME_CURR="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage }}${{ matrix.extra_version }}"
+          NAME_CURR="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage }}${{ matrix.kops }}"
 
           echo "curr=${NAME_CURR}" >> $GITHUB_OUTPUT
 
@@ -120,7 +116,7 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make tag VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }}
+            make tag VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} TAG=${{ steps.tag.outputs.docker-tag }} KOPS=${{ matrix.kops }}
 
       - name: "[Docker Tag] Show images"
         run: |
@@ -145,5 +141,5 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make push VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_version_name }}=${{ matrix.extra_version }}
+            make push VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} TAG=${{ steps.tag.outputs.docker-tag }} KOPS=${{ matrix.kops }}
         if: ${{ inputs.can_deploy }}
