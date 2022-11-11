@@ -11,14 +11,6 @@ on:
         description: 'The JSON string for versions. ( list of objects: [{NAME, VERSION[], ARCH[]}] )'
         required: true
         type: string
-      kops:
-        description: 'The JSON string for kops. ( list of versions: ["x.yz", "x.y.z"] )'
-        required: true
-        type: string
-      helm:
-        description: 'The JSON string for helm. ( list of versions: ["x.yz", "x.y.z"] )'
-        required: true
-        type: string
       refs:
         description: 'The JSON string for refs. ( object: {BRANCH, NUM_LATEST_TAGS} )'
         required: true
