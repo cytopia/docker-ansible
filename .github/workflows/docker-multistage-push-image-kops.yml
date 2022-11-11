@@ -43,7 +43,7 @@ jobs:
   # -----------------------------------------------------------------------------------------------
   # JOB: DEPLOY
   # -----------------------------------------------------------------------------------------------
-  test:
+  deploy:
     name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.kops }} (${{ matrix.arch }}) ${{ matrix.refs }}
     runs-on: ubuntu-latest
     strategy:
