@@ -64,9 +64,21 @@ on:
       matrix_build:
         description: "(string) The determined JSON string build matrix."
         value: ${{ jobs.configure.outputs.matrix_build }}
+      matrix_build_kops:
+        description: "(string) The determined JSON string build matrix."
+        value: ${{ jobs.configure.outputs.matrix_build_kops }}
+      matrix_build_helm:
+        description: "(string) The determined JSON string build matrix."
+        value: ${{ jobs.configure.outputs.matrix_build_helm }}
       matrix_deploy:
         description: "(string) The determined JSON string deploy matrix."
         value: ${{ jobs.configure.outputs.matrix_deploy }}
+      matrix_deploy_kops:
+        description: "(string) The determined JSON string deploy matrix."
+        value: ${{ jobs.configure.outputs.matrix_deploy_kops }}
+      matrix_deploy_helm:
+        description: "(string) The determined JSON string deploy matrix."
+        value: ${{ jobs.configure.outputs.matrix_deploy_helm }}
       artifact_prefix:
         description: "(string) The determined unique artifact prefix."
         value: ${{ jobs.configure.outputs.artifact_prefix }}
