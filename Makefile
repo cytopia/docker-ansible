@@ -33,7 +33,7 @@ DIR        = Dockerfiles
 DOCKER_TAG = $(VERSION)
 
 
-FILE = Dockerfile-$(STAGE)$(KOPS)$(HELM)
+FILE = Dockerfile-$(STAGE)
 
 
 #ifeq ($(strip $(TAG)),latest)
