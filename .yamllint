@@ -1,8 +1,13 @@
 ---
-
 extends: default
 
+ignore: |
+  .yamllint
+
+
 rules:
-  line-length:
-    max: 100
-  truthy: disable
+  truthy:
+    allowed-values: ['true', 'false']
+    check-keys: False
+    level: error
+  line-length: disable
