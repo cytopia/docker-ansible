@@ -3,9 +3,12 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM cytopia/ansible:${VERSION} as builder
 ARG VERSION
+
+RUN set -eux \
+	&& apk add --update --no-cache \
+		curl
 
 # Python packages (copied to final image)
 RUN set -eux \
@@ -27,9 +30,19 @@ RUN set -eux \
 
 # Binaries (copied to final image)
 RUN set -eux \
-	&& YQ="$( curl -L -sS -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest | sed 's/^.*\///g' )" \
-	&& curl -L -sS "https://github.com/mikefarah/yq/releases/download/${YQ}/yq_linux_amd64" > /usr/bin/yq \
+	&& if [ "$(uname -m)" = "aarch64" ]; then \
+		ARCH="arm64"; \
+	elif [ "$(uname -m)" = "x86_64" ]; then \
+		ARCH="amd64"; \
+	else \
+		fail; \
+	fi \
+	\
+	&& YQ="$( curl -L -sS --fail -o /dev/null -w %{url_effective} https://github.com/mikefarah/yq/releases/latest | sed 's/^.*\///g' )" \
+	\
+	&& curl -L -sS --fail "https://github.com/mikefarah/yq/releases/download/${YQ}/yq_linux_${ARCH}" > /usr/bin/yq \
 	&& chmod +x /usr/bin/yq \
+	\
 	&& yq --version
 
 
@@ -83,7 +96,7 @@ RUN set -eux \
 		openssh-client \
 		sshpass
 
-COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
+COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 COPY --from=builder /usr/bin/yq /usr/bin/yq
 COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
 

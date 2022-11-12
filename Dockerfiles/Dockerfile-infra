@@ -3,12 +3,20 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM cytopia/ansible:${VERSION}-tools as builder
 
 # Required tools for building Python packages
 RUN set -eux \
 	&& apk add --no-cache \
+		# build tools
+		coreutils \
+		g++ \
+		gcc \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3-dev \
+		# misc tools
 		postgresql-dev \
 		postgresql-libs
 
@@ -55,7 +63,7 @@ RUN set -eux \
 		libpq \
 		rsync
 
-COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
+COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]

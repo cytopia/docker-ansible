@@ -3,20 +3,35 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM cytopia/ansible:${VERSION}-awsk8s as builder
+
+# Required tools for building Python packages
+RUN set -eux \
+	&& apk add --no-cache \
+		# misc tools
+		coreutils \
+		curl \
+		git
 
 # Install Helm by major and minor version
 ARG HELM
 RUN set -eux \
+	&& if [ "$(uname -m)" = "aarch64" ]; then \
+		ARCH="arm64"; \
+	elif [ "$(uname -m)" = "x86_64" ]; then \
+		ARCH="amd64"; \
+	else \
+		fail; \
+	fi \
+	\
 	&& git clone https://github.com/helm/helm \
 	&& cd helm \
 	# Sort by unique minor versions (without patch) \
-	&& version="$(git tag | grep -E "^v${HELM}\.[0-9]{1,2}$" | sort -u | sort -t . -k 2 -n | tail -1)" \
+	&& version="$(git tag | grep -E "^v${HELM}\.[0-9]{1,2}$" | sort -V | tail -1)" \
 	&& echo "${version}" \
-	&& curl -sS -L -O https://get.helm.sh/helm-${version}-linux-amd64.tar.gz \
-	&& tar xvfz helm-${version}-linux-amd64.tar.gz \
-	&& mv linux-amd64/helm /usr/bin/helm \
+	&& curl -sS -L --fail -O https://get.helm.sh/helm-${version}-linux-${ARCH}.tar.gz \
+	&& tar xvfz helm-${version}-linux-${ARCH}.tar.gz \
+	&& mv linux-${ARCH}/helm /usr/bin/helm \
 	&& chmod +x /usr/bin/helm \
 	&& /usr/bin/helm version | grep -E "${HELM}" | grep -E "${version}"
 
