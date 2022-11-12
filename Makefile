@@ -332,7 +332,7 @@ test-python-libs:
 	\
 	REQUIRED_BASE="cffi cryptography paramiko Jinja2 PyYAML"; \
 	REQUIRED_TOOLS="dnspython mitogen"; \
-	REQUIRED_INFRA="docker docker-compose jsondiff pexpect psycopg2 pypsexec pymongo PyMySQL smbprotocol"; \
+	REQUIRED_INFRA="docker docker-compose jsondiff pexpect psycopg2 pypsexec pymongo PyMySQL smbprotocol pywinrm"; \
 	REQUIRED_AZURE="azure\-.*"; \
 	REQUIRED_AWS="awscli botocore boto boto3"; \
 	REQUIRED_AWSK8S="openshift"; \
