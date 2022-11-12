@@ -398,7 +398,7 @@ docker run --rm -v $(pwd):/data cytopia/ansible ansible-playbook playbook.yml
 `ansible.cfg`
 ```ini
 [defaults]
-strategy_plugins = /usr/lib/python3.8/site-packages/ansible_mitogen/plugins/strategy
+strategy_plugins = /usr/lib/python3.10/site-packages/ansible_mitogen/plugins/strategy
 strategy         = mitogen_linear
 ```
 
@@ -406,7 +406,7 @@ strategy         = mitogen_linear
 ```bash
 # Instead of hardcoding it via ansible.cfg,  you could also add the
 # option on-the-fly via environment variables.
-export ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.8/site-packages/ansible_mitogen/plugins/strategy
+export ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.10/site-packages/ansible_mitogen/plugins/strategy
 export ANSIBLE_STRATEGY=mitogen_linear
 ```
 
@@ -600,7 +600,7 @@ GID = 1000
 dry:
 ifndef GPG_PASS
 	docker run --rm -it \
-		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.8/site-packages/ansible_mitogen/plugins/strategy \
+		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.10/site-packages/ansible_mitogen/plugins/strategy \
 		-e ANSIBLE_STRATEGY=mitogen_linear \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
@@ -613,7 +613,7 @@ ifndef GPG_PASS
 		ansible-playbook playbook.yml --check
 else
 	docker run --rm -it \
-		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.8/site-packages/ansible_mitogen/plugins/strategy \
+		-e ANSIBLE_STRATEGY_PLUGINS=/usr/lib/python3.10/site-packages/ansible_mitogen/plugins/strategy \
 		-e ANSIBLE_STRATEGY=mitogen_linear \
 		-e USER=ansible \
 		-e MY_UID=$(UID) \
