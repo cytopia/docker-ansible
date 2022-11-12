@@ -3,8 +3,24 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM cytopia/ansible:${VERSION}-tools as builder
+
+# Required tools for building Python packages
+RUN set -eux \
+	&& apk add --no-cache \
+		# build tools
+		coreutils \
+		g++ \
+		gcc \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3-dev \
+		# misc tools
+		git \
+		# go tools
+		cargo \
+		go
 
 # Python packages (copied to final image)
 RUN set -eux \
@@ -19,17 +35,24 @@ RUN set -eux \
 
 # aws-iam-authemticator (copied to final image)
 RUN set -eux \
+	&& if [ "$(uname -m)" = "aarch64" ]; then \
+		ARCH="arm64"; \
+	elif [ "$(uname -m)" = "x86_64" ]; then \
+		ARCH="amd64"; \
+	else \
+		fail; \
+	fi \
+	\
 	&& git clone https://github.com/kubernetes-sigs/aws-iam-authenticator /tmp/aws-iam-authenticator \
 	&& cd /tmp/aws-iam-authenticator \
 	&& IAM_AUTH_VERSION="$( git tag --sort=-creatordate \
+		| sort -V \
 		| grep -E 'v[0-9]+\.[0-9]+\.[0-9]+$' \
-		| head -1 \
-		| sed 's/^v//g' \
+		| tail -1 \
 	)" \
-	&& curl -sS -L -b cookies.txt -c cookies.txt \
-		-o /usr/bin/aws-iam-authenticator \
-		-H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36" \
-		"https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v${IAM_AUTH_VERSION}/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_amd64" \
+	&& git checkout "${IAM_AUTH_VERSION}" \
+	&& make build-all-bins \
+	&& mv _output/bin/aws-iam-authenticator_${IAM_AUTH_VERSION}_linux_${ARCH} /usr/bin/aws-iam-authenticator \
 	&& chmod +x /usr/bin/aws-iam-authenticator \
 	&& aws-iam-authenticator version | grep -E "\"(${IAM_AUTH_VERSION}|unversioned)\"" \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
@@ -56,7 +79,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} aws"
 
-COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
+COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 COPY --from=builder /usr/bin/aws /usr/bin/aws
 COPY --from=builder /usr/bin/aws-iam-authenticator /usr/bin/aws-iam-authenticator
 

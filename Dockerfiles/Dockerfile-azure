@@ -3,22 +3,20 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-# See ./builder for this image
-FROM cytopia/ansible-builder as builder
+FROM cytopia/ansible:${VERSION}-tools as builder
 
-# Python packages (copied to final image)
-# pip3 search results in exception
-#RUN set -eux \
-#	&& pip3 install --no-cache-dir --no-compile \
-#		$(pip3 search azure \
-#			| grep -E '^azure' \
-#			| grep 'Microsoft Azure' \
-#			| grep Client \
-#			| awk '{print $1}' \
-#			| grep -v '^azure$' \
-#			| grep -v '^azure-mgmt$' \
-#			| xargs \
-#		)
+# Required tools for building Python packages
+RUN set -eux \
+	&& apk add --no-cache \
+		# build tools
+		coreutils \
+		g++ \
+		gcc \
+		make \
+		musl-dev \
+		openssl-dev \
+		python3-dev
+
 RUN set -eux \
 	&& pip3 install --no-cache-dir --no-compile \
 		azure-applicationinsights \
@@ -47,7 +45,6 @@ RUN set -eux \
 		azure-servicefabric \
 		azure-storage-queue \
 		azure-synapse \
-		azure-template \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
@@ -72,7 +69,7 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} azure"
 
-COPY --from=builder /usr/lib/python3.8/site-packages/ /usr/lib/python3.8/site-packages/
+COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]

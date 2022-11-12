@@ -1,0 +1,338 @@
+---
+name: "Configure multistage docker images (multi -flavours, -versions, -architectures)"
+
+on:
+  workflow_call:
+    ###
+    ### Input Variables
+    ###
+    inputs:
+      versions:
+        description: 'The JSON string for versions. ( list of objects: [{NAME, VERSION[], ARCH[]}] )'
+        required: true
+        type: string
+      refs:
+        description: 'The JSON string for refs. ( object: {BRANCH, NUM_LATEST_TAGS} )'
+        required: true
+        type: string
+      enabled:
+        description: 'Determines whether this workflow is enabled at all (will run or skip).'
+        required: true
+        type: boolean
+      can_deploy:
+        description: 'Determines whether this workflow can deploy (login and push).'
+        required: true
+        type: boolean
+      is_scheduled:
+        description: "Usage for a scheduled job? Only then we will evaluate git refs and add them to build matrix."
+        required: true
+        type: boolean
+
+    ###
+    ### Input Secrets
+    ###
+    secrets:
+      dockerhub_username:
+        description: 'The username for Dockerhub.'
+        required: false
+      dockerhub_password:
+        description: 'The password for Dockerhub.'
+        required: false
+
+    ###
+    ### Outputs
+    ###
+    outputs:
+      # Repeat input variables
+      versions:
+        description: "(string) Copied from inputs: The JSON string for versions."
+        value: ${{ jobs.configure.outputs.versions }}
+      refs:
+        description: "(string) Copied from inputs: The JSON string for refs."
+        value: ${{ jobs.configure.outputs.refs }}
+      # Determined settings (flags)
+      can_login:
+        description: "(boolean) Can we login to Dockerhub?"
+        value: ${{ jobs.configure.outputs.can_login }}
+      can_push:
+        description: "(boolean) Can we push to Dockerhub?"
+        value: ${{ jobs.configure.outputs.can_push }}
+      has_refs:
+        description: "(boolean) Do we have refs? (used for nightly builds)"
+        value: ${{ jobs.configure.outputs.has_refs }}
+      # Determined settings (values)
+      matrix_build:
+        description: "(string) The determined JSON string build matrix."
+        value: ${{ jobs.configure.outputs.matrix_build }}
+      matrix_build_kops:
+        description: "(string) The determined JSON string build matrix."
+        value: ${{ jobs.configure.outputs.matrix_build_kops }}
+      matrix_build_helm:
+        description: "(string) The determined JSON string build matrix."
+        value: ${{ jobs.configure.outputs.matrix_build_helm }}
+      matrix_deploy:
+        description: "(string) The determined JSON string deploy matrix."
+        value: ${{ jobs.configure.outputs.matrix_deploy }}
+      matrix_deploy_kops:
+        description: "(string) The determined JSON string deploy matrix."
+        value: ${{ jobs.configure.outputs.matrix_deploy_kops }}
+      matrix_deploy_helm:
+        description: "(string) The determined JSON string deploy matrix."
+        value: ${{ jobs.configure.outputs.matrix_deploy_helm }}
+      artifact_prefix:
+        description: "(string) The determined unique artifact prefix."
+        value: ${{ jobs.configure.outputs.artifact_prefix }}
+
+jobs:
+
+  # -----------------------------------------------------------------------------------------------
+  # JOB (1/3): CONFIGURE
+  # -----------------------------------------------------------------------------------------------
+  configure:
+    name: Configure
+    if: ${{ inputs.enabled }}
+    runs-on: ubuntu-latest
+
+    ###
+    ### Outputs
+    ###
+    outputs:
+      # Copied from inputs
+      versions: ${{ inputs.versions }}
+      refs: ${{ inputs.refs }}
+      # Flags
+      can_login: ${{ steps.set-login.outputs.can_login }}
+      can_push: ${{ steps.set-push.outputs.can_push }}
+      has_refs: ${{ steps.set-refs.outputs.has_refs }}
+      # Values
+      artifact_prefix: ${{ steps.set-artifact-prefix.outputs.prefix }}
+      matrix_build: ${{ steps.set-matrix.outputs.matrix_build }}
+      matrix_build_kops: ${{ steps.set-matrix.outputs.matrix_build_kops }}
+      matrix_build_helm: ${{ steps.set-matrix.outputs.matrix_build_helm }}
+      matrix_deploy: ${{ steps.set-matrix.outputs.matrix_deploy }}
+      matrix_deploy_kops: ${{ steps.set-matrix.outputs.matrix_deploy_kops }}
+      matrix_deploy_helm: ${{ steps.set-matrix.outputs.matrix_deploy_helm }}
+
+    ###
+    ### Steps
+    ###
+    steps:
+
+      # ------------------------------------------------------------
+      # Set flags
+      # ------------------------------------------------------------
+
+      ###
+      ### Can we login to Dockerhub?
+      ###
+      - name: "[Set-Output] can_login (Set Docker login capabilities)"
+        id: set-login
+        shell: bash
+        run: |
+          if [ "${{ env.ENV_USER }}" = '' ] || [ "${{ env.ENV_PASS }}" = '' ]; then
+            echo "can_login=false" >> $GITHUB_OUTPUT
+          else
+            echo "can_login=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          ENV_USER: ${{ secrets.dockerhub_username }}
+          ENV_PASS: ${{ secrets.dockerhub_password }}
+
+      ###
+      ### Can we push to Dockerhub?
+      ###
+      - name: "[Set-Output] can_push (Set Docker push capabilities)"
+        id: set-push
+        shell: bash
+        run: |
+          if [ "${{ steps.set-login.outputs.can_login }}" = "true" ] && [ "${{ inputs.can_deploy }}" = "true" ]; then
+            echo "can_push=true" >> $GITHUB_OUTPUT
+          else
+            echo "can_push=false" >> $GITHUB_OUTPUT
+          fi
+
+      ###
+      ### Do we have refs to build against?
+      ###
+      - name: "Evaluate Refs (branches and latest tags)"
+        id: eval-refs
+        shell: bash
+        run: |
+          DEFAULT_BRANCH="$( echo '${{ inputs.refs }}' | jq -M -c -r '.DEFAULT_BRANCH' )"
+          BRANCHES="$( echo '${{ inputs.refs }}' | jq -M -c -r '.BRANCHES' )"
+          NUM_LATEST_TAGS="$( echo '${{ inputs.refs }}' | jq -M -c -r '.NUM_LATEST_TAGS' )"
+
+          echo "default_branch=${DEFAULT_BRANCH}"   >> $GITHUB_OUTPUT
+          echo "branches=${BRANCHES}"               >> $GITHUB_OUTPUT
+          echo "num_latest_tags=${NUM_LATEST_TAGS}" >> $GITHUB_OUTPUT
+
+          echo "DEFAULT_BRANCH=${DEFAULT_BRANCH}"
+          echo "BRANCHES=${BRANCHES}"
+          echo "NUM_LATEST_TAGS=${NUM_LATEST_TAGS}"
+
+      - name: "[Set-Output] has_refs and matrix (ref-matrix) (branches and latest tags)"
+        id: set-refs
+        uses: cytopia/git-ref-matrix-action@v0.1.12
+        with:
+          repository_default_branch: ${{ steps.eval-refs.outputs.default_branch }}
+          branches: ${{ steps.eval-refs.outputs.branches }}
+          num_latest_tags: ${{ steps.eval-refs.outputs.num_latest_tags }}
+          # Only use refs if the job is a schedule or if the job is schedule and was triggered manually
+          disable_refs: ${{ !(inputs.is_scheduled && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')) }}
+
+
+      # ------------------------------------------------------------
+      # Set values
+      # ------------------------------------------------------------
+
+      ###
+      ### Unique Artifact prefix
+      ###
+      - name: "[Set-Output] artifact_prefix (unique Artifact prefix)"
+        id: set-artifact-prefix
+        shell: bash
+        run: |
+          PRE_DATE="$( date +"%s" )"
+          PRE_RAND="$( echo $RANDOM | md5sum | head -c 10 )"
+          echo "prefix=${PRE_DATE}-${PRE_RAND}" >> $GITHUB_OUTPUT
+
+      ###
+      ### Set Build and Deploy Matrix
+      ###
+      - name: "[Set-Output] matrix_build and matrix_deploy (Build Matrix & Deploy Matrix)"
+        id: set-matrix
+        shell: bash
+        run: |
+          if [ "${{ steps.set-refs.outputs.has_refs }}" = "true" ]; then
+            # BUILD MATRICES
+            MATRIX_BUILD="$( \
+              jq -M -c \
+                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
+                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_BUILD_KOPS="$( \
+              jq -M -c \
+                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
+                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[], arch:.ARCH[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_BUILD_HELM="$( \
+              jq -M -c \
+                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
+                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[], arch:.ARCH[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
+            )"
+
+            # DEPLOY MATRICES
+            MATRIX_DEPLOY="$( \
+              jq -M -c \
+                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
+                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_DEPLOY_KOPS="$( \
+              jq -M -c \
+                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
+                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_DEPLOY_HELM="$( \
+              jq -M -c \
+                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
+                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
+            )"
+            echo "matrix_build=${MATRIX_BUILD}"             >> $GITHUB_OUTPUT
+            echo "matrix_build_kops=${MATRIX_BUILD_KOPS}"   >> $GITHUB_OUTPUT
+            echo "matrix_build_helm=${MATRIX_BUILD_HELM}"   >> $GITHUB_OUTPUT
+            echo "matrix_deploy=${MATRIX_DEPLOY}"           >> $GITHUB_OUTPUT
+            echo "matrix_deploy_kops=${MATRIX_DEPLOY_KOPS}" >> $GITHUB_OUTPUT
+            echo "matrix_deploy_helm=${MATRIX_DEPLOY_HELM}" >> $GITHUB_OUTPUT
+            echo "has_refs=true"                            >> $GITHUB_OUTPUT
+          else
+            # BUILD MATRICES
+            MATRIX_BUILD="$( \
+              jq -M -c \
+                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_BUILD_KOPS="$( \
+              jq -M -c \
+                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_BUILD_HELM="$( \
+              jq -M -c \
+                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ inputs.versions }}' \
+            )"
+
+            # DEPLOY MATRICES
+            MATRIX_DEPLOY="$( \
+              jq -M -c \
+                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_DEPLOY_KOPS="$( \
+              jq -M -c \
+                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[]})' <<<'${{ inputs.versions }}' \
+            )"
+            MATRIX_DEPLOY_HELM="$( \
+              jq -M -c \
+                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[]})' <<<'${{ inputs.versions }}' \
+            )"
+            echo "matrix_build=${MATRIX_BUILD}"             >> $GITHUB_OUTPUT
+            echo "matrix_build_kops=${MATRIX_BUILD_KOPS}"   >> $GITHUB_OUTPUT
+            echo "matrix_build_helm=${MATRIX_BUILD_HELM}"   >> $GITHUB_OUTPUT
+            echo "matrix_deploy=${MATRIX_DEPLOY}"           >> $GITHUB_OUTPUT
+            echo "matrix_deploy_kops=${MATRIX_DEPLOY_KOPS}" >> $GITHUB_OUTPUT
+            echo "matrix_deploy_helm=${MATRIX_DEPLOY_HELM}" >> $GITHUB_OUTPUT
+            echo "has_refs=false"                           >> $GITHUB_OUTPUT
+          fi
+
+      # ------------------------------------------------------------
+      # Debug
+      # ------------------------------------------------------------
+
+      - name: "[DEBUG] Show GitHub Context"
+        shell: bash
+        run: |
+          echo 'Context                              | Value'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.actor                         | ${{ github.actor }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.repository_owner              | ${{ github.repository_owner }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.event.pull_request.user.login | ${{ github.event.pull_request.user.login }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.event_name                    | ${{ github.event_name }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.ref_name                      | ${{ github.ref_name }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.head_ref                      | ${{ github.head_ref }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.base_ref                      | ${{ github.base_ref }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.ref_type                      | ${{ github.ref_type }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.repository                    | ${{ github.repository }}'
+
+      - name: "[DEBUG] Show Workflow Inputs"
+        shell: bash
+        run: |
+          echo 'enabled: ${{ inputs.enabled }}'
+          echo 'can_deploy: ${{ inputs.can_deploy }}'
+          echo 'is_scheduled: ${{ inputs.is_scheduled }}'
+          echo 'can_deploy: ${{ inputs.can_deploy }}'
+          echo 'versions: ${{ inputs.versions }}'
+          echo 'refs: ${{ inputs.refs }}'
+
+      - name: "[DEBUG] Show Workflow Outputs"
+        shell: bash
+        run: |
+          # Copied from inputs
+          echo 'versions: ${{ inputs.versions }}'
+          echo 'refs: ${{ inputs.refs }}'
+          # Flags
+          echo 'can_login: ${{ steps.set-login.outputs.can_login }}'
+          echo 'can_push: ${{ steps.set-push.outputs.can_push }}'
+          echo 'has_refs: ${{ steps.set-refs.outputs.has_refs }}'
+          # Values
+          echo 'artifact_prefix: ${{ steps.set-artifact-prefix.outputs.prefix }}'
+          echo 'matrix_build: ${{ steps.set-matrix.outputs.matrix_build }}'
+          echo 'matrix_build_kops: ${{ steps.set-matrix.outputs.matrix_build_kops }}'
+          echo 'matrix_build_helm: ${{ steps.set-matrix.outputs.matrix_build_helm }}'
+          echo 'matrix_deploy: ${{ steps.set-matrix.outputs.matrix_deploy }}'
+          echo 'matrix_deploy_kops: ${{ steps.set-matrix.outputs.matrix_deploy_kops }}'
+          echo 'matrix_deploy_helm: ${{ steps.set-matrix.outputs.matrix_deploy_helm }}'

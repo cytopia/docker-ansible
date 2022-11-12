@@ -19,27 +19,4 @@ on:
 # -------------------------------------------------------------------------------------------------
 jobs:
   lint:
-    name: "Lint"
-    runs-on: ubuntu-latest
-    steps:
-      # ------------------------------------------------------------
-      # Setup repository
-      # ------------------------------------------------------------
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      # ------------------------------------------------------------
-      # Lint repository
-      # ------------------------------------------------------------
-      - name: Lint Files
-        run: |
-          make lint-files
-
-      # ------------------------------------------------------------
-      # Lint Workflow
-      # ------------------------------------------------------------
-      - name: Lint Workflow
-        run: |
-          make lint-workflow
+    uses: devilbox/github-actions/.github/workflows/lint-generic.yml@master
