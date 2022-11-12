@@ -7,8 +7,8 @@
 [![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
 [![lint](https://github.com/cytopia/docker-ansible/workflows/lint/badge.svg)](https://github.com/cytopia/docker-ansible/actions?query=workflow%3Alint)
-[![build](https://github.com/cytopia/docker-ansible/workflows/build/badge.svg)](https://github.com/cytopia/docker-ansible/actions?query=workflow%3Abuild)
-[![nightly](https://github.com/cytopia/docker-ansible/workflows/nightly/badge.svg)](https://github.com/cytopia/docker-ansible/actions?query=workflow%3Anightly)
+[![build](https://github.com/cytopia/docker-ansible/actions/workflows/action_branch.yml/badge.svg)](https://github.com/cytopia/docker-ansible/actions/workflows/action_branch.yml)
+[![nightly](https://github.com/cytopia/docker-ansible/actions/workflows/action_schedule.yml/badge.svg)](https://github.com/cytopia/docker-ansible/actions/workflows/action_schedule.yml)
 
 
 > #### All [#awesome-ci](https://github.com/topics/awesome-ci) Docker images
@@ -99,7 +99,7 @@ The following table shows a quick overview of provided libraries and tools for e
 
 The following Docker image tags are rolling releases and are built and updated every night.
 
-[![nightly](https://github.com/cytopia/docker-ansible/workflows/nightly/badge.svg)](https://github.com/cytopia/docker-ansible/actions?query=workflow%3Anightly)
+[![nightly](https://github.com/cytopia/docker-ansible/actions/workflows/action_schedule.yml/badge.svg)](https://github.com/cytopia/docker-ansible/actions/workflows/action_schedule.yml)
 
 ### Ansible base
 
@@ -350,7 +350,7 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 
 The following Docker image tags are built once and can be used for reproducible builds. Its version never changes so you will have to update tags in your pipelines from time to time in order to stay up-to-date.
 
-[![build](https://github.com/cytopia/docker-black/workflows/build/badge.svg)](https://github.com/cytopia/docker-black/actions?query=workflow%3Abuild)
+[![build](https://github.com/cytopia/docker-ansible/actions/workflows/action_branch.yml/badge.svg)](https://github.com/cytopia/docker-ansible/actions/workflows/action_branch.yml)
 
 | Docker Tag               | Git Ref      |  Available Architectures           |
 |--------------------------|--------------|------------------------------------|
