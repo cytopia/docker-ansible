@@ -239,47 +239,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.10-awskops1.19`       | master       | **`2.10.x`** | `1.19.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.19`        | master       | **`2.9.x`**  | `1.19.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.19`        | master       | **`2.8.x`**  | `1.19.x` | `amd64`, `arm64`                  |
-|                          |              |              |          |                                   |
-| **`latest-awskops1.18`** | master       | latest       | `1.18.x` | `amd64`, `arm64`                  |
-| `2.13-awskops1.18`       | master       | **`2.13.x`** | `1.18.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.18`       | master       | **`2.12.x`** | `1.18.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.18`       | master       | **`2.11.x`** | `1.18.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.18`       | master       | **`2.10.x`** | `1.18.x` | `amd64`, `arm64`                  |
-| `2.9-awskops1.18`        | master       | **`2.9.x`**  | `1.18.x` | `amd64`, `arm64`                  |
-| `2.8-awskops1.18`        | master       | **`2.8.x`**  | `1.18.x` | `amd64`, `arm64`                  |
-|                          |              |              |          |                                   |
-| **`latest-awskops1.17`** | master       | latest       | `1.17.x` | `amd64`, `arm64`                  |
-| `2.13-awskops1.17`       | master       | **`2.13.x`** | `1.17.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.17`       | master       | **`2.12.x`** | `1.17.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.17`       | master       | **`2.11.x`** | `1.17.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.17`       | master       | **`2.10.x`** | `1.17.x` | `amd64`, `arm64`                  |
-| `2.9-awskops1.17`        | master       | **`2.9.x`**  | `1.17.x` | `amd64`, `arm64`                  |
-| `2.8-awskops1.17`        | master       | **`2.8.x`**  | `1.17.x` | `amd64`, `arm64`                  |
-|                          |              |              |          |                                   |
-| **`latest-awskops1.16`** | master       | latest       | `1.16.x` | `amd64`, `arm64`                  |
-| `2.13-awskops1.16`       | master       | **`2.13.x`** | `1.16.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.16`       | master       | **`2.12.x`** | `1.16.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.16`       | master       | **`2.11.x`** | `1.16.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.16`       | master       | **`2.10.x`** | `1.16.x` | `amd64`, `arm64`                  |
-| `2.9-awskops1.16`        | master       | **`2.9.x`**  | `1.16.x` | `amd64`, `arm64`                  |
-| `2.8-awskops1.16`        | master       | **`2.8.x`**  | `1.16.x` | `amd64`, `arm64`                  |
-|                          |              |              |          |                                   |
-| **`latest-awskops1.15`** | master       | latest       | `1.15.x` | `amd64`, `arm64`                  |
-| `2.13-awskops1.15`       | master       | **`2.13.x`** | `1.15.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.15`       | master       | **`2.12.x`** | `1.15.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.15`       | master       | **`2.11.x`** | `1.15.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.15`       | master       | **`2.10.x`** | `1.15.x` | `amd64`, `arm64`                  |
-| `2.9-awskops1.15`        | master       | **`2.9.x`**  | `1.15.x` | `amd64`, `arm64`                  |
-| `2.8-awskops1.15`        | master       | **`2.8.x`**  | `1.15.x` | `amd64`, `arm64`                  |
-|                          |              |              |          |                                   |
-| **`latest-awskops1.14`** | master       | latest       | `1.14.x` | `amd64`, `arm64`                  |
-| `2.13-awskops1.14`       | master       | **`2.13.x`** | `1.14.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.14`       | master       | **`2.12.x`** | `1.14.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.14`       | master       | **`2.11.x`** | `1.14.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.14`       | master       | **`2.10.x`** | `1.14.x` | `amd64`, `arm64`                  |
-| `2.9-awskops1.14`        | master       | **`2.9.x`**  | `1.14.x` | `amd64`, `arm64`                  |
-| `2.8-awskops1.14`        | master       | **`2.8.x`**  | `1.14.x` | `amd64`, `arm64`                  |
-|                          |              |              |          |                                   |
 
 
 ### Ansible awshelm
@@ -396,7 +355,6 @@ The following Docker image tags are built once and can be used for reproducible 
 | Docker Tag               | Git Ref      |  Available Architectures           |
 |--------------------------|--------------|------------------------------------|
 | **`<docker-tag>-<tag>`** | git: `<tag>` |  `amd64`, `arm64`                  |
-|
 
 > * Where `<docker-tag>` refers to any of the tags listed in Rolling releases above.
 > * Where `<tag>` refers to the chosen git tag from this repository.
@@ -739,6 +697,17 @@ make run UID=1001 GID=1001
 ## :computer: Build locally
 
 To build locally you require GNU Make to be installed. Instructions as  shown below.
+
+### amd64 vs arm64
+If you want to build the Ansible image for a different platform, use the `ARCH` make variable as shown below. This also applies to all other examples below.
+```bash
+# Build amd64 images (default)
+make build
+make build ARCH=linux/amd64
+
+# Build arm64 images
+make build ARCH=linux/arm64
+```
 
 ### Ansible base
 ```bash
