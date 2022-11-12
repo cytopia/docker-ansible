@@ -1,3 +1,7 @@
+# Additional Makefiles are pulled from:
+# https://github.com/devilbox/makefiles/
+
+
 ifneq (,)
 .error This Makefile requires GNU Make.
 endif
@@ -54,19 +58,19 @@ help:
 	@echo " Build Targets"
 	@echo "--------------------------------------------------------------------------------"
 	@echo
-	@echo "All Docker images are build as follows: $(IMAGE):\$$VERSION[-\$$STAGEg[\$$KOPS|\$$HELM]]"
+	@echo "All Docker images are build as follows: $(IMAGE):\$$VERSION[-\$$STAGE[\$$KOPS|\$$HELM]]"
 	@echo
 	@echo "build   [VERSION=] [ARCH=] [KOPS=] [HELM=]        Build Docker image"
 	@echo "rebuild [VERSION=] [ARCH=] [KOPS=] [HELM=]        Build Docker image without cache"
 	@echo
 	@echo "    make build VERSION=2.3"
-	@echo "    make build VERSION=2.3 STAGEg=tools"
-	@echo "    make build VERSION=2.3 STAGEg=infra"
-	@echo "    make build VERSION=2.3 STAGEg=azure"
-	@echo "    make build VERSION=2.3 STAGEg=aws"
-	@echo "    make build VERSION=2.3 STAGEg=awsk8s"
-	@echo "    make build VERSION=2.3 STAGEg=awshelm HELM=2.11"
-	@echo "    make build VERSION=2.3 STAGEg=awskops KOPS=1.15"
+	@echo "    make build VERSION=2.3 STAGE=tools"
+	@echo "    make build VERSION=2.3 STAGE=infra"
+	@echo "    make build VERSION=2.3 STAGE=azure"
+	@echo "    make build VERSION=2.3 STAGE=aws"
+	@echo "    make build VERSION=2.3 STAGE=awsk8s"
+	@echo "    make build VERSION=2.3 STAGE=awshelm HELM=2.11"
+	@echo "    make build VERSION=2.3 STAGE=awskops KOPS=1.15"
 	@echo
 	@echo "--------------------------------------------------------------------------------"
 	@echo " Test Targets"
@@ -75,13 +79,13 @@ help:
 	@echo "test [VERSION=] [ARCH=] [KOPS=] [HELM=]           Test built Docker image"
 	@echo
 	@echo "    make test VERSION=2.3"
-	@echo "    make test VERSION=2.3 STAGEg=tools"
-	@echo "    make test VERSION=2.3 STAGEg=infra"
-	@echo "    make test VERSION=2.3 STAGEg=azure"
-	@echo "    make test VERSION=2.3 STAGEg=aws"
-	@echo "    make test VERSION=2.3 STAGEg=awsk8s"
-	@echo "    make test VERSION=2.3 STAGEg=awshelm HELM=2.11"
-	@echo "    make test VERSION=2.3 STAGEg=awskops KOPS=1.15"
+	@echo "    make test VERSION=2.3 STAGE=tools"
+	@echo "    make test VERSION=2.3 STAGE=infra"
+	@echo "    make test VERSION=2.3 STAGE=azure"
+	@echo "    make test VERSION=2.3 STAGE=aws"
+	@echo "    make test VERSION=2.3 STAGE=awsk8s"
+	@echo "    make test VERSION=2.3 STAGE=awshelm HELM=2.11"
+	@echo "    make test VERSION=2.3 STAGE=awskops KOPS=1.15"
 	@echo
 	@echo "--------------------------------------------------------------------------------"
 	@echo " Tagging Target"
@@ -90,13 +94,13 @@ help:
 	@echo "tag [VERSION=] [ARCH=] [KOPS=] [HELM=] [TAG=]     Tag built Docker image"
 	@echo
 	@echo "    make tag VERSION=2.3 TAG=2.3-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGEg=tools TAG=2.3-tools-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGEg=infra TAG=2.3-infra-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGEg=azure TAG=2.3-azure-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGEg=aws TAG=2.3-aws-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGEg=awsk8s TAG=2.3-awsk8s-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGEg=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGEg=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGE=tools TAG=2.3-tools-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGE=infra TAG=2.3-infra-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGE=azure TAG=2.3-azure-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGE=aws TAG=2.3-aws-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGE=awsk8s TAG=2.3-awsk8s-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGE=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
+	@echo "    make tag VERSION=2.3 STAGE=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
 
 
 # -------------------------------------------------------------------------------------------------
@@ -327,8 +331,8 @@ test-python-libs:
 	\
 	\
 	REQUIRED_BASE="cffi cryptography paramiko Jinja2 PyYAML"; \
-	REQUIRED_TOOLS="dnspython mitogen"; \
-	REQUIRED_INFRA="docker docker-compose jsondiff pexpect psycopg2 pypsexec pymongo PyMySQL smbprotocol"; \
+	REQUIRED_TOOLS="dnspython mitogen jmespath"; \
+	REQUIRED_INFRA="docker docker-compose jsondiff pexpect psycopg2 pypsexec pymongo PyMySQL smbprotocol pywinrm"; \
 	REQUIRED_AZURE="azure\-.*"; \
 	REQUIRED_AWS="awscli botocore boto boto3"; \
 	REQUIRED_AWSK8S="openshift"; \
@@ -483,7 +487,7 @@ test-binaries:
 	REQUIRED_BASE="python"; \
 	REQUIRED_TOOLS="git gpg jq yq ssh"; \
 	REQUIRED_INFRA="rsync"; \
-	REQUIRED_AZURE=""; \
+	REQUIRED_AZURE="az"; \
 	REQUIRED_AWS="aws aws-iam-authenticator"; \
 	REQUIRED_AWSK8S="kubectl oc"; \
 	REQUIRED_AWSKOPS="kops"; \
