@@ -1,0 +1,172 @@
+---
+name: "Build multistage docker images (multi -flavours, -versions, -architectures -kops)"
+
+on:
+  workflow_call:
+    ###
+    ### Variables
+    ###
+    inputs:
+      matrix:
+        description: 'The build matrix'
+        required: true
+        type: string
+      stage:
+        description: 'The stage to build (Examples: base, mods, prod or work).'
+        required: true
+        type: string
+      stage_prev:
+        description: 'The previous stage (used for downloading previous artifact).'
+        required: true
+        type: string
+      artifact_prefix:
+        description: 'Unique artifact name prefix (to avoid overriding existing artifcats during parallel runs).'
+        required: true
+        type: string
+      has_refs:
+        description: 'The ref build matrix as JSON string (list of git refs to build/deploy).'
+        required: true
+        type: boolean
+      run_tests:
+        description: 'Dertermines whether we run integration tests or not.'
+        required: true
+        type: boolean
+      upload_artifact:
+        description: 'Dertermines whether we upload the artifact not.'
+        required: true
+        type: boolean
+      pull_base_image:
+        description: 'Pull Docker base image before building?.'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  # -----------------------------------------------------------------------------------------------
+  # JOB: BUILD
+  # -----------------------------------------------------------------------------------------------
+  build:
+    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.kops }} (${{ matrix.arch }}) ${{ matrix.refs }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(inputs.matrix) }}
+    steps:
+
+      # ------------------------------------------------------------
+      # Setup repository
+      # ------------------------------------------------------------
+      - name: "[SETUP] Checkout repository (current)"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+        if: ${{ !inputs.has_refs }}
+
+      - name: "[SETUP] Checkout repository (ref: ${{ matrix.refs }})"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ matrix.refs }}
+        if: ${{ inputs.has_refs }}
+
+      - name: "[SETUP] Install QEMU environment"
+        uses: docker/setup-qemu-action@v2
+        id: qemu
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: "[SETUP] Install Docker Buildx"
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: "[SETUP] Set artifact names"
+        id: set-artifact-name
+        run: |
+          PRE_HASH="$( git rev-parse HEAD | head -c 10 )"
+          VERSION="${{ matrix.version }}"
+          ARCH="$( echo "${{ matrix.arch }}" | sed 's|/|-|g' )"
+
+          NAME_PREV="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage_prev }}"
+          NAME_CURR="${{ inputs.artifact_prefix }}-${PRE_HASH}-${VERSION}-${ARCH}-${{ inputs.stage }}${{ matrix.kops }}"
+          echo "prev=${NAME_PREV}" >> $GITHUB_OUTPUT
+          echo "curr=${NAME_CURR}" >> $GITHUB_OUTPUT
+
+      - name: "[DEBUG] Show setup"
+        shell: bash
+        run: |
+          echo '(qemu)   Platforms: ${{ steps.qemu.outputs.platforms }}'
+          echo "(buildx) Name:      ${{ steps.buildx.outputs.name }}"
+          echo "(buildx) Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
+          echo "(buildx) Status:    ${{ steps.buildx.outputs.status }}"
+          echo "(buildx) Flags:     ${{ steps.buildx.outputs.flags }}"
+          echo "(buildx) Platforms: ${{ steps.buildx.outputs.platforms }}"
+
+
+      # ------------------------------------------------------------
+      # Artifact Import
+      # ------------------------------------------------------------
+
+      ###
+      ### Download and import previously built image (if it exists)
+      ###
+      - name: "[Artifact Load] Download previously built image"
+        uses: cytopia/download-artifact-retry-action@v0.1.4
+        with:
+          name: ${{ steps.set-artifact-name.outputs.prev }}
+        if: ${{ inputs.stage_prev != '' }}
+
+      - name: "[Artifact Load] Import previously built image"
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make load INFILE=${{ steps.set-artifact-name.outputs.prev }}
+        if: ${{ inputs.stage_prev != '' }}
+
+
+      # ------------------------------------------------------------
+      # Build
+      # ------------------------------------------------------------
+      - name: Pull
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make docker-pull-base-image VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} KOPS=${{ matrix.kops }}
+        if: ${{ inputs.pull_base_image }}
+
+      - name: Build
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make build VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} KOPS=${{ matrix.kops }}
+
+
+      # ------------------------------------------------------------
+      # Test
+      # ------------------------------------------------------------
+      - name: Test
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make test VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} KOPS=${{ matrix.kops }}
+        if: ${{ inputs.run_tests }}
+
+
+      # ------------------------------------------------------------
+      # Artifact Export
+      # ------------------------------------------------------------
+
+      ###
+      ### Export current image
+      ###
+      - name: "[Artifact Save] Upload built artifact"
+        uses: cytopia/upload-artifact-retry-action@v0.1.6
+        with:
+          name: ${{ steps.set-artifact-name.outputs.curr }}
+          path: ${{ steps.set-artifact-name.outputs.curr }}
+          pre_command: |
+            make save-verify VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} KOPS=${{ matrix.kops }} OUTFILE=${{ steps.set-artifact-name.outputs.curr }} INFILE=${{ steps.set-artifact-name.outputs.curr }}
+          post_command: |
+            make load INFILE={{download_path}}
+        if: ${{ inputs.upload_artifact }}
