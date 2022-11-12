@@ -487,7 +487,7 @@ test-binaries:
 	REQUIRED_BASE="python"; \
 	REQUIRED_TOOLS="git gpg jq yq ssh"; \
 	REQUIRED_INFRA="rsync"; \
-	REQUIRED_AZURE=""; \
+	REQUIRED_AZURE="az"; \
 	REQUIRED_AWS="aws aws-iam-authenticator"; \
 	REQUIRED_AWSK8S="kubectl oc"; \
 	REQUIRED_AWSKOPS="kops"; \

@@ -88,7 +88,7 @@ The following table shows a quick overview of provided libraries and tools for e
 | base    | -        | `cffi`, `cryptography`, `Jinja2`, `junit-xml`, `lxml`, `paramiko`, `PyYAML` | - |
 | tools   | base     | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
 | infra   | tools    | `docker`, `docker-compose`, `jsondiff`, `netaddr`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
-| azure   | tools    | `azure-*`              | - |
+| azure   | tools    | `azure-*`              | `az` |
 | aws     | tools    | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
 | awsk8s  | aws      | `openshift`            | `kubectl`, `oc` |
 | awskops | awsk8s   | -                      | `kops` |
