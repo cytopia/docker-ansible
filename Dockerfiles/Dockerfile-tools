@@ -45,7 +45,13 @@ RUN set -eux \
 	\
 	&& yq --version
 
-
+# Download Mozilla Sops (Secrets Management)
+RUN set -eux \
+        && SOPS="$( curl -L -sS -o /dev/null -w %{url_effective} https://github.com/mozilla/sops/releases/latest | sed 's/^.*\///g' )" \
+        && curl -L -sS "https://github.com/mozilla/sops/releases/download/${SOPS}/sops-${SOPS}.linux.amd64" > /usr/bin/sops \
+        && chmod +x /usr/bin/sops \
+        && sops --version
+	
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
@@ -97,6 +103,7 @@ RUN set -eux \
 
 COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
 COPY --from=builder /usr/bin/yq /usr/bin/yq
+COPY --from=builder /usr/bin/sops /usr/bin/sops
 COPY ./data/docker-entrypoint.sh /docker-entrypoint.sh
 
 WORKDIR /data
