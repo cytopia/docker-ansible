@@ -108,6 +108,8 @@ The following Ansible Docker images are as small as possible and only contain An
 | Docker Tag               | Git Ref      | Ansible      | Available Architectures                      |
 |--------------------------|--------------|--------------|----------------------------------------------|
 | **`latest`**             | master       | latest       | `amd64`, `arm64`                             |
+| `2.13`                   | master       | **`2.13.x`** | `amd64`, `arm64`                             |
+| `2.12`                   | master       | **`2.12.x`** | `amd64`, `arm64`                             |
 | `2.11`                   | master       | **`2.11.x`** | `amd64`, `arm64`                             |
 | `2.10`                   | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 | `2.9`                    | master       | **`2.9.x`**  | `amd64`, `arm64`                             |
@@ -121,6 +123,8 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 | Docker Tag               | Git Ref      | Ansible      | Available Architectures                      |
 |--------------------------|--------------|--------------|----------------------------------------------|
 | **`latest-tools`**       | master       | latest       | `amd64`, `arm64`                             |
+| `2.13-tools`             | master       | **`2.13.x`** | `amd64`, `arm64`                             |
+| `2.12-tools`             | master       | **`2.12.x`** | `amd64`, `arm64`                             |
 | `2.11-tools`             | master       | **`2.11.x`** | `amd64`, `arm64`                             |
 | `2.10-tools`             | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 | `2.9-tools`              | master       | **`2.9.x`**  | `amd64`, `arm64`                             |
@@ -134,6 +138,8 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | Docker Tag               | Git Ref      | Ansible      | Available Architectures                      |
 |--------------------------|--------------|--------------|----------------------------------------------|
 | **`latest-azure`**       | master       | latest       | `amd64`, `arm64`                             |
+| `2.13-azure`             | master       | **`2.13.x`** | `amd64`, `arm64`                             |
+| `2.12-azure`             | master       | **`2.12.x`** | `amd64`, `arm64`                             |
 | `2.11-azure`             | master       | **`2.11.x`** | `amd64`, `arm64`                             |
 | `2.10-azure`             | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 | `2.9-azure`              | master       | **`2.9.x`**  | `amd64`, `arm64`                             |
@@ -147,6 +153,8 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | Docker Tag               | Git Ref      | Ansible      | Available Architectures                      |
 |--------------------------|--------------|--------------|----------------------------------------------|
 | **`latest-aws`**         | master       | latest       | `amd64`, `arm64`                             |
+| `2.13-aws`               | master       | **`2.13.x`** | `amd64`, `arm64`                             |
+| `2.12-aws`               | master       | **`2.12.x`** | `amd64`, `arm64`                             |
 | `2.11-aws`               | master       | **`2.11.x`** | `amd64`, `arm64`                             |
 | `2.10-aws`               | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 | `2.9-aws`                | master       | **`2.9.x`**  | `amd64`, `arm64`                             |
@@ -160,6 +168,8 @@ The following Ansible Docker images contain everything from `Ansible aws` and ad
 | Docker Tag               | Git Ref      | Ansible      | Available Architectures                      |
 |--------------------------|--------------|--------------|----------------------------------------------|
 | **`latest-awsk8s`**      | master       | latest       | `amd64`, `arm64`                             |
+| `2.13-awsk8s`            | master       | **`2.13.x`** | `amd64`, `arm64`                             |
+| `2.12-awsk8s`            | master       | **`2.12.x`** | `amd64`, `arm64`                             |
 | `2.11-awsk8s`            | master       | **`2.11.x`** | `amd64`, `arm64`                             |
 | `2.10-awsk8s`            | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 | `2.9-awsk8s`             | master       | **`2.9.x`**  | `amd64`, `arm64`                             |
@@ -175,72 +185,96 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker Tag               | Git Ref      | Ansible      | Kops     | Available Architectures           |
 |--------------------------|--------------|--------------|----------|-----------------------------------|
 | **`latest-awskops1.25`** | master       | latest       | `1.25.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.25`       | master       | **`2.13.x`** | `1.25.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.25`       | master       | **`2.12.x`** | `1.25.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.25`       | master       | **`2.11.x`** | `1.25.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.25`       | master       | **`2.10.x`** | `1.25.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.25`        | master       | **`2.9.x`**  | `1.25.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.25`        | master       | **`2.8.x`**  | `1.25.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.24`** | master       | latest       | `1.24.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.24`       | master       | **`2.13.x`** | `1.24.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.24`       | master       | **`2.12.x`** | `1.24.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.24`       | master       | **`2.11.x`** | `1.24.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.24`       | master       | **`2.10.x`** | `1.24.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.24`        | master       | **`2.9.x`**  | `1.24.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.24`        | master       | **`2.8.x`**  | `1.24.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.23`** | master       | latest       | `1.23.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.23`       | master       | **`2.13.x`** | `1.23.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.23`       | master       | **`2.12.x`** | `1.23.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.23`       | master       | **`2.11.x`** | `1.23.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.23`       | master       | **`2.10.x`** | `1.23.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.23`        | master       | **`2.9.x`**  | `1.23.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.23`        | master       | **`2.8.x`**  | `1.23.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.22`** | master       | latest       | `1.22.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.22`       | master       | **`2.13.x`** | `1.22.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.22`       | master       | **`2.12.x`** | `1.22.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.22`       | master       | **`2.11.x`** | `1.22.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.22`       | master       | **`2.10.x`** | `1.22.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.22`        | master       | **`2.9.x`**  | `1.22.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.22`        | master       | **`2.8.x`**  | `1.22.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.21`** | master       | latest       | `1.21.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.21`       | master       | **`2.13.x`** | `1.21.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.21`       | master       | **`2.12.x`** | `1.21.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.21`       | master       | **`2.11.x`** | `1.21.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.21`       | master       | **`2.10.x`** | `1.21.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.21`        | master       | **`2.9.x`**  | `1.21.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.21`        | master       | **`2.8.x`**  | `1.21.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.20`** | master       | latest       | `1.20.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.20`       | master       | **`2.13.x`** | `1.20.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.20`       | master       | **`2.12.x`** | `1.20.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.20`       | master       | **`2.11.x`** | `1.20.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.20`       | master       | **`2.10.x`** | `1.20.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.20`        | master       | **`2.9.x`**  | `1.20.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.20`        | master       | **`2.8.x`**  | `1.20.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.19`** | master       | latest       | `1.19.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.19`       | master       | **`2.13.x`** | `1.19.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.19`       | master       | **`2.12.x`** | `1.19.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.19`       | master       | **`2.11.x`** | `1.19.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.19`       | master       | **`2.10.x`** | `1.19.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.19`        | master       | **`2.9.x`**  | `1.19.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.19`        | master       | **`2.8.x`**  | `1.19.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.18`** | master       | latest       | `1.18.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.18`       | master       | **`2.13.x`** | `1.18.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.18`       | master       | **`2.12.x`** | `1.18.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.18`       | master       | **`2.11.x`** | `1.18.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.18`       | master       | **`2.10.x`** | `1.18.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.18`        | master       | **`2.9.x`**  | `1.18.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.18`        | master       | **`2.8.x`**  | `1.18.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.17`** | master       | latest       | `1.17.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.17`       | master       | **`2.13.x`** | `1.17.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.17`       | master       | **`2.12.x`** | `1.17.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.17`       | master       | **`2.11.x`** | `1.17.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.17`       | master       | **`2.10.x`** | `1.17.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.17`        | master       | **`2.9.x`**  | `1.17.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.17`        | master       | **`2.8.x`**  | `1.17.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.16`** | master       | latest       | `1.16.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.16`       | master       | **`2.13.x`** | `1.16.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.16`       | master       | **`2.12.x`** | `1.16.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.16`       | master       | **`2.11.x`** | `1.16.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.16`       | master       | **`2.10.x`** | `1.16.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.16`        | master       | **`2.9.x`**  | `1.16.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.16`        | master       | **`2.8.x`**  | `1.16.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.15`** | master       | latest       | `1.15.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.15`       | master       | **`2.13.x`** | `1.15.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.15`       | master       | **`2.12.x`** | `1.15.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.15`       | master       | **`2.11.x`** | `1.15.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.15`       | master       | **`2.10.x`** | `1.15.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.15`        | master       | **`2.9.x`**  | `1.15.x` | `amd64`, `arm64`                  |
 | `2.8-awskops1.15`        | master       | **`2.8.x`**  | `1.15.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.14`** | master       | latest       | `1.14.x` | `amd64`, `arm64`                  |
+| `2.13-awskops1.14`       | master       | **`2.13.x`** | `1.14.x` | `amd64`, `arm64`                  |
+| `2.12-awskops1.14`       | master       | **`2.12.x`** | `1.14.x` | `amd64`, `arm64`                  |
 | `2.11-awskops1.14`       | master       | **`2.11.x`** | `1.14.x` | `amd64`, `arm64`                  |
 | `2.10-awskops1.14`       | master       | **`2.10.x`** | `1.14.x` | `amd64`, `arm64`                  |
 | `2.9-awskops1.14`        | master       | **`2.9.x`**  | `1.14.x` | `amd64`, `arm64`                  |
@@ -257,72 +291,96 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | Docker Tag               | Git Ref      | Ansible      | Helm     | Available Architectures           |
 |--------------------------|--------------|--------------|----------|-----------------------------------|
 | **`latest-awshelm3.10`** | master       | latest       | `3.10.x` | `amd64`, `arm64`                  |
+| `2.13-awshelm3.10`       | master       | **`2.13.x`** | `3.10.x` | `amd64`, `arm64`                  |
+| `2.12-awshelm3.10`       | master       | **`2.12.x`** | `3.10.x` | `amd64`, `arm64`                  |
 | `2.11-awshelm3.10`       | master       | **`2.11.x`** | `3.10.x` | `amd64`, `arm64`                  |
 | `2.10-awshelm3.10`       | master       | **`2.10.x`** | `3.10.x` | `amd64`, `arm64`                  |
 | `2.9-awshelm3.10`        | master       | **`2.9.x`**  | `3.10.x` | `amd64`, `arm64`                  |
 | `2.8-awshelm3.10`        | master       | **`2.8.x`**  | `3.10.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.9`**  | master       | latest       | `3.9.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.9`        | master       | **`2.13.x`** | `3.9.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.9`        | master       | **`2.12.x`** | `3.9.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.9`        | master       | **`2.11.x`** | `3.9.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.9`        | master       | **`2.10.x`** | `3.9.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.9`         | master       | **`2.9.x`**  | `3.9.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.9`         | master       | **`2.8.x`**  | `3.9.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.8`**  | master       | latest       | `3.8.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.8`        | master       | **`2.13.x`** | `3.8.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.8`        | master       | **`2.12.x`** | `3.8.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.8`        | master       | **`2.11.x`** | `3.8.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.8`        | master       | **`2.10.x`** | `3.8.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.8`         | master       | **`2.9.x`**  | `3.8.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.8`         | master       | **`2.8.x`**  | `3.8.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.7`**  | master       | latest       | `3.7.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.7`        | master       | **`2.13.x`** | `3.7.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.7`        | master       | **`2.12.x`** | `3.7.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.7`        | master       | **`2.11.x`** | `3.7.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.7`        | master       | **`2.10.x`** | `3.7.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.7`         | master       | **`2.9.x`**  | `3.7.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.7`         | master       | **`2.8.x`**  | `3.7.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.6`**  | master       | latest       | `3.6.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.6`        | master       | **`2.13.x`** | `3.6.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.6`        | master       | **`2.12.x`** | `3.6.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.6`        | master       | **`2.11.x`** | `3.6.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.6`        | master       | **`2.10.x`** | `3.6.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.6`         | master       | **`2.9.x`**  | `3.6.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.6`         | master       | **`2.8.x`**  | `3.6.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.5`**  | master       | latest       | `3.5.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.5`        | master       | **`2.13.x`** | `3.5.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.5`        | master       | **`2.12.x`** | `3.5.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.5`        | master       | **`2.11.x`** | `3.5.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.5`        | master       | **`2.10.x`** | `3.5.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.5`         | master       | **`2.9.x`**  | `3.5.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.5`         | master       | **`2.8.x`**  | `3.5.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.4`**  | master       | latest       | `3.4.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.4`        | master       | **`2.13.x`** | `3.4.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.4`        | master       | **`2.12.x`** | `3.4.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.4`        | master       | **`2.11.x`** | `3.4.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.4`        | master       | **`2.10.x`** | `3.4.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.4`         | master       | **`2.9.x`**  | `3.4.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.4`         | master       | **`2.8.x`**  | `3.4.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.3`**  | master       | latest       | `3.3.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.3`        | master       | **`2.13.x`** | `3.3.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.3`        | master       | **`2.12.x`** | `3.3.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.3`        | master       | **`2.11.x`** | `3.3.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.3`        | master       | **`2.10.x`** | `3.3.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.3`         | master       | **`2.9.x`**  | `3.3.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.3`         | master       | **`2.8.x`**  | `3.3.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.2`**  | master       | latest       | `3.2.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.2`        | master       | **`2.13.x`** | `3.2.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.2`        | master       | **`2.12.x`** | `3.2.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.2`        | master       | **`2.11.x`** | `3.2.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.2`        | master       | **`2.10.x`** | `3.2.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.2`         | master       | **`2.9.x`**  | `3.2.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.2`         | master       | **`2.8.x`**  | `3.2.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.1`**  | master       | latest       | `3.1.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.1`        | master       | **`2.13.x`** | `3.1.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.1`        | master       | **`2.12.x`** | `3.1.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.1`        | master       | **`2.11.x`** | `3.1.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.1`        | master       | **`2.10.x`** | `3.1.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.1`         | master       | **`2.9.x`**  | `3.1.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.1`         | master       | **`2.8.x`**  | `3.1.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.0`**  | master       | latest       | `3.0.x`  | `amd64`, `arm64`                  |
+| `2.13-awshelm3.0`        | master       | **`2.13.x`** | `3.0.x`  | `amd64`, `arm64`                  |
+| `2.12-awshelm3.0`        | master       | **`2.12.x`** | `3.0.x`  | `amd64`, `arm64`                  |
 | `2.11-awshelm3.0`        | master       | **`2.11.x`** | `3.0.x`  | `amd64`, `arm64`                  |
 | `2.10-awshelm3.0`        | master       | **`2.10.x`** | `3.0.x`  | `amd64`, `arm64`                  |
 | `2.9-awshelm3.0`         | master       | **`2.9.x`**  | `3.0.x`  | `amd64`, `arm64`                  |
 | `2.8-awshelm3.0`         | master       | **`2.8.x`**  | `3.0.x`  | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm2.16`** | master       | latest       | `2.16.x` | `amd64`, `arm64`                  |
+| `2.13-awshelm2.16`       | master       | **`2.13.x`** | `2.16.x` | `amd64`, `arm64`                  |
+| `2.12-awshelm2.16`       | master       | **`2.12.x`** | `2.16.x` | `amd64`, `arm64`                  |
 | `2.11-awshelm2.16`       | master       | **`2.11.x`** | `2.16.x` | `amd64`, `arm64`                  |
 | `2.10-awshelm2.16`       | master       | **`2.10.x`** | `2.16.x` | `amd64`, `arm64`                  |
 | `2.9-awshelm2.16`        | master       | **`2.9.x`**  | `2.16.x` | `amd64`, `arm64`                  |
