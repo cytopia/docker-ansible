@@ -86,7 +86,7 @@ The following table shows a quick overview of provided libraries and tools for e
 | Flavour | Based on | Additional Python libs | Additional binaries |
 |---------|---------------|------------------------|---------------------|
 | base    | -        | `cffi`, `cryptography`, `Jinja2`, `junit-xml`, `lxml`, `paramiko`, `PyYAML` | - |
-| tools   | base     | `dnspython`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
+| tools   | base     | `dnspython`, `JMESPath`, `mitogen` | `bash`, `git`, `gpg`, `jq`, `ssh`, `yq` |
 | infra   | tools    | `docker`, `docker-compose`, `jsondiff`, `netaddr`, `pexpect`, `psycopg2`, `pypsexec`, `pymongo`, `PyMySQL`, `smbprotocol` | `rsync` |
 | azure   | tools    | `azure-*`              | `az` |
 | aws     | tools    | `awscli`, `botocore`, `boto`, `boto3` | `aws`, `aws-iam-authenticator` |
