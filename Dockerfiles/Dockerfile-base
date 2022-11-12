@@ -48,12 +48,25 @@ RUN set -eux \
 	&& if [ "${VERSION}" = "latest" ]; then \
 		pip3 install --no-cache-dir --no-compile ansible; \
 	\
-	elif [ "${MINOR_VERSION}" -lt "11" ]; then \
+	elif [ "${MINOR_VERSION}" -lt "10" ]; then \
 		pip3 install --no-cache-dir --no-binary pyyaml ansible~=${VERSION}.0; \
 	\
-	else \
-		pip3 install --no-cache-dir --no-binary pyyaml ansible-core~=${VERSION}.0; \
+    # Ansible added a weired versioning system with ansible-core and ansible packages:
+    # https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html#ansible-community-changelogs
+	elif [ "${VERSION}" = "2.10" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=3.0; \
 	\
+	elif [ "${VERSION}" = "2.11" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=4.0; \
+	\
+	elif [ "${VERSION}" = "2.12" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=5.0; \
+	\
+	elif [ "${VERSION}" = "2.13" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=6.0; \
+	\
+	else \
+		fail; \
 	fi \
 	\
 	&& if [ "${VERSION}" != "latest" ]; then \
