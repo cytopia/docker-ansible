@@ -71,7 +71,7 @@ jobs:
 
     outputs:
       versions: ${{ steps.set-matrix.outputs.versions }}
-      refs: ${{ steps.set-refs.outputs.refs }}
+      refs: ${{ steps.set-refs.outputs.matrix }}
 
     steps:
       - name: "[Set-Output] Matrix"
@@ -99,5 +99,5 @@ jobs:
 
           echo 'Refs'
           echo '--------------------'
-          echo '${{ steps.set-matrix-refs.outputs.refs }}'
+          echo '${{ steps.set-refs.outputs.matrix }}'
           echo
