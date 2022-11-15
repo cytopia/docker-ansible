@@ -50,8 +50,8 @@ env:
         "ARCH":    ["linux/amd64", "linux/arm64"]
       }
     ]
-  FIELDS_BUILD: '[{"VERSION":"VERSION"}, {"ARCH":"ARCH"}]'
-  FIELDS_DEPLOY: '[{"VERSION":"VERSION"}]'
+  FIELDS_BUILD: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"ARCH":"ARCH"}]'
+  FIELDS_DEPLOY: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}]'
 
   # Set Refs to build for scheduled jobs
   REFS: >-

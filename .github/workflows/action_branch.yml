@@ -52,8 +52,8 @@ jobs:
       can_deploy: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/heads/release-') }}
       versions: ${{ needs.params.outputs.versions }}
       refs: ${{ needs.params.outputs.refs }}
-      fields_build: '[{"VERSION":"VERSION"}, {"KOPS":"EXTRA"}, {"ARCH":"ARCH"}]'
-      fields_deploy: '[{"VERSION":"VERSION"}, {"KOPS":"EXTRA"}]'
+      fields_build: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"KOPS":"EXTRA"}, {"ARCH":"ARCH"}]'
+      fields_deploy: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"KOPS":"EXTRA"}]'
     secrets:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -66,8 +66,8 @@ jobs:
       can_deploy: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/heads/release-') }}
       versions: ${{ needs.params.outputs.versions }}
       refs: ${{ needs.params.outputs.refs }}
-      fields_build: '[{"VERSION":"VERSION"}, {"HELM":"EXTRA"}, {"ARCH":"ARCH"}]'
-      fields_deploy: '[{"VERSION":"VERSION"}, {"HELM":"EXTRA"}]'
+      fields_build: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"HELM":"EXTRA"}, {"ARCH":"ARCH"}]'
+      fields_deploy: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"HELM":"EXTRA"}]'
     secrets:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub_password: ${{ secrets.DOCKERHUB_PASSWORD }}

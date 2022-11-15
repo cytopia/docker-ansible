@@ -47,8 +47,8 @@ jobs:
       can_deploy: false
       versions: ${{ needs.params.outputs.versions }}
       refs: ${{ needs.params.outputs.refs }}
-      fields_build: '[{"VERSION":"VERSION"}, {"KOPS":"EXTRA"}, {"ARCH":"ARCH"}]'
-      fields_deploy: '[{"VERSION":"VERSION"}, {"KOPS":"EXTRA"}]'
+      fields_build: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"KOPS":"EXTRA"}, {"ARCH":"ARCH"}]'
+      fields_deploy: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"KOPS":"EXTRA"}]'
     secrets:
       dockerhub_username: ""
       dockerhub_password: ""
@@ -61,8 +61,8 @@ jobs:
       can_deploy: false
       versions: ${{ needs.params.outputs.versions }}
       refs: ${{ needs.params.outputs.refs }}
-      fields_build: '[{"VERSION":"VERSION"}, {"HELM":"EXTRA"}, {"ARCH":"ARCH"}]'
-      fields_deploy: '[{"VERSION":"VERSION"}, {"HELM":"EXTRA"}]'
+      fields_build: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"HELM":"EXTRA"}, {"ARCH":"ARCH"}]'
+      fields_deploy: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"HELM":"EXTRA"}]'
     secrets:
       dockerhub_username: ""
       dockerhub_password: ""
