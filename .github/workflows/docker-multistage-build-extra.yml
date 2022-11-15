@@ -167,11 +167,11 @@ jobs:
       # ------------------------------------------------------------
       # Push
       # ------------------------------------------------------------
-      #- name: Docker Tag
-      #  uses: cytopia/shell-command-retry-action@v0.1.5
-      #  with:
-      #    command: |
-      #      make tag VERSION="${{ matrix.VERSION }}" STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
+      - name: Docker Tag
+        uses: cytopia/shell-command-retry-action@v0.1.5
+        with:
+          command: |
+            make tag VERSION="${{ matrix.VERSION }}" STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
 
       - name: Docker login
         uses: docker/login-action@v2
