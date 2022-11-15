@@ -172,7 +172,7 @@ jobs:
 
       - name: "[Set-Output] has_refs and matrix (ref-matrix) (branches and latest tags)"
         id: set-refs
-        uses: cytopia/git-ref-matrix-action@v0.1.12
+        uses: cytopia/git-ref-matrix-action@v0.1.13
         with:
           repository_default_branch: ${{ steps.eval-refs.outputs.default_branch }}
           branches: ${{ steps.eval-refs.outputs.branches }}
