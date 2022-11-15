@@ -27,6 +27,11 @@ on:
         description: 'The ref build matrix as JSON string (list of git refs to build/deploy).'
         required: true
         type: boolean
+      extra_make_var_name:
+        description: 'Extra makefile variable name to assign matrix.EXTRA value to'
+        required: true
+        type: string
+
 
     ###
     ### Secrets
@@ -44,7 +49,7 @@ jobs:
   # JOB (3/3): DEPLOY
   # -----------------------------------------------------------------------------------------------
   deploy:
-    name: ${{ matrix.name }}-${{ matrix.version }}-${{ inputs.stage }}${{ matrix.kops }} ${{ matrix.refs }}
+    name: ${{ matrix.NAME }}-${{ matrix.VERSION }}-${{ inputs.stage }}${{ matrix.EXTRA }} ${{ matrix.REFS }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -61,11 +66,11 @@ jobs:
           fetch-depth: 0
         if: ${{ !inputs.has_refs }}
 
-      - name: "[SETUP] Checkout repository (ref: ${{ matrix.refs }})"
+      - name: "[SETUP] Checkout repository (ref: ${{ matrix.REFS }})"
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: ${{ matrix.refs }}
+          ref: ${{ matrix.REFS }}
         if: ${{ inputs.has_refs }}
 
       - name: "[SETUP] Setup QEMU environment"
@@ -82,9 +87,9 @@ jobs:
         id: manifest
         run: |
           ARCHES="$( echo '${{ inputs.versions }}' \
-            | jq 'group_by(.NAME, .VERSION, .KOPS, .ARCH)' \
-            | jq 'map({NAME: .[].NAME, VERSION: .[].VERSION[], KOPS: .[].KOPS[], FLAVOUR: .[].FLAVOUR[], ARCHES: .[].ARCH|join(",")})' \
-            | jq '.[] | select(.NAME=="${{ matrix.name }}" and .VERSION=="${{ matrix.version }}" and .KOPS=="${{ matrix.kops }}" and .FLAVOUR=="${{ matrix.flavour }}") | .ARCHES' \
+            | jq 'group_by(.NAME, .VERSION, .ARCH)' \
+            | jq 'map({NAME: .[].NAME, VERSION: .[].VERSION[], FLAVOUR: .[].FLAVOUR[], EXTRA: .[].EXTRA[], ARCHES: .[].ARCH|join(",")})' \
+            | jq '.[] | select(.NAME=="${{ matrix.NAME }}" and .VERSION=="${{ matrix.VERSION }}" and .FLAVOUR=="${{ matrix.FLAVOUR }}" and .EXTRA=="${{ matrix.EXTRA }}") | .ARCHES' \
             | jq -c -M \
           )"
           echo "arches=${ARCHES}" >> $GITHUB_OUTPUT
@@ -108,7 +113,7 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make manifest-create VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCHES=${{ steps.manifest.outputs.arches }} TAG=${{ steps.tag.outputs.docker-tag }} KOPS=${{ matrix.kops }}
+            make manifest-create VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCHES=${{ steps.manifest.outputs.arches }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
 
 
       # ------------------------------------------------------------
@@ -118,4 +123,4 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make manifest-push VERSION=${{ matrix.version }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} TAG=${{ steps.tag.outputs.docker-tag }} KOPS=${{ matrix.kops }}
+            make manifest-push VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
