@@ -332,7 +332,6 @@ jobs:
       matrix: ${{ needs.configure-awskops.outputs.matrix_deploy }}
       versions: ${{ needs.configure-awskops.outputs.versions }}
       stage: awskops
-      extra_make_var_name: KOPS
     secrets:
       dockerhub_username: ""
       dockerhub_password: ""
@@ -349,7 +348,6 @@ jobs:
       matrix: ${{ needs.configure-awshelm.outputs.matrix_deploy }}
       versions: ${{ needs.configure-awshelm.outputs.versions }}
       stage: awshelm
-      extra_make_var_name: HELM
     secrets:
       dockerhub_username: ""
       dockerhub_password: ""
