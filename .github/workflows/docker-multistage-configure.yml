@@ -15,16 +15,20 @@ on:
         description: 'The JSON string for refs. ( object: {BRANCH, NUM_LATEST_TAGS} )'
         required: true
         type: string
+      fields_build:
+        description: 'The JSON string for build fields to extract'
+        required: true
+        type: string
+      fields_deploy:
+        description: 'The JSON string for deploy fields to extract'
+        required: true
+        type: string
       enabled:
         description: 'Determines whether this workflow is enabled at all (will run or skip).'
         required: true
         type: boolean
       can_deploy:
         description: 'Determines whether this workflow can deploy (login and push).'
-        required: true
-        type: boolean
-      is_scheduled:
-        description: "Usage for a scheduled job? Only then we will evaluate git refs and add them to build matrix."
         required: true
         type: boolean
 
@@ -57,28 +61,16 @@ on:
       can_push:
         description: "(boolean) Can we push to Dockerhub?"
         value: ${{ jobs.configure.outputs.can_push }}
-      has_refs:
-        description: "(boolean) Do we have refs? (used for nightly builds)"
-        value: ${{ jobs.configure.outputs.has_refs }}
       # Determined settings (values)
+      has_refs:
+        description: "(string) 'true' or 'false' Do we have refs to build?"
+        value: ${{ jobs.configure.outputs.has_refs }}
       matrix_build:
         description: "(string) The determined JSON string build matrix."
         value: ${{ jobs.configure.outputs.matrix_build }}
-      matrix_build_kops:
-        description: "(string) The determined JSON string build matrix."
-        value: ${{ jobs.configure.outputs.matrix_build_kops }}
-      matrix_build_helm:
-        description: "(string) The determined JSON string build matrix."
-        value: ${{ jobs.configure.outputs.matrix_build_helm }}
       matrix_deploy:
         description: "(string) The determined JSON string deploy matrix."
         value: ${{ jobs.configure.outputs.matrix_deploy }}
-      matrix_deploy_kops:
-        description: "(string) The determined JSON string deploy matrix."
-        value: ${{ jobs.configure.outputs.matrix_deploy_kops }}
-      matrix_deploy_helm:
-        description: "(string) The determined JSON string deploy matrix."
-        value: ${{ jobs.configure.outputs.matrix_deploy_helm }}
       artifact_prefix:
         description: "(string) The determined unique artifact prefix."
         value: ${{ jobs.configure.outputs.artifact_prefix }}
@@ -103,15 +95,12 @@ jobs:
       # Flags
       can_login: ${{ steps.set-login.outputs.can_login }}
       can_push: ${{ steps.set-push.outputs.can_push }}
+      # Settings
       has_refs: ${{ steps.set-refs.outputs.has_refs }}
-      # Values
       artifact_prefix: ${{ steps.set-artifact-prefix.outputs.prefix }}
+      # Values
       matrix_build: ${{ steps.set-matrix.outputs.matrix_build }}
-      matrix_build_kops: ${{ steps.set-matrix.outputs.matrix_build_kops }}
-      matrix_build_helm: ${{ steps.set-matrix.outputs.matrix_build_helm }}
       matrix_deploy: ${{ steps.set-matrix.outputs.matrix_deploy }}
-      matrix_deploy_kops: ${{ steps.set-matrix.outputs.matrix_deploy_kops }}
-      matrix_deploy_helm: ${{ steps.set-matrix.outputs.matrix_deploy_helm }}
 
     ###
     ### Steps
@@ -151,6 +140,10 @@ jobs:
             echo "can_push=false" >> $GITHUB_OUTPUT
           fi
 
+      # ------------------------------------------------------------
+      # Set values
+      # ------------------------------------------------------------
+
       ###
       ### Do we have refs to build against?
       ###
@@ -170,20 +163,18 @@ jobs:
           echo "BRANCHES=${BRANCHES}"
           echo "NUM_LATEST_TAGS=${NUM_LATEST_TAGS}"
 
-      - name: "[Set-Output] has_refs and matrix (ref-matrix) (branches and latest tags)"
+      ###
+      ### Set Refs
+      ###
+      - name: "[Set-Output] has_refs and ref-matrix"
         id: set-refs
-        uses: cytopia/git-ref-matrix-action@v0.1.12
+        uses: cytopia/git-ref-matrix-action@v0.1.13
         with:
           repository_default_branch: ${{ steps.eval-refs.outputs.default_branch }}
           branches: ${{ steps.eval-refs.outputs.branches }}
           num_latest_tags: ${{ steps.eval-refs.outputs.num_latest_tags }}
           # Only use refs if the job is a schedule or if the job is schedule and was triggered manually
-          disable_refs: ${{ !(inputs.is_scheduled && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')) }}
-
-
-      # ------------------------------------------------------------
-      # Set values
-      # ------------------------------------------------------------
+          disable_refs: ${{ !(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
 
       ###
       ### Unique Artifact prefix
@@ -192,9 +183,9 @@ jobs:
         id: set-artifact-prefix
         shell: bash
         run: |
-          PRE_DATE="$( date +"%s" )"
-          PRE_RAND="$( echo $RANDOM | md5sum | head -c 10 )"
-          echo "prefix=${PRE_DATE}-${PRE_RAND}" >> $GITHUB_OUTPUT
+          PRE_RUN="$( echo '${{ github.run_id }}' )"
+          PRE_SHA="$( echo '${{ github.sha }}' | md5sum | head -c 10 )"
+          echo "prefix=${PRE_RUN}-${PRE_SHA}" >> $GITHUB_OUTPUT
 
       ###
       ### Set Build and Deploy Matrix
@@ -203,82 +194,52 @@ jobs:
         id: set-matrix
         shell: bash
         run: |
+          FIELDS_BUILD="$(  echo  '${{ inputs.fields_build }}' | jq -M -c )"
+          FIELDS_DEPLOY="$( echo '${{ inputs.fields_deploy }}' | jq -M -c )"
+          VERSIONS="$(      echo '${{ inputs.versions }}'      | jq -M -c )"
+
           if [ "${{ steps.set-refs.outputs.has_refs }}" = "true" ]; then
-            # BUILD MATRICES
-            MATRIX_BUILD="$( \
-              jq -M -c \
-                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
-                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_BUILD_KOPS="$( \
-              jq -M -c \
-                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
-                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[], arch:.ARCH[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_BUILD_HELM="$( \
-              jq -M -c \
-                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
-                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[], arch:.ARCH[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
-            )"
+            REFS="$( echo '${{ steps.set-refs.outputs.matrix }}' | jq -M -c )"
 
-            # DEPLOY MATRICES
-            MATRIX_DEPLOY="$( \
-              jq -M -c \
-                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
-                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_DEPLOY_KOPS="$( \
-              jq -M -c \
-                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
-                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_DEPLOY_HELM="$( \
-              jq -M -c \
-                --argjson refs '${{ steps.set-refs.outputs.matrix }}' \
-                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[], refs:$refs[]})' <<<'${{ inputs.versions }}' \
-            )"
+            # map({NAME: .NAME, VERSION: .VERSION[], FLAVOUR: .FLAVOUR[], ARCH:. ARCH[], ...})
+            INNER_STRING="$( echo "${FIELDS_BUILD}" \
+              | jq -r '.[] | to_entries[] | "\(.value): .\(.key)[]"' \
+              | jq --raw-input --slurp 'split("\n") | map(select(. != ""))' \
+              | jq -r '. | join(", ")' )"
+            OUTER_STRING="$( echo "'map({NAME: .NAME, ${INNER_STRING}, REFS: ${REFS}[]})'" )"
+            MATRIX_BUILD="$( eval jq -M -c  "${OUTER_STRING}" <<<"${VERSIONS}" )"
+
+            # map({NAME: .NAME, VERSION: .VERSION[], FLAVOUR: .FLAVOUR[], ....})
+            INNER_STRING="$( echo "${FIELDS_DEPLOY}" \
+              | jq -r '.[] | to_entries[] | "\(.value): .\(.key)[]"' \
+              | jq --raw-input --slurp 'split("\n") | map(select(. != ""))' \
+              | jq -r '. | join(", ")' )"
+            OUTER_STRING="$( echo "'map({NAME: .NAME, ${INNER_STRING}, REFS: ${REFS}[]})'" )"
+            MATRIX_DEPLOY="$( eval jq -M -c "${OUTER_STRING}" <<<"${VERSIONS}" )"
+
             echo "matrix_build=${MATRIX_BUILD}"             >> $GITHUB_OUTPUT
-            echo "matrix_build_kops=${MATRIX_BUILD_KOPS}"   >> $GITHUB_OUTPUT
-            echo "matrix_build_helm=${MATRIX_BUILD_HELM}"   >> $GITHUB_OUTPUT
             echo "matrix_deploy=${MATRIX_DEPLOY}"           >> $GITHUB_OUTPUT
-            echo "matrix_deploy_kops=${MATRIX_DEPLOY_KOPS}" >> $GITHUB_OUTPUT
-            echo "matrix_deploy_helm=${MATRIX_DEPLOY_HELM}" >> $GITHUB_OUTPUT
-            echo "has_refs=true"                            >> $GITHUB_OUTPUT
+
           else
-            # BUILD MATRICES
-            MATRIX_BUILD="$( \
-              jq -M -c \
-                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_BUILD_KOPS="$( \
-              jq -M -c \
-                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_BUILD_HELM="$( \
-              jq -M -c \
-                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[], arch:.ARCH[]})' <<<'${{ inputs.versions }}' \
-            )"
 
-            # DEPLOY MATRICES
-            MATRIX_DEPLOY="$( \
-              jq -M -c \
-                'map({name:.NAME, version:.VERSION[], flavour:.FLAVOUR[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_DEPLOY_KOPS="$( \
-              jq -M -c \
-                'map({name:.NAME, version:.VERSION[], kops:.KOPS[], flavour:.FLAVOUR[]})' <<<'${{ inputs.versions }}' \
-            )"
-            MATRIX_DEPLOY_HELM="$( \
-              jq -M -c \
-                'map({name:.NAME, version:.VERSION[], helm:.HELM[], flavour:.FLAVOUR[]})' <<<'${{ inputs.versions }}' \
-            )"
+            # map({NAME: .NAME, VERSION: .VERSION[], FLAVOUR: .FLAVOUR[], ARCH:. ARCH[], ...})
+            INNER_STRING="$( echo "${FIELDS_BUILD}" \
+              | jq -r '.[] | to_entries[] | "\(.value): .\(.key)[]"' \
+              | jq --raw-input --slurp 'split("\n") | map(select(. != ""))' \
+              | jq -r '. | join(", ")' )"
+            OUTER_STRING="$( echo "'map({NAME: .NAME, ${INNER_STRING}})'" )"
+            MATRIX_BUILD="$( eval jq -M -c "${OUTER_STRING}" <<<"${VERSIONS}" )"
+
+            # map({NAME: .NAME, VERSION: .VERSION[], FLAVOUR: .FLAVOUR[], ....})
+            INNER_STRING="$( echo "${FIELDS_DEPLOY}" \
+              | jq -r '.[] | to_entries[] | "\(.value): .\(.key)[]"' \
+              | jq --raw-input --slurp 'split("\n") | map(select(. != ""))' \
+              | jq -r '. | join(", ")' )"
+            OUTER_STRING="$( echo "'map({NAME: .NAME, ${INNER_STRING}})'" )"
+            MATRIX_DEPLOY="$( eval jq -M -c "${OUTER_STRING}" <<<"${VERSIONS}" )"
+
             echo "matrix_build=${MATRIX_BUILD}"             >> $GITHUB_OUTPUT
-            echo "matrix_build_kops=${MATRIX_BUILD_KOPS}"   >> $GITHUB_OUTPUT
-            echo "matrix_build_helm=${MATRIX_BUILD_HELM}"   >> $GITHUB_OUTPUT
             echo "matrix_deploy=${MATRIX_DEPLOY}"           >> $GITHUB_OUTPUT
-            echo "matrix_deploy_kops=${MATRIX_DEPLOY_KOPS}" >> $GITHUB_OUTPUT
-            echo "matrix_deploy_helm=${MATRIX_DEPLOY_HELM}" >> $GITHUB_OUTPUT
-            echo "has_refs=false"                           >> $GITHUB_OUTPUT
           fi
 
       # ------------------------------------------------------------
@@ -298,6 +259,8 @@ jobs:
           echo '-------------------------------------|-----------------------------------'
           echo 'github.event_name                    | ${{ github.event_name }}'
           echo '-------------------------------------|-----------------------------------'
+          echo 'github.ref                           | ${{ github.ref }}'
+          echo '-------------------------------------|-----------------------------------'
           echo 'github.ref_name                      | ${{ github.ref_name }}'
           echo '-------------------------------------|-----------------------------------'
           echo 'github.head_ref                      | ${{ github.head_ref }}'
@@ -307,13 +270,19 @@ jobs:
           echo 'github.ref_type                      | ${{ github.ref_type }}'
           echo '-------------------------------------|-----------------------------------'
           echo 'github.repository                    | ${{ github.repository }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.action                        | ${{ github.action }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.action_ref                    | ${{ github.action_ref }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.run_id                        | ${{ github.run_id }}'
+          echo '-------------------------------------|-----------------------------------'
+          echo 'github.sha                           | ${{ github.sha }}'
 
       - name: "[DEBUG] Show Workflow Inputs"
         shell: bash
         run: |
           echo 'enabled: ${{ inputs.enabled }}'
-          echo 'can_deploy: ${{ inputs.can_deploy }}'
-          echo 'is_scheduled: ${{ inputs.is_scheduled }}'
           echo 'can_deploy: ${{ inputs.can_deploy }}'
           echo 'versions: ${{ inputs.versions }}'
           echo 'refs: ${{ inputs.refs }}'
@@ -327,12 +296,9 @@ jobs:
           # Flags
           echo 'can_login: ${{ steps.set-login.outputs.can_login }}'
           echo 'can_push: ${{ steps.set-push.outputs.can_push }}'
+          # Settins
           echo 'has_refs: ${{ steps.set-refs.outputs.has_refs }}'
           # Values
           echo 'artifact_prefix: ${{ steps.set-artifact-prefix.outputs.prefix }}'
           echo 'matrix_build: ${{ steps.set-matrix.outputs.matrix_build }}'
-          echo 'matrix_build_kops: ${{ steps.set-matrix.outputs.matrix_build_kops }}'
-          echo 'matrix_build_helm: ${{ steps.set-matrix.outputs.matrix_build_helm }}'
           echo 'matrix_deploy: ${{ steps.set-matrix.outputs.matrix_deploy }}'
-          echo 'matrix_deploy_kops: ${{ steps.set-matrix.outputs.matrix_deploy_kops }}'
-          echo 'matrix_deploy_helm: ${{ steps.set-matrix.outputs.matrix_deploy_helm }}'
