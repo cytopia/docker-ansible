@@ -50,8 +50,6 @@ env:
         "ARCH":    ["linux/amd64", "linux/arm64"]
       }
     ]
-  FIELDS_BUILD: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}, {"ARCH":"ARCH"}]'
-  FIELDS_DEPLOY: '[{"VERSION":"VERSION"}, {"FLAVOUR":"FLAVOUR"}]'
 
   # Set Refs to build for scheduled jobs
   REFS: >-
@@ -74,12 +72,6 @@ on:
       refs:
         description: "Stringified JSON of Refs definition."
         value: ${{ jobs.params.outputs.refs }}
-      fields_build:
-        description: "Stringified JSON of Build fields to extract."
-        value: ${{ jobs.params.outputs.fields_build }}
-      fields_deploy:
-        description: "Stringified JSON of Deploy fields to extract."
-        value: ${{ jobs.params.outputs.fields_deploy }}
 
 jobs:
   params:
@@ -88,22 +80,16 @@ jobs:
     outputs:
       versions: ${{ steps.set-json.outputs.versions }}
       refs: ${{ steps.set-json.outputs.refs }}
-      fields_build: ${{ steps.set-json.outputs.fields_build }}
-      fields_deploy: ${{ steps.set-json.outputs.fields_deploy }}
 
     steps:
       - name: "[Set-Output] JSON"
         id: set-json
         run: |
           VERSIONS="$( echo '${{ env.VERSIONS }}' | jq -M -c )"
-          REFS="$(    echo '${{ env.REFS }}'      | jq -M -c )"
-          FIELDS_BUILD="$(  echo '${{ env.FIELDS_BUILD }}'  | jq -M -c )"
-          FIELDS_DEPLOY="$( echo '${{ env.FIELDS_DEPLOY }}' | jq -M -c )"
+          REFS="$( echo '${{ env.REFS }}' | jq -M -c )"
 
           echo "versions=${VERSIONS}" >> $GITHUB_OUTPUT
           echo "refs=${REFS}"         >> $GITHUB_OUTPUT
-          echo "fields_build=${FIELDS_BUILD}"   >> $GITHUB_OUTPUT
-          echo "fields_deploy=${FIELDS_DEPLOY}" >> $GITHUB_OUTPUT
 
       - name: "[DEBUG] Show settings'"
         run: |
@@ -115,14 +101,4 @@ jobs:
           echo 'Refs'
           echo '--------------------'
           echo '${{ steps.set-json.outputs.refs }}'
-          echo
-
-          echo 'Fields (build)'
-          echo '--------------------'
-          echo '${{ steps.set-json.outputs.fields_build }}'
-          echo
-
-          echo 'Fields (deploy)'
-          echo '--------------------'
-          echo '${{ steps.set-json.outputs.fields_deploy }}'
           echo
