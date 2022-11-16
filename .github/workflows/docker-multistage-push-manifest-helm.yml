@@ -27,10 +27,6 @@ on:
         description: 'The ref build matrix as JSON string (list of git refs to build/deploy).'
         required: true
         type: boolean
-      extra_make_var_name:
-        description: 'Extra makefile variable name to assign matrix.EXTRA value to'
-        required: true
-        type: string
 
 
     ###
@@ -87,9 +83,9 @@ jobs:
         id: manifest
         run: |
           ARCHES="$( echo '${{ inputs.versions }}' \
-            | jq 'group_by(.NAME, .VERSION, .ARCH)' \
-            | jq 'map({NAME: .[].NAME, VERSION: .[].VERSION[], FLAVOUR: .[].FLAVOUR[], EXTRA: .[].EXTRA[], ARCHES: .[].ARCH|join(",")})' \
-            | jq '.[] | select(.NAME=="${{ matrix.NAME }}" and .VERSION=="${{ matrix.VERSION }}" and .FLAVOUR=="${{ matrix.FLAVOUR }}" and .EXTRA=="${{ matrix.EXTRA }}") | .ARCHES' \
+            | jq 'group_by(.NAME, .VERSION, .FLAVOUR, .HELM, .ARCH)' \
+            | jq 'map({NAME: .[].NAME, VERSION: .[].VERSION[], FLAVOUR: .[].FLAVOUR[], HELM: .[].HELM[], ARCHES: .[].ARCH|join(",")})' \
+            | jq '.[] | select(.NAME=="${{ matrix.NAME }}" and .VERSION=="${{ matrix.VERSION }}" and .FLAVOUR=="${{ matrix.FLAVOUR }}" and .HELM=="${{ matrix.EXTRA }}") | .ARCHES' \
             | jq -c -M \
           )"
           echo "arches=${ARCHES}" >> $GITHUB_OUTPUT
@@ -113,7 +109,7 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make manifest-create VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCHES=${{ steps.manifest.outputs.arches }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
+            make manifest-create VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCHES=${{ steps.manifest.outputs.arches }} TAG=${{ steps.tag.outputs.docker-tag }} HELM=${{ matrix.EXTRA }}
 
 
       # ------------------------------------------------------------
@@ -123,4 +119,4 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make manifest-push VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
+            make manifest-push VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} HELM=${{ matrix.EXTRA }}

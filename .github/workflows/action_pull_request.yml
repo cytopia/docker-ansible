@@ -325,7 +325,7 @@ jobs:
     needs:
       - configure-awskops
       - build-awskops
-    uses: ./.github/workflows/docker-multistage-push-manifest-extra.yml
+    uses: ./.github/workflows/docker-multistage-push-manifest-kops.yml
     with:
       can_deploy: ${{ needs.configure-awskops.outputs.can_login == 'true' && needs.configure-awskops.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure-awskops.outputs.has_refs == 'true' }}
@@ -342,7 +342,7 @@ jobs:
     needs:
       - configure-awshelm
       - build-awshelm
-    uses: ./.github/workflows/docker-multistage-push-manifest-extra.yml
+    uses: ./.github/workflows/docker-multistage-push-manifest-helm.yml
     with:
       can_deploy: ${{ needs.configure-awshelm.outputs.can_login == 'true' && needs.configure-awshelm.outputs.can_push == 'true' }}
       has_refs: ${{ needs.configure-awshelm.outputs.has_refs == 'true' }}

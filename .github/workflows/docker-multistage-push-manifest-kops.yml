@@ -45,7 +45,7 @@ jobs:
   # JOB (3/3): DEPLOY
   # -----------------------------------------------------------------------------------------------
   deploy:
-    name: ${{ matrix.NAME }}-${{ matrix.VERSION }}-${{ inputs.stage }} ${{ matrix.REFS }}
+    name: ${{ matrix.NAME }}-${{ matrix.VERSION }}-${{ inputs.stage }}${{ matrix.EXTRA }} ${{ matrix.REFS }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -83,9 +83,9 @@ jobs:
         id: manifest
         run: |
           ARCHES="$( echo '${{ inputs.versions }}' \
-            | jq 'group_by(.NAME, .VERSION, .FLAVOUR, .ARCH)' \
-            | jq 'map({NAME: .[].NAME, VERSION: .[].VERSION[], FLAVOUR: .[].FLAVOUR[], ARCHES: .[].ARCH|join(",")})' \
-            | jq '.[] | select(.NAME=="${{ matrix.NAME }}" and .VERSION=="${{ matrix.VERSION }}" and .FLAVOUR=="${{ matrix.FLAVOUR }}") | .ARCHES' \
+            | jq 'group_by(.NAME, .VERSION, .FLAVOUR, .KOPS, .ARCH)' \
+            | jq 'map({NAME: .[].NAME, VERSION: .[].VERSION[], FLAVOUR: .[].FLAVOUR[], KOPS: .[].KOPS[], ARCHES: .[].ARCH|join(",")})' \
+            | jq '.[] | select(.NAME=="${{ matrix.NAME }}" and .VERSION=="${{ matrix.VERSION }}" and .FLAVOUR=="${{ matrix.FLAVOUR }}" and .KOPS=="${{ matrix.EXTRA }}") | .ARCHES' \
             | jq -c -M \
           )"
           echo "arches=${ARCHES}" >> $GITHUB_OUTPUT
@@ -109,7 +109,7 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make manifest-create VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCHES=${{ steps.manifest.outputs.arches }} TAG=${{ steps.tag.outputs.docker-tag }}
+            make manifest-create VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCHES=${{ steps.manifest.outputs.arches }} TAG=${{ steps.tag.outputs.docker-tag }} KOPS=${{ matrix.EXTRA }}
 
 
       # ------------------------------------------------------------
@@ -119,4 +119,4 @@ jobs:
         uses: cytopia/shell-command-retry-action@v0.1.5
         with:
           command: |
-            make manifest-push VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }}
+            make manifest-push VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} KOPS=${{ matrix.EXTRA }}
