@@ -129,7 +129,7 @@ jobs:
         if: ${{ inputs.stage_prev != '' }}
 
       - name: "[Artifact Load] Import previously built image"
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make load INFILE=${{ steps.set-artifact-name.outputs.prev }}
@@ -140,14 +140,14 @@ jobs:
       # Build
       # ------------------------------------------------------------
       - name: Pull
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make docker-pull-base-image VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCH=${{ matrix.ARCH }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
         if: ${{ inputs.pull_base_image }}
 
       - name: Build
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make build VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCH=${{ matrix.ARCH }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
@@ -157,7 +157,7 @@ jobs:
       # Test
       # ------------------------------------------------------------
       - name: Test
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make test VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCH=${{ matrix.ARCH }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
@@ -168,7 +168,7 @@ jobs:
       # Push
       # ------------------------------------------------------------
       - name: Docker Tag
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make tag VERSION="${{ matrix.VERSION }}" STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
@@ -181,7 +181,7 @@ jobs:
         if: ${{ inputs.push_image }}
 
       - name: Docker push
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make push VERSION="${{ matrix.version }}" STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.flavour }} ARCH=${{ matrix.arch }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
