@@ -106,7 +106,7 @@ jobs:
       # Create Manifest
       # ------------------------------------------------------------
       - name: "[Create Manifest] (${{ steps.manifest.outputs.arches }})"
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make manifest-create VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} ARCHES=${{ steps.manifest.outputs.arches }} TAG=${{ steps.tag.outputs.docker-tag }} HELM=${{ matrix.EXTRA }}
@@ -116,7 +116,7 @@ jobs:
       # Deploy Manifest
       # ------------------------------------------------------------
       - name: "[Push Manifest] ${{ steps.tag.outputs.docker-tag }}"
-        uses: cytopia/shell-command-retry-action@v0.1.5
+        uses: cytopia/shell-command-retry-action@v0.1.6
         with:
           command: |
             make manifest-push VERSION=${{ matrix.VERSION }} STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} HELM=${{ matrix.EXTRA }}
