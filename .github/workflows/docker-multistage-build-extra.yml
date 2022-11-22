@@ -192,7 +192,7 @@ jobs:
       # Artifact Export
       # ------------------------------------------------------------
       - name: "[Artifact Save] Upload built artifact"
-        uses: cytopia/upload-artifact-retry-action@v0.1.6
+        uses: cytopia/upload-artifact-retry-action@v0.1.7
         with:
           name: ${{ steps.set-artifact-name.outputs.curr }}
           path: ${{ steps.set-artifact-name.outputs.curr }}
