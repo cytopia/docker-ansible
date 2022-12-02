@@ -25,12 +25,35 @@ update_uid_gid() {
 	local gid="${4}"
 
 
-	echo "[INFO] Adjusting local user with uid:${uid} and gid:${gid}"
+	echo "[INFO] Adjusting local user '${user}' with uid:${uid} and gid:${gid}"
 
 	# Remove previous user/group
 	if ! deluser "${user}"; then
 		>&2 echo "[ERR]  Failed to delete user: ${user}"
 		exit 1
+	fi
+
+	# Check if current group id already exists and fix it
+	tmp_gid="${gid}"
+	if grep -q "x:${tmp_gid}:" /etc/group; then
+		tmp_grp="$( grep "x:${tmp_gid}:" /etc/group | awk -F':' '{print $1}' )"
+		while grep -q "x:${tmp_gid}:" /etc/group; do
+			tmp_gid="$(( tmp_gid + 1 ))"
+		done
+		# Simply change the already existing group id to something else
+		echo "[INFO] Group '${tmp_grp}' with gid '${gid}' already exists. Moving it to ${tmp_grp}:x:${tmp_gid}"
+		sed -i'' "s/x:${gid}:/x:${tmp_gid}:/g" /etc/group
+	fi
+	# Check if current user id already exists and fix it
+	tmp_uid="${uid}"
+	if grep -q "x:${tmp_uid}:" /etc/passwd; then
+		tmp_usr="$( grep "x:${tmp_uid}:" /etc/passwd | awk -F':' '{print $1}' )"
+		while grep -q "x:${tmp_uid}:" /etc/passwd; do
+			tmp_uid="$(( tmp_uid + 1 ))"
+		done
+		# Simply change the already existing user id to something else
+		echo "[INFO] User '${tmp_usr}' with uid '${uid}' already exists. Moving it to ${tmp_usr}:x:${tmp_uid}"
+		sed -i'' "s/x:${uid}:/x:${tmp_uid}:/g" /etc/passwd
 	fi
 
 	# Add new user/group
