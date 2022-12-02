@@ -134,7 +134,7 @@ COPY --from=builder /usr/bin/ansible* /usr/bin/
 
 # Pre-compile Python for better performance
 RUN set -eux \
-	&& python3 -m compileall /usr/lib/python3.10
+	&& python3 -m compileall -j 0 /usr/lib/python3.10
 
 WORKDIR /data
 CMD ["/bin/sh"]
