@@ -249,6 +249,14 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 
 | Docker Tag               | Git Ref      | Ansible      | Helm     | Available Architectures           |
 |--------------------------|--------------|--------------|----------|-----------------------------------|
+| **`latest-awshelm3.11`** | master       | latest       | `3.11.x` | `amd64`, `arm64`                  |
+| `2.13-awshelm3.11`       | master       | **`2.13.x`** | `3.11.x` | `amd64`, `arm64`                  |
+| `2.12-awshelm3.11`       | master       | **`2.12.x`** | `3.11.x` | `amd64`, `arm64`                  |
+| `2.11-awshelm3.11`       | master       | **`2.11.x`** | `3.11.x` | `amd64`, `arm64`                  |
+| `2.10-awshelm3.11`       | master       | **`2.10.x`** | `3.11.x` | `amd64`, `arm64`                  |
+| `2.9-awshelm3.11`        | master       | **`2.9.x`**  | `3.11.x` | `amd64`, `arm64`                  |
+| `2.8-awshelm3.11`        | master       | **`2.8.x`**  | `3.11.x` | `amd64`, `arm64`                  |
+|                          |              |              |          |                                   |
 | **`latest-awshelm3.10`** | master       | latest       | `3.10.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.10`       | master       | **`2.13.x`** | `3.10.x` | `amd64`, `arm64`                  |
 | `2.12-awshelm3.10`       | master       | **`2.12.x`** | `3.10.x` | `amd64`, `arm64`                  |
