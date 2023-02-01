@@ -459,7 +459,8 @@ docker run --rm \
   -e USER=ansible \
   -e MY_UID=1000 \
   -e MY_GID=1000 \
-  -v ${HOME}/.ssh/:/home/ansible/.ssh/:ro \
+  -v ${HOME}/.ssh/:/home/ansible/.ssh/ \
+  -v ${SSH_AUTH_SOCK}:/ssh-agent --env SSH_AUTH_SOCK=/ssh-agent \
   -v $(pwd):/data \
   cytopia/ansible:latest-tools ansible-playbook playbook.yml
 ```
