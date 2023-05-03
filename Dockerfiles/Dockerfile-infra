@@ -28,6 +28,7 @@ RUN set -eux \
 		PyMySQL \
 		docker \
 		docker-compose \
+		jc \
 		jsondiff \
 		netaddr \
 		pexpect \
