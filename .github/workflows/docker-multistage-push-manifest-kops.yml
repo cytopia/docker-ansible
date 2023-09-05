@@ -57,13 +57,13 @@ jobs:
       # Setup repository
       # ------------------------------------------------------------
       - name: "[SETUP] Checkout repository (current)"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
         if: ${{ !inputs.has_refs }}
 
       - name: "[SETUP] Checkout repository (ref: ${{ matrix.REFS }})"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ matrix.REFS }}
