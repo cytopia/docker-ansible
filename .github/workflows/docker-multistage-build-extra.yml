@@ -90,7 +90,7 @@ jobs:
         if: ${{ inputs.has_refs }}
 
       - name: "[SETUP] Install QEMU environment"
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         id: qemu
         with:
           image: tonistiigi/binfmt:latest
