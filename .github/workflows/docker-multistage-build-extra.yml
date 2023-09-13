@@ -174,7 +174,7 @@ jobs:
             make tag VERSION="${{ matrix.VERSION }}" STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
 
       - name: Docker login
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.dockerhub_username }}
           password: ${{ secrets.dockerhub_password }}
