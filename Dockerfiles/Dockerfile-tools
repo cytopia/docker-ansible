@@ -3,7 +3,7 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION} as builder
+FROM cytopia/ansible:${VERSION} AS builder
 ARG VERSION
 
 RUN set -eux \
@@ -53,7 +53,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION} as production
+FROM cytopia/ansible:${VERSION} AS production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""

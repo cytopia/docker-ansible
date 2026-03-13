@@ -3,7 +3,7 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-awsk8s as builder
+FROM cytopia/ansible:${VERSION}-awsk8s AS builder
 
 # Required tools for building Python packages
 RUN set -eux \
@@ -39,7 +39,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-awsk8s as production
+FROM cytopia/ansible:${VERSION}-awsk8s AS production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
