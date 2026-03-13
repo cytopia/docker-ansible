@@ -46,7 +46,7 @@ RUN set -eux \
 		fail; \
 	fi \
 	&& curl -OL https://golang.org/dl/go1.25.0.linux-${ARCH}.tar.gz \
-	&& tar -C /usr/local -xzf go1.25.0.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xzf go1.25.0.linux-${ARCH}.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/local/bin/go \
 	&& rm -rf /usr/bin/go
 
