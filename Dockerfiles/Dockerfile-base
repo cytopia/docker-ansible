@@ -28,7 +28,7 @@ RUN set -eux \
 
 # Pip required tools
 RUN set -eux \
-	&& pip3 install --no-cache-dir --no-compile \
+	&& pip3 install --no-cache-dir --no-compile --ignore-installed \
 		wheel
 RUN set -eux \
 	&& pip3 install --no-cache-dir --no-compile \
