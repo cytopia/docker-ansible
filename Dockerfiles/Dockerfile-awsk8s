@@ -3,7 +3,7 @@ ARG VERSION
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-aws as builder
+FROM cytopia/ansible:${VERSION}-aws AS builder
 
 # Required tools for building Python packages
 RUN set -eux \
@@ -36,11 +36,11 @@ RUN set -eux \
 		fail; \
 	fi \
 	\
-	&& KUBECTL_VERSION="$(curl -sS --fail https://storage.googleapis.com/kubernetes-release/release/stable.txt)" \
+	&& KUBECTL_VERSION="$(curl -L -sS --fail https://dl.k8s.io/release/stable.txt)" \
 	&& curl -sS -L --fail -o /usr/bin/kubectl \
-		https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl \
+		"https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
 	&& chmod +x /usr/bin/kubectl \
-	&& kubectl version --client --short=true 2>&1 | grep -E 'v[.0-9]+'
+	&& kubectl version --client 2>&1 | grep -E 'v[.0-9]+'
 
 # openshift client (copied to final image)
 RUN set -eux \
@@ -49,6 +49,9 @@ RUN set -eux \
 		&& chmod +x /usr/bin/oc \
 		&& exit 0; \
 	fi \
+	\
+# Fix openshift
+	&& ln -s /lib/libc.musl-x86_64.so.1 /usr/lib/libresolv.so.2 \
 	\
 	&& curl -sS -L --fail -o /tmp/openshift-client-linux.tar.gz \
 		https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
@@ -63,7 +66,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM cytopia/ansible:${VERSION}-aws as production
+FROM cytopia/ansible:${VERSION}-aws AS production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
