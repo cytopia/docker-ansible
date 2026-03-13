@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------------------
 # Builder Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.17 AS builder
+FROM alpine:3.23 AS builder
 
 RUN set -eux \
 	&& apk add --update --no-cache \
@@ -47,10 +47,6 @@ RUN set -eux \
 	\
 	&& if [ "${VERSION}" = "latest" ]; then \
 		pip3 install --no-cache-dir --no-compile ansible; \
-	\
-	elif [ "${MINOR_VERSION}" -lt "10" ]; then \
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=${VERSION}.0; \
-	\
     # Ansible added a weired versioning system with ansible-core and ansible packages:
     # https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html#ansible-community-changelogs
 	elif [ "${VERSION}" = "2.10" ]; then\
@@ -64,6 +60,27 @@ RUN set -eux \
 	\
 	elif [ "${VERSION}" = "2.13" ]; then\
 		pip3 install --no-cache-dir --no-binary pyyaml ansible~=6.0; \
+	\
+	elif [ "${VERSION}" = "2.14" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=7.0; \
+	\
+	elif [ "${VERSION}" = "2.15" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=8.0; \
+	\
+	elif [ "${VERSION}" = "2.16" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=9.0; \
+	\
+	elif [ "${VERSION}" = "2.17" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=10.0; \
+	\
+	elif [ "${VERSION}" = "2.18" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=11.0; \
+	\
+	elif [ "${VERSION}" = "2.19" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=12.0; \
+	\
+	elif [ "${VERSION}" = "2.20" ]; then\
+		pip3 install --no-cache-dir --no-binary pyyaml ansible~=13.0; \
 	\
 	else \
 		fail; \
@@ -99,7 +116,7 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 # Final Image
 # --------------------------------------------------------------------------------------------------
-FROM alpine:3.17 AS production
+FROM alpine:3.23 AS production
 ARG VERSION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 #LABEL "org.opencontainers.image.created"=""
@@ -129,12 +146,12 @@ RUN set -eux \
 	\
 	&& ln -sf /usr/bin/python3 /usr/bin/python
 
-COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
+COPY --from=builder /usr/lib/python3.12/site-packages/ /usr/lib/python3.12/site-packages/
 COPY --from=builder /usr/bin/ansible* /usr/bin/
 
 # Pre-compile Python for better performance
 RUN set -eux \
-	&& python3 -m compileall -j 0 /usr/lib/python3.10
+	&& python3 -m compileall -j 0 /usr/lib/python3.12
 
 WORKDIR /data
 CMD ["/bin/sh"]

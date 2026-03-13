@@ -71,7 +71,7 @@ RUN set -eux \
 		rsync \
 		sshpass
 
-COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
+COPY --from=builder /usr/lib/python3.12/site-packages/ /usr/lib/python3.12/site-packages/
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
