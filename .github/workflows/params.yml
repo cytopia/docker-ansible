@@ -52,7 +52,7 @@ env:
       }
     ]
 
-  # Set Refs to build for scheduled jobs
+  # Set Refs to build for scheduled jobs.
   REFS: >-
     {
       "DEFAULT_BRANCH": "master",
