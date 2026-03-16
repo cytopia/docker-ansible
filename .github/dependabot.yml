@@ -6,3 +6,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      # Group everything into a single PR
+      all-github-actions:
+        patterns:
+          - "*"
