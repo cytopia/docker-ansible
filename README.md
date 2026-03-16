@@ -77,7 +77,7 @@ infra  azure  aws              #docker-tag:  :latest-infra     :latest-azure    
         awskops  awshelm       #docker-tag   :latest-awskops     :latest-awshelm
                                              :<version>-awskops  :<version>-awshelm
 ```
-> <sub>`<version>` refers to the latest<sup>\[1\],</sup> patch-level version of Ansible. E.g.: `2.9`, `2.10`, `2.11`, ...</sub><br/>
+> <sub>`<version>` refers to the latest<sup>\[1\],</sup> patch-level version of Ansible. E.g.: `2.13`, `2.14`, `2.15`, ...</sub><br/>
 > <sub>\[1\]: latest as docker images are (re)built every night via CI against the latest available patch level version of Ansible</sub>
 
 
@@ -116,9 +116,6 @@ The following Ansible Docker images are as small as possible and only contain An
 | `2.15`       | master       | **`2.15.x`** | `amd64`, `arm64`                             |
 | `2.14`       | master       | **`2.14.x`** | `amd64`, `arm64`                             |
 | `2.13`       | master       | **`2.13.x`** | `amd64`, `arm64`                             |
-| `2.12`       | master       | **`2.12.x`** | `amd64`, `arm64`                             |
-| `2.11`       | master       | **`2.11.x`** | `amd64`, `arm64`                             |
-| `2.10`       | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 
 
 ### Ansible tools
@@ -136,9 +133,6 @@ The following Ansible Docker images contain everything from `Ansible base` and a
 | `2.15-tools`             | master       | **`2.15.x`** | `amd64`, `arm64`                             |
 | `2.14-tools`             | master       | **`2.14.x`** | `amd64`, `arm64`                             |
 | `2.13-tools`             | master       | **`2.13.x`** | `amd64`, `arm64`                             |
-| `2.12-tools`             | master       | **`2.12.x`** | `amd64`, `arm64`                             |
-| `2.11-tools`             | master       | **`2.11.x`** | `amd64`, `arm64`                             |
-| `2.10-tools`             | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 
 
 ### Ansible azure
@@ -156,9 +150,6 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | `2.15-azure`             | master       | **`2.15.x`** | `amd64`, `arm64`                             |
 | `2.14-azure`             | master       | **`2.14.x`** | `amd64`, `arm64`                             |
 | `2.13-azure`             | master       | **`2.13.x`** | `amd64`, `arm64`                             |
-| `2.12-azure`             | master       | **`2.12.x`** | `amd64`, `arm64`                             |
-| `2.11-azure`             | master       | **`2.11.x`** | `amd64`, `arm64`                             |
-| `2.10-azure`             | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 
 
 ### Ansible aws
@@ -176,9 +167,6 @@ The following Ansible Docker images contain everything from `Ansible tools` and 
 | `2.15-aws`               | master       | **`2.15.x`** | `amd64`, `arm64`                             |
 | `2.14-aws`               | master       | **`2.14.x`** | `amd64`, `arm64`                             |
 | `2.13-aws`               | master       | **`2.13.x`** | `amd64`, `arm64`                             |
-| `2.12-aws`               | master       | **`2.12.x`** | `amd64`, `arm64`                             |
-| `2.11-aws`               | master       | **`2.11.x`** | `amd64`, `arm64`                             |
-| `2.10-aws`               | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 
 
 ### Ansible awsk8s
@@ -196,9 +184,6 @@ The following Ansible Docker images contain everything from `Ansible aws` and ad
 | `2.15-awsk8s`            | master       | **`2.15.x`** | `amd64`, `arm64`                             |
 | `2.14-awsk8s`            | master       | **`2.14.x`** | `amd64`, `arm64`                             |
 | `2.13-awsk8s`            | master       | **`2.13.x`** | `amd64`, `arm64`                             |
-| `2.12-awsk8s`            | master       | **`2.12.x`** | `amd64`, `arm64`                             |
-| `2.11-awsk8s`            | master       | **`2.11.x`** | `amd64`, `arm64`                             |
-| `2.10-awsk8s`            | master       | **`2.10.x`** | `amd64`, `arm64`                             |
 
 
 ### Ansible awskops
@@ -218,9 +203,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awskops1.34`       | master       | **`2.15.x`** | `1.34.x` | `amd64`, `arm64`                  |
 | `2.14-awskops1.34`       | master       | **`2.14.x`** | `1.34.x` | `amd64`, `arm64`                  |
 | `2.13-awskops1.34`       | master       | **`2.13.x`** | `1.34.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.34`       | master       | **`2.12.x`** | `1.34.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.34`       | master       | **`2.11.x`** | `1.34.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.34`       | master       | **`2.10.x`** | `1.34.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.33`** | master       | latest       | `1.33.x` | `amd64`, `arm64`                  |
 | `2.20-awskops1.33`       | master       | **`2.20.x`** | `1.33.x` | `amd64`, `arm64`                  |
@@ -231,9 +213,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awskops1.33`       | master       | **`2.15.x`** | `1.33.x` | `amd64`, `arm64`                  |
 | `2.14-awskops1.33`       | master       | **`2.14.x`** | `1.33.x` | `amd64`, `arm64`                  |
 | `2.13-awskops1.33`       | master       | **`2.13.x`** | `1.33.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.33`       | master       | **`2.12.x`** | `1.33.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.33`       | master       | **`2.11.x`** | `1.33.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.33`       | master       | **`2.10.x`** | `1.33.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.32`** | master       | latest       | `1.32.x` | `amd64`, `arm64`                  |
 | `2.20-awskops1.32`       | master       | **`2.20.x`** | `1.32.x` | `amd64`, `arm64`                  |
@@ -244,9 +223,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awskops1.32`       | master       | **`2.15.x`** | `1.32.x` | `amd64`, `arm64`                  |
 | `2.14-awskops1.32`       | master       | **`2.14.x`** | `1.32.x` | `amd64`, `arm64`                  |
 | `2.13-awskops1.32`       | master       | **`2.13.x`** | `1.32.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.32`       | master       | **`2.12.x`** | `1.32.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.32`       | master       | **`2.11.x`** | `1.32.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.32`       | master       | **`2.10.x`** | `1.32.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.31`** | master       | latest       | `1.31.x` | `amd64`, `arm64`                  |
 | `2.20-awskops1.31`       | master       | **`2.20.x`** | `1.31.x` | `amd64`, `arm64`                  |
@@ -257,9 +233,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awskops1.31`       | master       | **`2.15.x`** | `1.31.x` | `amd64`, `arm64`                  |
 | `2.14-awskops1.31`       | master       | **`2.14.x`** | `1.31.x` | `amd64`, `arm64`                  |
 | `2.13-awskops1.31`       | master       | **`2.13.x`** | `1.31.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.31`       | master       | **`2.12.x`** | `1.31.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.31`       | master       | **`2.11.x`** | `1.31.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.31`       | master       | **`2.10.x`** | `1.31.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awskops1.30`** | master       | latest       | `1.30.x` | `amd64`, `arm64`                  |
 | `2.20-awskops1.30`       | master       | **`2.20.x`** | `1.30.x` | `amd64`, `arm64`                  |
@@ -270,9 +243,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awskops1.30`       | master       | **`2.15.x`** | `1.30.x` | `amd64`, `arm64`                  |
 | `2.14-awskops1.30`       | master       | **`2.14.x`** | `1.30.x` | `amd64`, `arm64`                  |
 | `2.13-awskops1.30`       | master       | **`2.13.x`** | `1.30.x` | `amd64`, `arm64`                  |
-| `2.12-awskops1.30`       | master       | **`2.12.x`** | `1.30.x` | `amd64`, `arm64`                  |
-| `2.11-awskops1.30`       | master       | **`2.11.x`** | `1.30.x` | `amd64`, `arm64`                  |
-| `2.10-awskops1.30`       | master       | **`2.10.x`** | `1.30.x` | `amd64`, `arm64`                  |
 
 
 ### Ansible awshelm
@@ -292,9 +262,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.20`       | master       | **`2.15.x`** | `3.20.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.20`       | master       | **`2.14.x`** | `3.20.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.20`       | master       | **`2.13.x`** | `3.20.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.20`       | master       | **`2.12.x`** | `3.20.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.20`       | master       | **`2.11.x`** | `3.20.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.20`       | master       | **`2.10.x`** | `3.20.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.19`** | master       | latest       | `3.19.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.19`       | master       | **`2.20.x`** | `3.19.x` | `amd64`, `arm64`                  |
@@ -305,9 +272,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.19`       | master       | **`2.15.x`** | `3.19.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.19`       | master       | **`2.14.x`** | `3.19.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.19`       | master       | **`2.13.x`** | `3.19.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.19`       | master       | **`2.12.x`** | `3.19.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.19`       | master       | **`2.11.x`** | `3.19.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.19`       | master       | **`2.10.x`** | `3.19.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.18`** | master       | latest       | `3.18.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.18`       | master       | **`2.20.x`** | `3.18.x` | `amd64`, `arm64`                  |
@@ -318,9 +282,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.18`       | master       | **`2.15.x`** | `3.18.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.18`       | master       | **`2.14.x`** | `3.18.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.18`       | master       | **`2.13.x`** | `3.18.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.18`       | master       | **`2.12.x`** | `3.18.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.18`       | master       | **`2.11.x`** | `3.18.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.18`       | master       | **`2.10.x`** | `3.18.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.17`** | master       | latest       | `3.17.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.17`       | master       | **`2.20.x`** | `3.17.x` | `amd64`, `arm64`                  |
@@ -331,9 +292,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.17`       | master       | **`2.15.x`** | `3.17.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.17`       | master       | **`2.14.x`** | `3.17.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.17`       | master       | **`2.13.x`** | `3.17.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.17`       | master       | **`2.12.x`** | `3.17.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.17`       | master       | **`2.11.x`** | `3.17.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.17`       | master       | **`2.10.x`** | `3.17.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.16`** | master       | latest       | `3.16.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.16`       | master       | **`2.20.x`** | `3.16.x` | `amd64`, `arm64`                  |
@@ -344,9 +302,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.16`       | master       | **`2.15.x`** | `3.16.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.16`       | master       | **`2.14.x`** | `3.16.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.16`       | master       | **`2.13.x`** | `3.16.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.16`       | master       | **`2.12.x`** | `3.16.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.16`       | master       | **`2.11.x`** | `3.16.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.16`       | master       | **`2.10.x`** | `3.16.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.15`** | master       | latest       | `3.15.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.15`       | master       | **`2.20.x`** | `3.15.x` | `amd64`, `arm64`                  |
@@ -357,9 +312,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.15`       | master       | **`2.15.x`** | `3.15.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.15`       | master       | **`2.14.x`** | `3.15.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.15`       | master       | **`2.13.x`** | `3.15.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.15`       | master       | **`2.12.x`** | `3.15.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.15`       | master       | **`2.11.x`** | `3.15.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.15`       | master       | **`2.10.x`** | `3.15.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.14`** | master       | latest       | `3.14.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.14`       | master       | **`2.20.x`** | `3.14.x` | `amd64`, `arm64`                  |
@@ -370,9 +322,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.14`       | master       | **`2.15.x`** | `3.14.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.14`       | master       | **`2.14.x`** | `3.14.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.14`       | master       | **`2.13.x`** | `3.14.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.14`       | master       | **`2.12.x`** | `3.14.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.14`       | master       | **`2.11.x`** | `3.14.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.14`       | master       | **`2.10.x`** | `3.14.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.13`** | master       | latest       | `3.13.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.13`       | master       | **`2.20.x`** | `3.13.x` | `amd64`, `arm64`                  |
@@ -383,9 +332,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.13`       | master       | **`2.15.x`** | `3.13.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.13`       | master       | **`2.14.x`** | `3.13.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.13`       | master       | **`2.13.x`** | `3.13.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.13`       | master       | **`2.12.x`** | `3.13.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.13`       | master       | **`2.11.x`** | `3.13.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.13`       | master       | **`2.10.x`** | `3.13.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.12`** | master       | latest       | `3.12.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.12`       | master       | **`2.20.x`** | `3.12.x` | `amd64`, `arm64`                  |
@@ -396,9 +342,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.12`       | master       | **`2.15.x`** | `3.12.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.12`       | master       | **`2.14.x`** | `3.12.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.12`       | master       | **`2.13.x`** | `3.12.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.12`       | master       | **`2.12.x`** | `3.12.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.12`       | master       | **`2.11.x`** | `3.12.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.12`       | master       | **`2.10.x`** | `3.12.x` | `amd64`, `arm64`                  |
 |                          |              |              |          |                                   |
 | **`latest-awshelm3.11`** | master       | latest       | `3.11.x` | `amd64`, `arm64`                  |
 | `2.20-awshelm3.11`       | master       | **`2.20.x`** | `3.11.x` | `amd64`, `arm64`                  |
@@ -409,9 +352,6 @@ The following Ansible Docker images contain everything from `Ansible awsk8s` and
 | `2.15-awshelm3.11`       | master       | **`2.15.x`** | `3.11.x` | `amd64`, `arm64`                  |
 | `2.14-awshelm3.11`       | master       | **`2.14.x`** | `3.11.x` | `amd64`, `arm64`                  |
 | `2.13-awshelm3.11`       | master       | **`2.13.x`** | `3.11.x` | `amd64`, `arm64`                  |
-| `2.12-awshelm3.11`       | master       | **`2.12.x`** | `3.11.x` | `amd64`, `arm64`                  |
-| `2.11-awshelm3.11`       | master       | **`2.11.x`** | `3.11.x` | `amd64`, `arm64`                  |
-| `2.10-awshelm3.11`       | master       | **`2.10.x`** | `3.11.x` | `amd64`, `arm64`                  |
 
 
 ## :new: Point in time releases
