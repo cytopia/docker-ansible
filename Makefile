@@ -63,14 +63,14 @@ help:
 	@echo "build   [VERSION=] [ARCH=] [KOPS=] [HELM=]        Build Docker image"
 	@echo "rebuild [VERSION=] [ARCH=] [KOPS=] [HELM=]        Build Docker image without cache"
 	@echo
-	@echo "    make build VERSION=2.3"
-	@echo "    make build VERSION=2.3 STAGE=tools"
-	@echo "    make build VERSION=2.3 STAGE=infra"
-	@echo "    make build VERSION=2.3 STAGE=azure"
-	@echo "    make build VERSION=2.3 STAGE=aws"
-	@echo "    make build VERSION=2.3 STAGE=awsk8s"
-	@echo "    make build VERSION=2.3 STAGE=awshelm HELM=2.11"
-	@echo "    make build VERSION=2.3 STAGE=awskops KOPS=1.15"
+	@echo "    make build VERSION=2.20"
+	@echo "    make build VERSION=2.20 STAGE=tools"
+	@echo "    make build VERSION=2.20 STAGE=infra"
+	@echo "    make build VERSION=2.20 STAGE=azure"
+	@echo "    make build VERSION=2.20 STAGE=aws"
+	@echo "    make build VERSION=2.20 STAGE=awsk8s"
+	@echo "    make build VERSION=2.20 STAGE=awshelm HELM=3.20"
+	@echo "    make build VERSION=2.20 STAGE=awskops KOPS=1.34"
 	@echo
 	@echo "--------------------------------------------------------------------------------"
 	@echo " Test Targets"
@@ -78,14 +78,14 @@ help:
 	@echo
 	@echo "test [VERSION=] [ARCH=] [KOPS=] [HELM=]           Test built Docker image"
 	@echo
-	@echo "    make test VERSION=2.3"
-	@echo "    make test VERSION=2.3 STAGE=tools"
-	@echo "    make test VERSION=2.3 STAGE=infra"
-	@echo "    make test VERSION=2.3 STAGE=azure"
-	@echo "    make test VERSION=2.3 STAGE=aws"
-	@echo "    make test VERSION=2.3 STAGE=awsk8s"
-	@echo "    make test VERSION=2.3 STAGE=awshelm HELM=2.11"
-	@echo "    make test VERSION=2.3 STAGE=awskops KOPS=1.15"
+	@echo "    make test VERSION=2.20"
+	@echo "    make test VERSION=2.20 STAGE=tools"
+	@echo "    make test VERSION=2.20 STAGE=infra"
+	@echo "    make test VERSION=2.20 STAGE=azure"
+	@echo "    make test VERSION=2.20 STAGE=aws"
+	@echo "    make test VERSION=2.20 STAGE=awsk8s"
+	@echo "    make test VERSION=2.20 STAGE=awshelm HELM=3.20"
+	@echo "    make test VERSION=2.20 STAGE=awskops KOPS=1.34"
 	@echo
 	@echo "--------------------------------------------------------------------------------"
 	@echo " Tagging Target"
@@ -93,14 +93,14 @@ help:
 	@echo
 	@echo "tag [VERSION=] [ARCH=] [KOPS=] [HELM=] [TAG=]     Tag built Docker image"
 	@echo
-	@echo "    make tag VERSION=2.3 TAG=2.3-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGE=tools TAG=2.3-tools-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGE=infra TAG=2.3-infra-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGE=azure TAG=2.3-azure-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGE=aws TAG=2.3-aws-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGE=awsk8s TAG=2.3-awsk8s-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGE=awshelm HELM=2.11 TAG=2.3-awshelm-mysuffix"
-	@echo "    make tag VERSION=2.3 STAGE=awskops KOPS=1.15 TAG=2.3-awskops-mysuffix"
+	@echo "    make tag VERSION=2.20 TAG=2.20-mysuffix"
+	@echo "    make tag VERSION=2.20 STAGE=tools TAG=2.20-tools-mysuffix"
+	@echo "    make tag VERSION=2.20 STAGE=infra TAG=2.20-infra-mysuffix"
+	@echo "    make tag VERSION=2.20 STAGE=azure TAG=2.20-azure-mysuffix"
+	@echo "    make tag VERSION=2.20 STAGE=aws TAG=2.20-aws-mysuffix"
+	@echo "    make tag VERSION=2.20 STAGE=awsk8s TAG=2.20-awsk8s-mysuffix"
+	@echo "    make tag VERSION=2.20 STAGE=awshelm HELM=3.20 TAG=2.20-awshelm-mysuffix"
+	@echo "    make tag VERSION=2.20 STAGE=awskops KOPS=1.34 TAG=2.20-awskops-mysuffix"
 
 
 # -------------------------------------------------------------------------------------------------

@@ -71,8 +71,8 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} azure"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} azure"
 
-COPY --from=builder /usr/lib/python3.12/site-packages/ /usr/lib/python3.12/site-packages/
-COPY --from=builder /usr/bin/az /usr/bin/az
+# Copy venv with ansible and all python deps
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]

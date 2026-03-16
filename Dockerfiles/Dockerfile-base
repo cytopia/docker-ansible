@@ -3,9 +3,12 @@
 # --------------------------------------------------------------------------------------------------
 FROM alpine:3.23 AS builder
 
+# Install into a venv to avoid PEP 668 / externally-managed system python limitations
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
 RUN set -eux \
 	&& apk add --update --no-cache \
-		# build tools
 		coreutils \
 		g++ \
 		gcc \
@@ -13,25 +16,27 @@ RUN set -eux \
 		musl-dev \
 		openssl-dev \
 		python3-dev \
-		# misc tools
 		bc \
 		libffi-dev \
 		libxml2-dev \
 		libxslt-dev \
 		py3-pip \
 		python3 \
-# Fix: ansible --version: libyaml = True
-# https://www.jeffgeerling.com/blog/2021/ansible-might-be-running-slow-if-libyaml-not-available
+	\
+	# Fix: ansible --version: libyaml = True \
+	# https://www.jeffgeerling.com/blog/2021/ansible-might-be-running-slow-if-libyaml-not-available \
 	&& apk add --update --no-cache \
 		py3-yaml \
-	&& python3 -c 'import _yaml'
+	&& python3 -c 'import _yaml' \
+	&& python3 -m venv "${VIRTUAL_ENV}" \
+	&& python3 -m pip install --no-cache-dir --no-compile --upgrade pip
 
 # Pip required tools
 RUN set -eux \
-	&& pip3 install --no-cache-dir --no-compile --ignore-installed \
+	&& python3 -m pip install --no-cache-dir --no-compile --ignore-installed \
 		wheel
 RUN set -eux \
-	&& pip3 install --no-cache-dir --no-compile \
+	&& python3 -m pip install --no-cache-dir --no-compile \
 		Jinja2 \
 		MarkupSafe \
 		PyNaCl \
@@ -46,41 +51,41 @@ RUN set -eux \
 	&& MINOR_VERSION="$( echo "${VERSION}" | awk -F'.' '{print $2}' )" \
 	\
 	&& if [ "${VERSION}" = "latest" ]; then \
-		pip3 install --no-cache-dir --no-compile ansible; \
-    # Ansible added a weired versioning system with ansible-core and ansible packages:
-    # https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html#ansible-community-changelogs
-	elif [ "${VERSION}" = "2.13" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=6.0; \
+		python3 -m pip install --no-cache-dir --no-compile ansible; \
+	# Ansible added a weired versioning system with ansible-core and ansible packages: \
+	# https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html#ansible-community-changelogs \
+	elif [ "${VERSION}" = "2.13" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=6.0; \
 	\
-	elif [ "${VERSION}" = "2.14" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=7.0; \
+	elif [ "${VERSION}" = "2.14" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=7.0; \
 	\
-	elif [ "${VERSION}" = "2.15" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=8.0; \
+	elif [ "${VERSION}" = "2.15" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=8.0; \
 	\
-	elif [ "${VERSION}" = "2.16" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=9.0; \
+	elif [ "${VERSION}" = "2.16" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=9.0; \
 	\
-	elif [ "${VERSION}" = "2.17" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=10.0; \
+	elif [ "${VERSION}" = "2.17" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=10.0; \
 	\
-	elif [ "${VERSION}" = "2.18" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=11.0; \
+	elif [ "${VERSION}" = "2.18" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=11.0; \
 	\
-	elif [ "${VERSION}" = "2.19" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=12.0; \
+	elif [ "${VERSION}" = "2.19" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=12.0; \
 	\
-	elif [ "${VERSION}" = "2.20" ]; then\
-		pip3 install --no-cache-dir --no-binary pyyaml ansible~=13.0; \
+	elif [ "${VERSION}" = "2.20" ]; then \
+		python3 -m pip install --no-cache-dir --no-binary pyyaml ansible~=13.0; \
 	\
 	else \
 		fail; \
 	fi \
 	\
 	&& if [ "${VERSION}" != "latest" ]; then \
-		ansible --version | grep ^ansible | grep -E "${VERSION}\.[0-9]+" \
-		&& ansible-playbook --version | grep ^ansible | grep -E "${VERSION}\.[0-9]+" \
-		&& ansible-galaxy --version | grep ^ansible | grep -E "${VERSION}\.[0-9]+"; \
+		ansible --version | grep ^ansible | grep -E "${VERSION}\\.[0-9]+" \
+		&& ansible-playbook --version | grep ^ansible | grep -E "${VERSION}\\.[0-9]+" \
+		&& ansible-galaxy --version | grep ^ansible | grep -E "${VERSION}\\.[0-9]+"; \
 	fi \
 	\
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
@@ -88,7 +93,7 @@ RUN set -eux \
 
 # Python packages (copied to final image)
 RUN set -eux \
-	&& pip3 install --no-cache-dir --no-compile \
+	&& python3 -m pip install --no-cache-dir --no-compile \
 		junit-xml \
 		lxml \
 		paramiko \
@@ -97,7 +102,7 @@ RUN set -eux \
 
 # Clean-up some site-packages to safe space
 RUN set -eux \
-	&& pip3 uninstall --yes \
+	&& python3 -m pip uninstall --yes \
 		setuptools \
 		wheel \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
@@ -109,10 +114,10 @@ RUN set -eux \
 # --------------------------------------------------------------------------------------------------
 FROM alpine:3.23 AS production
 ARG VERSION
-# https://github.com/opencontainers/image-spec/blob/master/annotations.md
-#LABEL "org.opencontainers.image.created"=""
-#LABEL "org.opencontainers.image.version"=""
-#LABEL "org.opencontainers.image.revision"=""
+
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
 LABEL "maintainer"="cytopia <cytopia@everythingcli.org>"
 LABEL "org.opencontainers.image.authors"="cytopia <cytopia@everythingcli.org>"
 LABEL "org.opencontainers.image.vendor"="cytopia"
@@ -126,19 +131,19 @@ LABEL "org.opencontainers.image.description"="Ansible ${VERSION} base"
 
 RUN set -eux \
 	&& apk add --no-cache \
-# Issue: #85 libgcc required for ansible-vault
+	\
+	# Issue: #85 libgcc required for ansible-vault \
 		libgcc \
-		py3-pip \
 		python3 \
-# Issue: #76 yaml required for 'libyaml = True' (faster startup time)
+	# Issue: #76 yaml required for 'libyaml = True' (faster startup time) \
 		yaml \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf \
 	\
 	&& ln -sf /usr/bin/python3 /usr/bin/python
 
-COPY --from=builder /usr/lib/python3.12/site-packages/ /usr/lib/python3.12/site-packages/
-COPY --from=builder /usr/bin/ansible* /usr/bin/
+# Copy venv with ansible and all python deps
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 # Pre-compile Python for better performance
 RUN set -eux \
