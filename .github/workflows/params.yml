@@ -42,7 +42,7 @@ env:
           "3.14",
           "3.13",
           "3.12",
-          "3.11",
+          "3.11"
         ],
         "FLAVOUR": ["default"],
         "ARCH":    ["linux/amd64", "linux/arm64"]

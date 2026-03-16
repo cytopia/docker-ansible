@@ -477,14 +477,14 @@ test-binaries:
 	@echo "################################################################################"
 	@echo "# Testing correct Binaries"
 	@echo "################################################################################"
-	@echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) find /usr/bin/ -type f | sed 's|/usr/bin/||g'"
+	@echo "docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) sh -c 'find /usr/bin /opt/venv/bin -maxdepth 1 -type f -exec basename {} \\; | sort -u'"
 	@\
 	\
 	\
-	BINS="$$( docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) find /usr/bin/ -type f | sed 's|/usr/bin/||g' )"; \
+	BINS="$$( docker run --rm --platform $(ARCH) $(IMAGE):$(DOCKER_TAG) sh -c 'find /usr/bin /opt/venv/bin -maxdepth 1 -type f -exec basename {} \; | sort -u' q)"; \
 	\
 	\
-	REQUIRED_BASE="python"; \
+	REQUIRED_BASE="python3.12"; \
 	REQUIRED_TOOLS="git gpg jq yq ssh"; \
 	REQUIRED_INFRA="rsync"; \
 	REQUIRED_AZURE="az"; \
