@@ -26,11 +26,9 @@ RUN set -eux \
 # Python packages (copied to final image)
 RUN set -eux \
 	&& pip3 install --no-cache-dir --no-compile \
-		awscli \
 		botocore \
 		boto \
 		boto3 \
-	&& aws --version 2>&1 | grep -E '^aws-cli/[.0-9]+' \
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
@@ -45,8 +43,8 @@ RUN set -eux \
 	else \
 		fail; \
 	fi \
-	&& curl -OL https://golang.org/dl/go1.25.0.linux-${ARCH}.tar.gz \
-	&& tar -C /usr/local -xzf go1.25.0.linux-${ARCH}.tar.gz \
+	&& curl -OL https://golang.org/dl/go1.26.1.linux-${ARCH}.tar.gz \
+	&& tar -C /usr/local -xzf go1.26.1.linux-${ARCH}.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/local/bin/go \
 	&& rm -rf /usr/bin/go
 
@@ -97,8 +95,13 @@ LABEL "org.opencontainers.image.ref.name"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.title"="Ansible ${VERSION} aws"
 LABEL "org.opencontainers.image.description"="Ansible ${VERSION} aws"
 
-COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
-COPY --from=builder /usr/bin/aws /usr/bin/aws
+# Additional binaries
+RUN set -eux \
+	&& apk add --no-cache \
+		aws-cli
+
+# Copy venv with ansible and all python deps
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY --from=builder /usr/bin/aws-iam-authenticator /usr/bin/aws-iam-authenticator
 
 WORKDIR /data

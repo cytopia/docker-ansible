@@ -71,7 +71,8 @@ RUN set -eux \
 		rsync \
 		sshpass
 
-COPY --from=builder /usr/lib/python3.10/site-packages/ /usr/lib/python3.10/site-packages/
+# Copy venv with ansible and all python deps
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /data
 ENTRYPOINT ["/docker-entrypoint.sh"]
