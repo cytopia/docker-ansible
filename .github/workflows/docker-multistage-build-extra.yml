@@ -109,7 +109,7 @@ jobs:
 
       - name: "[SETUP] Determine Docker tag"
         id: tag
-        uses: cytopia/docker-tag-action@v0.4.22
+        uses: cytopia/docker-tag-action@v0.4.26
 
       # https://github.com/alpinelinux/docker-alpine/issues/98
       - name: "[SETUP] Fix Docker IP forwarding"
