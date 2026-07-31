@@ -77,13 +77,13 @@ jobs:
       # Setup repository
       # ------------------------------------------------------------
       - name: "[SETUP] Checkout repository (current)"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
         if: ${{ !inputs.has_refs }}
 
       - name: "[SETUP] Checkout repository (ref: ${{ matrix.REFS }})"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ matrix.REFS }}
@@ -174,7 +174,7 @@ jobs:
             make tag VERSION="${{ matrix.VERSION }}" STAGE=${{ inputs.stage }} FLAVOUR=${{ matrix.FLAVOUR }} TAG=${{ steps.tag.outputs.docker-tag }} ${{ inputs.extra_make_var_name }}=${{ matrix.EXTRA }}
 
       - name: Docker login
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.5.2
         with:
           username: ${{ secrets.dockerhub_username }}
           password: ${{ secrets.dockerhub_password }}
